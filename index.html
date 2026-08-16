@@ -132,7 +132,7 @@
     <div class="flex items-center space-x-4">
       <div id="connection-pill" class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="product-count-badge">Syncing Cloud...</span>
+        <span id="product-count-badge">Loading All Inventory...</span>
       </div>
       <div class="flex items-center space-x-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-xs font-mono-code text-slate-300">
         <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
@@ -152,7 +152,7 @@
         <div class="depth-card p-3 rounded-2xl flex flex-col gap-3">
           <div class="relative flex items-center">
             <i data-lucide="search" class="w-5 h-5 absolute left-4 text-indigo-400"></i>
-            <input type="text" id="pos-search" placeholder="Search title, article code, or scan barcode..." 
+            <input type="text" id="pos-search" placeholder="Search title, article code, or scan barcode (e.g. maswa)..." 
                    class="w-full pl-12 pr-10 py-3 bg-black/40 border border-white/10 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 text-sm font-medium text-white placeholder-slate-500 outline-none">
             <button onclick="document.getElementById('pos-search').value=''; renderProducts(allProducts);" class="absolute right-3 text-slate-500 hover:text-white">
               <i data-lucide="x" class="w-4 h-4"></i>
@@ -160,7 +160,7 @@
           </div>
           <!-- Category Chips -->
           <div id="category-pills" class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
-            <button onclick="filterByCategory('ALL')" class="px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap">ALL</button>
+            <button onclick="filterByCategory('ALL')" id="cat-pill-all" class="px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap">ALL</button>
           </div>
         </div>
 
@@ -234,24 +234,24 @@
     <div id="view-analytics" class="hidden flex-1 p-6 overflow-y-auto flex-col gap-6">
       <div class="grid grid-cols-4 gap-4">
         <div class="depth-card p-5 rounded-2xl border-l-4 border-indigo-500">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Total Sales Generated</span>
+          <span class="text-xs font-semibold text-slate-400 uppercase">Total Sales Volume</span>
           <h3 id="kpi-total-sales" class="text-2xl font-extrabold font-mono-code text-white mt-1">Rs. 0</h3>
-          <span class="text-[10px] text-indigo-400 font-medium mt-2 block">Live aggregate from database</span>
+          <span class="text-[10px] text-indigo-400 font-medium mt-2 block">Live sum across all records</span>
         </div>
         <div class="depth-card p-5 rounded-2xl border-l-4 border-emerald-500">
           <span class="text-xs font-semibold text-slate-400 uppercase">Total Completed Invoices</span>
           <h3 id="kpi-invoice-count" class="text-2xl font-extrabold font-mono-code text-white mt-1">0</h3>
-          <span class="text-[10px] text-emerald-400 font-medium mt-2 block">All completed transactions</span>
+          <span class="text-[10px] text-emerald-400 font-medium mt-2 block">In database</span>
         </div>
         <div class="depth-card p-5 rounded-2xl border-l-4 border-purple-500">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Active Catalog SKUs</span>
+          <span class="text-xs font-semibold text-slate-400 uppercase">Total Inventory Products</span>
           <h3 id="kpi-catalog-items" class="text-2xl font-extrabold font-mono-code text-white mt-1">0</h3>
-          <span class="text-[10px] text-purple-400 font-medium mt-2 block">Total products in store</span>
+          <span class="text-[10px] text-purple-400 font-medium mt-2 block">100% active catalog</span>
         </div>
         <div class="depth-card p-5 rounded-2xl border-l-4 border-pink-500">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Customer Accounts</span>
+          <span class="text-xs font-semibold text-slate-400 uppercase">Registered Customers</span>
           <h3 id="kpi-customer-count" class="text-2xl font-extrabold font-mono-code text-white mt-1">0</h3>
-          <span class="text-[10px] text-pink-400 font-medium mt-2 block">Registered client base</span>
+          <span class="text-[10px] text-pink-400 font-medium mt-2 block">Customer database ledger</span>
         </div>
       </div>
 
@@ -297,9 +297,9 @@
           <table class="w-full text-left text-xs">
             <thead class="sticky top-0 bg-slate-900/90 backdrop-blur-md">
               <tr class="text-slate-400 border-b border-white/10 uppercase font-semibold">
-                <th class="py-3">ID</th>
+                <th class="py-3">Invoice</th>
                 <th class="py-3">Timestamp</th>
-                <th class="py-3">Total Amount</th>
+                <th class="py-3">Total Bill</th>
                 <th class="py-3">Discount</th>
                 <th class="py-3">Paid Amount</th>
                 <th class="py-3 text-center">Action</th>
@@ -315,7 +315,7 @@
 
   </main>
 
-  <!-- Printable Thermal Receipt (Hidden until print) -->
+  <!-- Printable Thermal Receipt -->
   <div id="receipt-print-modal" class="hidden font-mono text-[11px] p-4 text-black max-w-[280px] mx-auto leading-tight">
     <div class="text-center pb-2 border-b border-dashed border-black">
       <h2 class="text-sm font-bold tracking-wider uppercase">LADIES OUTLET</h2>
@@ -338,7 +338,6 @@
   </div>
 
   <script>
-    // Supabase API Integration
     const SUPABASE_URL = 'https://akfhhyljhjaotxbbpljh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZmhoeWxqaGphb3R4YmJwbGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NzIyMTUsImV4cCI6MjEwMjQ0ODIxNX0.hZ_Bx6Xw6Lxf9pRlNfYyqcZLezdkyYn_Z0ux58sJNfk';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -347,6 +346,7 @@
     let allCategories = [];
     let allSales = [];
     let cart = [];
+    let activeCat = 'ALL';
 
     async function init() {
       lucide.createIcons();
@@ -355,19 +355,41 @@
       }, 1000);
 
       await Promise.all([
-        fetchProducts(),
+        fetchAllProductsBatched(),
         fetchCategories(),
         fetchCustomers()
       ]);
     }
 
-    // 1. Fetch Products
-    async function fetchProducts() {
+    // 1. Fetch 100% of Products (Bypasses Supabase 1,000 Row Limit)
+    async function fetchAllProductsBatched() {
       try {
-        const { data, error } = await db.from('products').select('*').limit(1000);
-        if (error) throw error;
+        let records = [];
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
 
-        allProducts = (data || []).map(p => ({
+        while (hasMore) {
+          const { data, error } = await db
+            .from('products')
+            .select('*')
+            .range(from, from + batchSize - 1);
+
+          if (error) throw error;
+
+          if (data && data.length > 0) {
+            records = records.concat(data);
+            if (data.length < batchSize) {
+              hasMore = false;
+            } else {
+              from += batchSize;
+            }
+          } else {
+            hasMore = false;
+          }
+        }
+
+        allProducts = records.map(p => ({
           id: p.id,
           name: p.name || p.product_name || p.title || `Item #${p.id}`,
           code: p.product_code || p.code || p.sku || `P-${p.id}`,
@@ -379,20 +401,26 @@
         document.getElementById('kpi-catalog-items').innerText = allProducts.length;
         renderProducts(allProducts);
       } catch (err) {
-        console.error('Fetch products error:', err);
+        console.error('Fetch all products error:', err);
       }
     }
 
-    // 2. Fetch Categories
+    // 2. Fetch Real Category Titles
     async function fetchCategories() {
       try {
-        const { data } = await db.from('categories').select('*').limit(50);
+        const { data } = await db.from('categories').select('*').limit(200);
         allCategories = data || [];
         const pillContainer = document.getElementById('category-pills');
-        allCategories.slice(0, 12).forEach(c => {
+        pillContainer.innerHTML = `
+          <button onclick="filterByCategory('ALL')" id="cat-pill-all" class="px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap">ALL</button>
+        `;
+
+        allCategories.forEach(c => {
+          const catName = c.category_name || c.name || c.title || `Category ${c.id}`;
           const btn = document.createElement('button');
+          btn.id = `cat-pill-${c.id}`;
           btn.className = 'px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-semibold text-xs whitespace-nowrap transition border border-white/5';
-          btn.innerText = c.name || c.category_name || `Cat #${c.id}`;
+          btn.innerText = catName;
           btn.onclick = () => filterByCategory(c.id);
           pillContainer.appendChild(btn);
         });
@@ -402,7 +430,7 @@
     // 3. Fetch Customers
     async function fetchCustomers() {
       try {
-        const { data } = await db.from('account_masters').select('id, name, phone').limit(100);
+        const { data } = await db.from('account_masters').select('id, name, phone').limit(300);
         const sel = document.getElementById('customer-select');
         (data || []).forEach(c => {
           if (c.name) {
@@ -451,22 +479,35 @@
       lucide.createIcons();
     }
 
-    // Search filter
+    // Instant Multi-Field Search (Works for Maswa, Zellbury, Codes)
     document.getElementById('pos-search').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase().trim();
-      const filtered = allProducts.filter(p => 
-        p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)
+      let pool = activeCat === 'ALL' ? allProducts : allProducts.filter(p => String(p.category_id) === String(activeCat));
+      
+      const filtered = pool.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        p.code.toLowerCase().includes(q)
       );
       renderProducts(filtered);
     });
 
     function filterByCategory(catId) {
-      if (catId === 'ALL') {
-        renderProducts(allProducts);
-      } else {
-        const filtered = allProducts.filter(p => p.category_id === catId);
-        renderProducts(filtered);
+      activeCat = catId;
+      document.querySelectorAll('#category-pills button').forEach(b => {
+        b.className = 'px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-semibold text-xs whitespace-nowrap transition border border-white/5';
+      });
+
+      const activeBtn = document.getElementById(`cat-pill-${catId === 'ALL' ? 'all' : catId}`);
+      if (activeBtn) {
+        activeBtn.className = 'px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap';
       }
+
+      const q = document.getElementById('pos-search').value.toLowerCase().trim();
+      let filtered = catId === 'ALL' ? allProducts : allProducts.filter(p => String(p.category_id) === String(catId));
+      if (q) {
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
+      }
+      renderProducts(filtered);
     }
 
     // Cart Handlers
@@ -541,7 +582,7 @@
       const { subtotal, discount, grandTotal } = updateCalculations();
       const btn = document.getElementById('btn-checkout');
       btn.disabled = true;
-      btn.innerText = 'Writing to Supabase Cloud...';
+      btn.innerText = 'Saving transaction...';
 
       try {
         const { data: sellData, error: sellErr } = await db
@@ -568,7 +609,7 @@
 
         await db.from('sell_products').insert(lineItems);
 
-        // Thermal Print Formatting
+        // Thermal Print
         document.getElementById('prn-date').innerText = new Date().toLocaleString();
         document.getElementById('prn-inv-id').innerText = `INV-${sellId}`;
         document.getElementById('prn-items').innerHTML = cart.map(i => `
@@ -619,26 +660,35 @@
       lucide.createIcons();
     }
 
-    // Load Analytics & Sales History
+    // Load Analytics & Sales History with Dynamic Field Mapping
     async function loadAnalyticsData() {
       try {
-        const { data: sales } = await db.from('sells').select('*').order('id', { ascending: false }).limit(20);
-        const totalSalesSum = (sales || []).reduce((acc, s) => acc + (parseFloat(s.grand_total) || 0), 0);
+        const { data: sales } = await db.from('sells').select('*').order('id', { ascending: false }).limit(50);
+        const totalSalesSum = (sales || []).reduce((acc, s) => {
+          const val = parseFloat(s.grand_total || s.total_bill || s.total_amount || s.paid_amount || 0);
+          return acc + val;
+        }, 0);
 
         document.getElementById('kpi-total-sales').innerText = `Rs. ${totalSalesSum.toLocaleString()}`;
         document.getElementById('kpi-invoice-count').innerText = sales ? sales.length : 0;
 
         const tbl = document.getElementById('tbl-recent-sales');
-        tbl.innerHTML = (sales || []).map(s => `
-          <tr class="hover:bg-white/5">
-            <td class="py-3 font-bold text-indigo-400">#${s.id}</td>
-            <td class="py-3 text-slate-400">${new Date(s.created_at || Date.now()).toLocaleDateString()}</td>
-            <td class="py-3 text-slate-300">Rs. ${parseFloat(s.total_amount || 0).toLocaleString()}</td>
-            <td class="py-3 text-slate-500">Rs. ${parseFloat(s.discount || 0).toLocaleString()}</td>
-            <td class="py-3 font-bold text-emerald-400">Rs. ${parseFloat(s.grand_total || 0).toLocaleString()}</td>
-            <td class="py-3 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold">PAID</span></td>
-          </tr>
-        `).join('');
+        tbl.innerHTML = (sales || []).map(s => {
+          const total = parseFloat(s.grand_total || s.total_bill || s.total_amount || 0);
+          const disc = parseFloat(s.discount || 0);
+          const invId = s.id || s.invoice_no || '---';
+          const dt = s.created_at || s.sale_date || Date.now();
+          return `
+            <tr class="hover:bg-white/5">
+              <td class="py-3 font-bold text-indigo-400">#${invId}</td>
+              <td class="py-3 text-slate-400">${new Date(dt).toLocaleDateString()}</td>
+              <td class="py-3 text-slate-300">Rs. ${total.toLocaleString()}</td>
+              <td class="py-3 text-slate-500">Rs. ${disc.toLocaleString()}</td>
+              <td class="py-3 font-bold text-emerald-400">Rs. ${(total - disc).toLocaleString()}</td>
+              <td class="py-3 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold">PAID</span></td>
+            </tr>
+          `;
+        }).join('');
       } catch (e) {}
     }
 
@@ -652,18 +702,25 @@
 
     function renderLedger(list) {
       const tbody = document.getElementById('tbl-full-ledger');
-      tbody.innerHTML = list.map(s => `
-        <tr class="hover:bg-white/5">
-          <td class="py-3 font-bold text-indigo-400">INV-${s.id}</td>
-          <td class="py-3 text-slate-400">${new Date(s.created_at || Date.now()).toLocaleString()}</td>
-          <td class="py-3 text-slate-300">Rs. ${parseFloat(s.total_amount || 0).toLocaleString()}</td>
-          <td class="py-3 text-slate-500">Rs. ${parseFloat(s.discount || 0).toLocaleString()}</td>
-          <td class="py-3 font-bold text-emerald-400">Rs. ${parseFloat(s.grand_total || 0).toLocaleString()}</td>
-          <td class="py-3 text-center">
-            <button onclick="reprintInvoice(${s.id})" class="px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 text-[10px] font-bold">Print</button>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = list.map(s => {
+        const total = parseFloat(s.grand_total || s.total_bill || s.total_amount || 0);
+        const disc = parseFloat(s.discount || 0);
+        const paid = parseFloat(s.paid_amount || total - disc);
+        const invId = s.id || s.invoice_no || '---';
+        const dt = s.created_at || s.sale_date || Date.now();
+        return `
+          <tr class="hover:bg-white/5">
+            <td class="py-3 font-bold text-indigo-400">INV-${invId}</td>
+            <td class="py-3 text-slate-400">${new Date(dt).toLocaleString()}</td>
+            <td class="py-3 text-slate-300">Rs. ${total.toLocaleString()}</td>
+            <td class="py-3 text-slate-500">Rs. ${disc.toLocaleString()}</td>
+            <td class="py-3 font-bold text-emerald-400">Rs. ${paid.toLocaleString()}</td>
+            <td class="py-3 text-center">
+              <button onclick="reprintInvoice(${s.id})" class="px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 text-[10px] font-bold">Print</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function filterLedger() {

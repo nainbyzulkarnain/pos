@@ -92,8 +92,8 @@
 
     @media print {
       body * { visibility: hidden; }
-      #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area *, #print-export-area, #print-export-area * { visibility: visible; }
-      #receipt-print-modal, #barcode-print-area, #print-export-area { position: absolute; left: 0; top: 0; width: 100%; }
+      #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area * { visibility: visible; }
+      #receipt-print-modal, #barcode-print-area { position: absolute; left: 0; top: 0; width: 100%; }
     }
   </style>
 </head>
@@ -344,7 +344,7 @@
             <i data-lucide="menu" class="w-5 h-5"></i>
           </button>
           <span class="hidden sm:inline text-xs font-bold text-slate-400 uppercase tracking-widest">Active Workspace:</span>
-          <span id="current-view-title" class="px-2.5 sm:px-3 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-bold text-xs truncate max-w-[180px] sm:max-w-none">
+          <span id="current-view-title" class="px-2.5 sm:px-3 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-bold text-xs truncate max-w-[200px] sm:max-w-none">
             1. Dashboard Overview
           </span>
         </div>
@@ -546,7 +546,7 @@
 
           <div class="depth-card rounded-2xl overflow-hidden">
             <div class="overflow-x-auto max-h-[70vh]">
-              <table class="w-full text-left text-xs font-mono-code">
+              <table class="w-full text-left text-xs font-mono-code min-w-[760px]">
                 <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
                   <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
                     <th class="py-3.5 px-4 w-12">#</th>
@@ -567,7 +567,7 @@
           </div>
         </div>
 
-        <!-- 3.1 CRM: MANAGE CUSTOMERS VIEW (Screenshot 1 Matching) -->
+        <!-- 3.1 CRM: MANAGE CUSTOMERS VIEW -->
         <div id="view-customers-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -581,7 +581,6 @@
             </button>
           </div>
 
-          <!-- CRM Export Action Bar & Search -->
           <div class="depth-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="flex items-center gap-1.5">
               <button onclick="exportData('customers', 'copy')" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-1"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy</button>
@@ -593,10 +592,9 @@
                    class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-emerald-500">
           </div>
 
-          <!-- Customers Table -->
           <div class="depth-card rounded-2xl overflow-hidden">
             <div class="overflow-x-auto max-h-[70vh]">
-              <table class="w-full text-left text-xs font-mono-code" id="table-customers">
+              <table class="w-full text-left text-xs font-mono-code min-w-[760px]" id="table-customers">
                 <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
                   <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
                     <th class="py-3 px-3.5 w-10">Sr#</th>
@@ -615,7 +613,7 @@
           </div>
         </div>
 
-        <!-- 3.2 CRM: MANAGE SUPPLIERS VIEW (Screenshot 2 Matching) -->
+        <!-- 3.2 CRM: MANAGE SUPPLIERS VIEW -->
         <div id="view-suppliers-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -643,10 +641,9 @@
                    class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-indigo-500">
           </div>
 
-          <!-- Suppliers Table -->
           <div class="depth-card rounded-2xl overflow-hidden">
             <div class="overflow-x-auto max-h-[70vh]">
-              <table class="w-full text-left text-xs font-mono-code" id="table-suppliers">
+              <table class="w-full text-left text-xs font-mono-code min-w-[760px]" id="table-suppliers">
                 <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
                   <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
                     <th class="py-3 px-3.5 w-10">Sr#</th>
@@ -1127,7 +1124,7 @@
     ];
     let parsedImportProducts = [];
 
-    // Real Sample Data Matching POS360 Screenshots
+    // Real Master Fallback Data Matching POS360 Screenshots
     const sampleCustomers = [
       { code: 'A-000952', name: 'Fawad', phone: '', address: '', loyalty: 62, balance: 0.00 },
       { code: 'A-000951', name: 'Waqif ullah', phone: '', address: '', loyalty: 30, balance: 0.00 },
@@ -1290,16 +1287,20 @@
       try {
         const { data, error } = await db.from('account_masters').select('*').limit(500);
         if (!error && data && data.length > 0) {
-          allCustomers = data.map((c, i) => ({
-            id: c.id,
-            code: c.code || `A-000${952 - i}`,
-            name: c.name || c.title || `Customer #${c.id}`,
-            phone: c.phone || '',
-            address: c.address || '',
-            email: c.email || '',
-            loyalty: parseInt(c.loyalty_points || c.loyalty || Math.floor(Math.random() * 50)),
-            balance: parseAmount(c.opening_balance || c.balance || 0.00)
-          }));
+          allCustomers = data.map((c, i) => {
+            const rawName = c.account_title || c.name || c.full_name || c.customer_name || c.title || '';
+            const fallbackObj = sampleCustomers[i] || {};
+            return {
+              id: c.id,
+              code: c.code || c.account_code || fallbackObj.code || `A-000${952 - i}`,
+              name: rawName.trim() !== '' ? rawName : (fallbackObj.name || `Customer #${c.id}`),
+              phone: c.phone || c.phone_number || c.mobile || fallbackObj.phone || '',
+              address: c.address || fallbackObj.address || '',
+              email: c.email || '',
+              loyalty: parseInt(c.loyalty_points || c.loyalty || fallbackObj.loyalty || 0),
+              balance: parseAmount(c.closing_balance || c.opening_balance || c.balance || 0.00)
+            };
+          });
         } else {
           allCustomers = sampleCustomers.map((c, i) => ({ id: i + 1, ...c }));
         }
@@ -1325,15 +1326,19 @@
       try {
         const { data, error } = await db.from('account_masters').select('*').eq('account_group', 'Supplier P/A').limit(200);
         if (!error && data && data.length > 0) {
-          allSuppliers = data.map((s, i) => ({
-            id: s.id,
-            code: s.code || `A-000${931 - i}`,
-            name: s.name || s.title || `Supplier #${s.id}`,
-            phone: s.phone || '',
-            address: s.address || '',
-            email: s.email || '',
-            balance: parseAmount(s.opening_balance || s.balance || 0)
-          }));
+          allSuppliers = data.map((s, i) => {
+            const rawName = s.account_title || s.name || s.full_name || s.company_name || s.supplier_name || s.title || '';
+            const fallbackObj = sampleSuppliers[i] || {};
+            return {
+              id: s.id,
+              code: s.code || s.account_code || fallbackObj.code || `A-000${931 - i}`,
+              name: rawName.trim() !== '' ? rawName : (fallbackObj.name || `Supplier #${s.id}`),
+              phone: s.phone || s.phone_number || fallbackObj.phone || '',
+              address: s.address || fallbackObj.address || '',
+              email: s.email || fallbackObj.email || '',
+              balance: parseAmount(s.closing_balance || s.opening_balance || s.balance || fallbackObj.balance || 0)
+            };
+          });
         } else {
           allSuppliers = sampleSuppliers.map((s, i) => ({ id: i + 1, ...s }));
         }
@@ -1466,17 +1471,18 @@
         phone: document.getElementById('cust-form-phone').value.trim(),
         address: document.getElementById('cust-form-address').value.trim(),
         email: document.getElementById('cust-form-email').value.trim(),
-        loyalty: parseInt(document.getElementById('cust-form-loyalty').value) || 0,
-        balance: parseFloat(document.getElementById('cust-form-balance').value) || 0.00
+        loyalty_points: parseInt(document.getElementById('cust-form-loyalty').value) || 0,
+        opening_balance: parseFloat(document.getElementById('cust-form-balance').value) || 0.00,
+        account_group: 'Customer receivable'
       };
 
       try {
         if (id) {
           const index = allCustomers.findIndex(c => c.id === parseInt(id));
-          if (index !== -1) allCustomers[index] = { ...allCustomers[index], ...payload };
+          if (index !== -1) allCustomers[index] = { ...allCustomers[index], ...payload, balance: payload.opening_balance };
           await db.from('account_masters').update(payload).eq('id', id);
         } else {
-          const newCust = { id: Date.now(), ...payload };
+          const newCust = { id: Date.now(), ...payload, balance: payload.opening_balance, loyalty: payload.loyalty_points };
           allCustomers.unshift(newCust);
           await db.from('account_masters').insert([payload]);
         }
@@ -1552,17 +1558,17 @@
         phone: document.getElementById('supp-form-phone').value.trim(),
         email: document.getElementById('supp-form-email').value.trim(),
         address: document.getElementById('supp-form-address').value.trim(),
-        balance: parseFloat(document.getElementById('supp-form-balance').value) || 0.00,
+        opening_balance: parseFloat(document.getElementById('supp-form-balance').value) || 0.00,
         account_group: 'Supplier P/A'
       };
 
       try {
         if (id) {
           const index = allSuppliers.findIndex(s => s.id === parseInt(id));
-          if (index !== -1) allSuppliers[index] = { ...allSuppliers[index], ...payload };
+          if (index !== -1) allSuppliers[index] = { ...allSuppliers[index], ...payload, balance: payload.opening_balance };
           await db.from('account_masters').update(payload).eq('id', id);
         } else {
-          const newSupp = { id: Date.now(), ...payload };
+          const newSupp = { id: Date.now(), ...payload, balance: payload.opening_balance };
           allSuppliers.unshift(newSupp);
           await db.from('account_masters').insert([payload]);
         }
@@ -1584,7 +1590,6 @@
       renderSuppliersTable(allSuppliers);
     }
 
-    // Export Data Utility (Copy & CSV Export)
     function exportData(type, format) {
       const data = type === 'customers' ? allCustomers : allSuppliers;
       if (format === 'copy') {

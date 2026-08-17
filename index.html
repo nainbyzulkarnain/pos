@@ -72,6 +72,15 @@
       box-shadow: 0 1px 0 #047857;
     }
 
+    .btn-3d-rose {
+      background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
+      box-shadow: 0 4px 0 #9f1239, 0 6px 14px rgba(244, 63, 94, 0.4);
+    }
+    .btn-3d-rose:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #9f1239;
+    }
+
     .inset-panel {
       background: rgba(10, 12, 22, 0.75);
       box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.7), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.05);
@@ -158,7 +167,7 @@
             <a href="#" onclick="openTaxModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Tax Profile</a>
             <a href="#" onclick="openProductModal('create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 text-emerald-400 font-semibold">+ Create Product</a>
             <a href="#" onclick="showSection('products-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Products List</a>
-            <a href="#" onclick="alert('Product CSV Import tool ready.'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Import Product</a>
+            <a href="#" onclick="openImportModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Import Product</a>
           </div>
         </div>
 
@@ -364,7 +373,7 @@
     <!-- RIGHT MAIN WORKSPACE -->
     <div class="flex-1 flex flex-col overflow-hidden w-full">
 
-      <!-- Header Topbar -->
+      <!-- Header Topbar (Add Product removed from here) -->
       <header class="h-16 px-4 sm:px-6 flex items-center justify-between border-b border-white/10 bg-slate-900/60 backdrop-blur-xl z-20 shadow-lg flex-shrink-0">
         <div class="flex items-center space-x-3">
           <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white">
@@ -377,9 +386,6 @@
         </div>
 
         <div class="flex items-center space-x-2 sm:space-x-4">
-          <button onclick="openProductModal('create')" class="btn-3d btn-3d-indigo px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold text-white flex items-center gap-1.5 sm:gap-2">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i> <span class="hidden sm:inline">Add</span> Product
-          </button>
           <button onclick="showSection('terminal')" class="btn-3d btn-3d-emerald px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold text-white flex items-center gap-1.5 sm:gap-2">
             <i data-lucide="shopping-cart" class="w-4 h-4"></i> <span class="hidden sm:inline">Rapid Cashier</span> POS
           </button>
@@ -740,11 +746,7 @@
 
           <div>
             <label class="block text-slate-400 mb-1">Unit</label>
-            <select id="prod-unit" class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
-              <option value="Piece">Piece</option>
-              <option value="Meter">Meter</option>
-              <option value="Pack">Pack</option>
-            </select>
+            <select id="prod-unit" class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500"></select>
           </div>
 
           <div>
@@ -776,7 +778,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CATEGORIES MANAGEMENT -->
+  <!-- MODAL: CATEGORIES MANAGEMENT (Fixed undefined display & CRUD) -->
   <div id="modal-categories" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-white/15 max-h-[85vh] flex flex-col">
       <div class="flex justify-between items-center pb-3 border-b border-white/10 flex-shrink-0">
@@ -800,6 +802,88 @@
     </div>
   </div>
 
+  <!-- MODAL: PRODUCT UNIT MANAGER -->
+  <div id="modal-units" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-md rounded-2xl p-6 space-y-4 border border-white/15">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10">
+        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="scale" class="w-5 h-5 text-indigo-400"></i> Product Unit Directory
+        </h3>
+        <button onclick="closeUnitsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex gap-2">
+        <input type="text" id="new-unit-name" placeholder="e.g. Meter, Pack, Box..." 
+               class="flex-1 px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500">
+        <button onclick="addNewUnit()" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap">
+          + Add Unit
+        </button>
+      </div>
+
+      <div class="inset-panel p-3 rounded-xl max-h-60 overflow-y-auto space-y-1.5 text-xs" id="units-list-container"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: TAX PROFILE MANAGER -->
+  <div id="modal-tax" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-white/15">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10">
+        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="percent" class="w-5 h-5 text-emerald-400"></i> Tax Profiles & Slabs
+        </h3>
+        <button onclick="closeTaxModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <input type="text" id="tax-name-inp" placeholder="Tax Name (e.g. GST)" class="col-span-2 px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500">
+        <input type="number" id="tax-rate-inp" placeholder="Rate %" class="px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500 font-mono-code">
+      </div>
+      <button onclick="addTaxProfile()" class="btn-3d btn-3d-indigo w-full py-2 rounded-xl text-xs font-bold text-white">Save Tax Profile</button>
+
+      <div class="inset-panel p-3 rounded-xl max-h-52 overflow-y-auto space-y-2 text-xs" id="tax-profiles-list"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: IMPORT CSV PRODUCTS -->
+  <div id="modal-import" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-xl rounded-2xl p-6 space-y-4 border border-white/15 max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10">
+        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="file-up" class="w-5 h-5 text-indigo-400"></i> Bulk Product CSV Import
+        </h3>
+        <button onclick="closeImportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-4 border-2 border-dashed border-white/15 rounded-2xl flex flex-col items-center justify-center gap-2 bg-white/5 hover:bg-white/10 transition">
+        <i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-400"></i>
+        <span class="text-xs text-slate-300 font-medium">Select or drag & drop CSV file</span>
+        <input type="file" id="csv-file-input" accept=".csv" class="text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+      </div>
+
+      <div class="flex items-center justify-between text-xs">
+        <button onclick="downloadCSVTemplate()" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Sample CSV
+        </button>
+        <span id="import-stats" class="text-slate-400 font-mono-code text-[11px]">0 rows loaded</span>
+      </div>
+
+      <div class="flex-1 inset-panel p-2.5 rounded-xl overflow-y-auto max-h-48 text-[11px] font-mono-code" id="import-preview-box">
+        <span class="text-slate-500">File preview will appear here...</span>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2 border-t border-white/10">
+        <button onclick="closeImportModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs">Cancel</button>
+        <button onclick="executeBulkImport()" id="btn-do-import" disabled class="btn-3d btn-3d-emerald px-5 py-2 rounded-xl text-white font-bold text-xs disabled:opacity-50">Execute Bulk Import</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: THERMAL BARCODE LABEL PRINT -->
   <div id="modal-barcode" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-sm rounded-2xl p-6 space-y-4 border border-white/15 text-center">
@@ -810,7 +894,6 @@
         </button>
       </div>
 
-      <!-- Printable Barcode Box -->
       <div id="barcode-print-area" class="bg-white text-black p-3 rounded-lg flex flex-col items-center justify-center">
         <h4 id="lbl-bar-title" class="text-[11px] font-bold uppercase truncate max-w-[220px]">PRODUCT TITLE</h4>
         <svg id="barcode-svg" class="my-1"></svg>
@@ -858,14 +941,26 @@
     let salesChartInstance = null;
     let salesExpensesChartInstance = null;
 
+    let unitsList = ['Piece', 'Meter', 'Pack', 'Dozen', 'Box', 'Pair', 'Kg', 'Yard'];
+    let taxProfiles = [
+      { id: 1, name: 'Zero Tax (Standard)', rate: 0, isDefault: true },
+      { id: 2, name: 'General Sales Tax (GST)', rate: 18, isDefault: false },
+      { id: 3, name: 'Reduced Rate Tax', rate: 5, isDefault: false }
+    ];
+    let parsedImportProducts = [];
+
     async function init() {
       lucide.createIcons();
       setInterval(() => {
-        document.getElementById('live-clock').innerText = new Date().toLocaleTimeString();
+        const clk = document.getElementById('live-clock');
+        if (clk) clk.innerText = new Date().toLocaleTimeString();
       }, 1000);
 
       document.getElementById('dash-start-date').value = '2026-08-01';
       document.getElementById('dash-end-date').value = '2026-08-17';
+
+      populateUnitSelect();
+      setupCSVListener();
 
       await Promise.all([
         fetchAllProductsBatched(),
@@ -874,6 +969,12 @@
         fetchPurchases(),
         fetchSalesAndAnalytics()
       ]);
+    }
+
+    // Helper: Safely resolve Category Name across DB variations
+    function getCategoryName(c) {
+      if (!c) return 'General';
+      return c.category_name || c.name || c.cat_name || c.title || c.category || `Category #${c.id}`;
     }
 
     // Responsive Mobile Sidebar Drawer Toggle
@@ -1008,7 +1109,7 @@
 
       tbody.innerHTML = list.slice(0, 100).map((p, idx) => {
         const cat = allCategories.find(c => String(c.id) === String(p.category_id));
-        const catName = cat ? (cat.category_name || cat.name) : 'General';
+        const catName = getCategoryName(cat);
         const isOut = p.stock <= 0;
         return `
           <tr class="hover:bg-white/5 transition">
@@ -1045,8 +1146,10 @@
       const title = document.getElementById('modal-product-title');
       const catSelect = document.getElementById('prod-category');
 
-      // Populate Categories in modal
-      catSelect.innerHTML = allCategories.map(c => `<option value="${c.id}">${c.category_name || c.name || 'Cat ' + c.id}</option>`).join('');
+      populateUnitSelect();
+
+      // Populate Categories with proper names
+      catSelect.innerHTML = allCategories.map(c => `<option value="${c.id}">${getCategoryName(c)}</option>`).join('');
 
       if (mode === 'edit' && prodId) {
         const p = allProducts.find(item => item.id === prodId);
@@ -1117,18 +1220,32 @@
       }
     }
 
-    // Modal: Categories Manager
+    // Modal: Categories Manager (Fixed undefined display)
     function openCategoriesModal() {
       const modal = document.getElementById('modal-categories');
       const list = document.getElementById('cat-list-modal');
-      list.innerHTML = allCategories.map((c, i) => `
-        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
-          <span class="font-bold text-white">${i + 1}. ${c.category_name || c.name}</span>
-          <span class="text-[10px] text-slate-500 font-mono-code">ID: ${c.id}</span>
-        </div>
-      `).join('');
+      
+      list.innerHTML = allCategories.map((c, i) => {
+        const catTitle = getCategoryName(c);
+        return `
+          <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-5 text-indigo-400 font-mono-code font-bold">${i + 1}.</span>
+              <span class="font-bold text-white">${catTitle}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-500 font-mono-code bg-white/5 px-2 py-0.5 rounded">ID: ${c.id}</span>
+              <button onclick="deleteCategory(${c.id})" class="p-1 text-slate-500 hover:text-rose-400 transition" title="Delete Category">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      lucide.createIcons();
     }
 
     function closeCategoriesModal() {
@@ -1146,18 +1263,220 @@
         document.getElementById('new-cat-name').value = '';
         await fetchCategories();
         openCategoriesModal();
-        alert('Category added successfully!');
       } catch (e) {
         alert('Category error: ' + e.message);
       }
     }
 
-    function openUnitsModal() {
-      alert('Product Unit Manager: Standard Unit is set to "Piece". Additional unit types (Meter, Pack, Dozen) are enabled.');
+    async function deleteCategory(id) {
+      if (!confirm('Are you sure you want to delete this category?')) return;
+      try {
+        const { error } = await db.from('categories').delete().eq('id', id);
+        if (error) throw error;
+        await fetchCategories();
+        openCategoriesModal();
+      } catch (e) {
+        alert('Could not delete category: ' + e.message);
+      }
     }
 
+    // Modal: Product Unit Manager
+    function populateUnitSelect() {
+      const sel = document.getElementById('prod-unit');
+      if (sel) {
+        sel.innerHTML = unitsList.map(u => `<option value="${u}">${u}</option>`).join('');
+      }
+    }
+
+    function openUnitsModal() {
+      const modal = document.getElementById('modal-units');
+      renderUnitsList();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeUnitsModal() {
+      const modal = document.getElementById('modal-units');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderUnitsList() {
+      const container = document.getElementById('units-list-container');
+      container.innerHTML = unitsList.map((u, idx) => `
+        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-3.5 h-3.5 text-indigo-400"></i>
+            <span class="font-bold text-white">${u}</span>
+          </div>
+          ${idx > 2 ? `<button onclick="removeUnit('${u}')" class="text-slate-500 hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : `<span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Standard</span>`}
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function addNewUnit() {
+      const inp = document.getElementById('new-unit-name');
+      const val = inp.value.trim();
+      if (!val) return alert('Enter unit name');
+      if (!unitsList.includes(val)) {
+        unitsList.push(val);
+        populateUnitSelect();
+        renderUnitsList();
+      }
+      inp.value = '';
+    }
+
+    function removeUnit(u) {
+      unitsList = unitsList.filter(item => item !== u);
+      populateUnitSelect();
+      renderUnitsList();
+    }
+
+    // Modal: Tax Profile Manager
     function openTaxModal() {
-      alert('Tax Profile Manager: Default Tax profile is set to "Zero Tax (0%)" per store configuration.');
+      const modal = document.getElementById('modal-tax');
+      renderTaxProfilesList();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeTaxModal() {
+      const modal = document.getElementById('modal-tax');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderTaxProfilesList() {
+      const container = document.getElementById('tax-profiles-list');
+      container.innerHTML = taxProfiles.map(t => `
+        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white flex items-center gap-2">
+              ${t.name}
+              ${t.isDefault ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">Active Default</span>' : ''}
+            </div>
+            <span class="text-[11px] font-mono-code text-indigo-400">${t.rate}% Rate</span>
+          </div>
+          <button onclick="setDefaultTax(${t.id})" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[10px] font-bold text-slate-300">Set Default</button>
+        </div>
+      `).join('');
+    }
+
+    function addTaxProfile() {
+      const name = document.getElementById('tax-name-inp').value.trim();
+      const rate = parseFloat(document.getElementById('tax-rate-inp').value) || 0;
+      if (!name) return alert('Enter tax profile name');
+      taxProfiles.push({ id: Date.now(), name: name, rate: rate, isDefault: false });
+      document.getElementById('tax-name-inp').value = '';
+      document.getElementById('tax-rate-inp').value = '';
+      renderTaxProfilesList();
+    }
+
+    function setDefaultTax(id) {
+      taxProfiles.forEach(t => t.isDefault = (t.id === id));
+      renderTaxProfilesList();
+    }
+
+    // Modal: CSV Importer Engine
+    function openImportModal() {
+      const modal = document.getElementById('modal-import');
+      parsedImportProducts = [];
+      document.getElementById('csv-file-input').value = '';
+      document.getElementById('import-stats').innerText = '0 rows loaded';
+      document.getElementById('import-preview-box').innerHTML = '<span class="text-slate-500">File preview will appear here...</span>';
+      document.getElementById('btn-do-import').disabled = true;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeImportModal() {
+      const modal = document.getElementById('modal-import');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function setupCSVListener() {
+      const fileInput = document.getElementById('csv-file-input');
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          parseCSVData(evt.target.result);
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function parseCSVData(csvText) {
+      const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
+      if (lines.length <= 1) return alert('CSV file is empty or invalid.');
+      
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      parsedImportProducts = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim());
+        if (cols.length >= 2) {
+          const item = {
+            name: cols[0] || `Import Item ${i}`,
+            product_code: cols[1] || `IMP-${Date.now()}-${i}`,
+            purchase_price: parseFloat(cols[2]) || 0,
+            sell_price: parseFloat(cols[3]) || 0,
+            opening_stock: parseInt(cols[4]) || 0,
+            current_stock: parseInt(cols[4]) || 0,
+            product_unit: cols[5] || 'Piece'
+          };
+          parsedImportProducts.push(item);
+        }
+      }
+
+      document.getElementById('import-stats').innerText = `${parsedImportProducts.length} rows loaded`;
+      const preview = document.getElementById('import-preview-box');
+      preview.innerHTML = parsedImportProducts.slice(0, 15).map(p => `
+        <div class="py-1 border-b border-white/5 flex justify-between">
+          <span class="text-white truncate max-w-[240px]">${p.name} (${p.product_code})</span>
+          <span class="text-emerald-400">Rs. ${p.sell_price} | Stk: ${p.current_stock}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('btn-do-import').disabled = parsedImportProducts.length === 0;
+    }
+
+    function downloadCSVTemplate() {
+      const csvContent = "data:text/csv;charset=utf-8,Product Name,Barcode SKU,Purchase Price,Selling Price,Stock,Unit\nZELLBURY LAWN 3PC,P-001399,2200,3400,20,Piece\nSAPHIRE DRESS 2PC,P-001400,1800,2900,15,Piece";
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "ladies_outlet_products_template.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    async function executeBulkImport() {
+      if (parsedImportProducts.length === 0) return;
+      const btn = document.getElementById('btn-do-import');
+      btn.disabled = true;
+      btn.innerText = 'Importing to cloud...';
+
+      try {
+        const { error } = await db.from('products').insert(parsedImportProducts);
+        if (error) throw error;
+        alert(`Successfully imported ${parsedImportProducts.length} products!`);
+        closeImportModal();
+        await fetchAllProductsBatched();
+        showSection('products-list');
+      } catch (err) {
+        alert('Import failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Execute Bulk Import';
+      }
     }
 
     // Modal: Barcode Label Print
@@ -1198,7 +1517,7 @@
         `;
 
         allCategories.forEach(c => {
-          const catName = c.category_name || c.name || c.title || `Cat ${c.id}`;
+          const catName = getCategoryName(c);
           const btn = document.createElement('button');
           btn.id = `cat-pill-${c.id}`;
           btn.className = 'px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-semibold text-xs whitespace-nowrap transition border border-white/5';

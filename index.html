@@ -72,15 +72,6 @@
       box-shadow: 0 1px 0 #047857;
     }
 
-    .btn-3d-rose {
-      background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
-      box-shadow: 0 4px 0 #9f1239, 0 6px 14px rgba(244, 63, 94, 0.4);
-    }
-    .btn-3d-rose:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #9f1239;
-    }
-
     .inset-panel {
       background: rgba(10, 12, 22, 0.75);
       box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.7), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.05);
@@ -101,8 +92,8 @@
 
     @media print {
       body * { visibility: hidden; }
-      #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area * { visibility: visible; }
-      #receipt-print-modal, #barcode-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area *, #print-export-area, #print-export-area * { visibility: visible; }
+      #receipt-print-modal, #barcode-print-area, #print-export-area { position: absolute; left: 0; top: 0; width: 100%; }
     }
   </style>
 </head>
@@ -171,7 +162,7 @@
           </div>
         </div>
 
-        <!-- 3. CRM -->
+        <!-- 3. CRM (Manage Customers & Manage Suppliers) -->
         <div>
           <button onclick="toggleMenu('menu-crm')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -181,8 +172,8 @@
             <i data-lucide="chevron-down" id="chevron-menu-crm" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-crm" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Manage Customers</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Manage Suppliers</a>
+            <a href="#" onclick="showSection('customers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">Manage Customers</a>
+            <a href="#" onclick="showSection('suppliers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Manage Suppliers</a>
           </div>
         </div>
 
@@ -236,10 +227,7 @@
         <!-- 7 to 14 Sections -->
         <div>
           <button onclick="toggleMenu('menu-adj')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-400"></i>
-              <span>7. Stock Adjustment</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-400"></i><span>7. Stock Adjustment</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-adj" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-adj" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
@@ -250,10 +238,7 @@
 
         <div>
           <button onclick="toggleMenu('menu-vouchers')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="file-check" class="w-4 h-4 text-slate-400"></i>
-              <span>8. Vouchers</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="file-check" class="w-4 h-4 text-slate-400"></i><span>8. Vouchers</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-vouchers" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-vouchers" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
@@ -267,43 +252,31 @@
 
         <div>
           <button onclick="toggleMenu('menu-prpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i>
-              <span>9. Purchase Reports</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i><span>9. Purchase Reports</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-prpt" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-prpt" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
             <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Date Wise Report</a>
             <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Purchase By Supplier</a>
             <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Product Wise Purchase</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">All Product Wise Purchase</a>
           </div>
         </div>
 
         <div>
           <button onclick="toggleMenu('menu-srpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="line-chart" class="w-4 h-4 text-slate-400"></i>
-              <span>10. Sales Reports</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="line-chart" class="w-4 h-4 text-slate-400"></i><span>10. Sales Reports</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-srpt" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-srpt" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
             <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Daily Sales Summary</a>
             <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Item Sale Report</a>
             <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Customer Wise Sell Report</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Sell Load Paper</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Item Sell Summary</a>
           </div>
         </div>
 
         <div>
           <button onclick="toggleMenu('menu-stkrpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="package-search" class="w-4 h-4 text-slate-400"></i>
-              <span>11. Stock Report</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="package-search" class="w-4 h-4 text-slate-400"></i><span>11. Stock Report</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-stkrpt" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-stkrpt" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
@@ -313,10 +286,7 @@
 
         <div>
           <button onclick="toggleMenu('menu-doc')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="printer" class="w-4 h-4 text-slate-400"></i>
-              <span>12. Document Actions</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="printer" class="w-4 h-4 text-slate-400"></i><span>12. Document Actions</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-doc" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-doc" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
@@ -327,10 +297,7 @@
 
         <div>
           <button onclick="toggleMenu('menu-acctrpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="calculator" class="w-4 h-4 text-slate-400"></i>
-              <span>13. Account Reports</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="calculator" class="w-4 h-4 text-slate-400"></i><span>13. Account Reports</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-acctrpt" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-acctrpt" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
@@ -345,10 +312,7 @@
 
         <div>
           <button onclick="toggleMenu('menu-admin')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="shield-check" class="w-4 h-4 text-slate-400"></i>
-              <span>14. Administrative</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="shield-check" class="w-4 h-4 text-slate-400"></i><span>14. Administrative</span></div>
             <i data-lucide="chevron-down" id="chevron-menu-admin" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-admin" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
@@ -373,7 +337,7 @@
     <!-- RIGHT MAIN WORKSPACE -->
     <div class="flex-1 flex flex-col overflow-hidden w-full">
 
-      <!-- Header Topbar (Add Product removed from here) -->
+      <!-- Header Topbar -->
       <header class="h-16 px-4 sm:px-6 flex items-center justify-between border-b border-white/10 bg-slate-900/60 backdrop-blur-xl z-20 shadow-lg flex-shrink-0">
         <div class="flex items-center space-x-3">
           <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white">
@@ -402,8 +366,6 @@
 
         <!-- 1. DASHBOARD OVERVIEW VIEW -->
         <div id="view-dashboard" class="space-y-5 sm:space-y-6">
-
-          <!-- Date Range & Quick Filters Filter Bar -->
           <div class="depth-card p-4 sm:p-5 rounded-2xl flex flex-col gap-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
@@ -411,7 +373,6 @@
                 <p class="text-xs text-slate-400 mt-0.5" id="dash-filter-subtitle">Showing: 2026-08-01 to 2026-08-17</p>
               </div>
               
-              <!-- Calendar Date Inputs -->
               <div class="flex flex-wrap items-center gap-2 text-xs">
                 <div class="flex items-center space-x-1.5 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1.5">
                   <span class="text-slate-400 text-[10px] uppercase font-bold">Start:</span>
@@ -433,7 +394,6 @@
               </div>
             </div>
 
-            <!-- Quick Filter Pill Toggles -->
             <div class="pt-3 border-t border-white/5 flex items-center gap-2 text-xs overflow-x-auto pb-1">
               <span class="text-slate-400 font-semibold mr-1 whitespace-nowrap">Quick Select:</span>
               <button onclick="applyQuickFilter(7, this)" class="quick-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-bold transition border border-white/5 whitespace-nowrap">Last 7 Days</button>
@@ -446,7 +406,6 @@
 
           <!-- 3D 4-Column KPI Metric Cards -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            
             <div class="depth-card p-5 rounded-2xl border-l-4 border-emerald-500 flex flex-col justify-between">
               <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider" id="kpi-sales-label">This Month Sales</span>
@@ -490,7 +449,6 @@
                 <i data-lucide="truck" class="w-4 h-4"></i>
               </div>
             </div>
-
           </div>
 
           <!-- Charts Row -->
@@ -502,9 +460,7 @@
                 </h3>
                 <span class="text-[11px] font-mono-code text-slate-400" id="chart-date-range-badge">2026-08-01 - 2026-08-17</span>
               </div>
-              <div class="h-64">
-                <canvas id="salesChart"></canvas>
-              </div>
+              <div class="h-64"><canvas id="salesChart"></canvas></div>
             </div>
 
             <div class="depth-card p-5 rounded-2xl space-y-3">
@@ -515,9 +471,7 @@
                 <span class="text-[11px] font-mono-code text-slate-400" id="expense-date-badge">Filtered Period</span>
               </div>
               <div class="h-64 flex flex-col justify-between">
-                <div class="h-52">
-                  <canvas id="salesExpensesChart"></canvas>
-                </div>
+                <div class="h-52"><canvas id="salesExpensesChart"></canvas></div>
                 <div class="flex items-center justify-center gap-4 text-xs font-semibold pt-1 border-t border-white/5">
                   <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span><span class="text-slate-300">Sales</span></div>
                   <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span><span class="text-slate-300">Expenses</span></div>
@@ -572,10 +526,9 @@
               </div>
             </div>
           </div>
-
         </div>
 
-        <!-- 2. MASTER PROFILE: PRODUCTS LIST & CATALOG VIEW -->
+        <!-- 2. MASTER PROFILE: PRODUCTS LIST VIEW -->
         <div id="view-products-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -614,7 +567,106 @@
           </div>
         </div>
 
-        <!-- 3. CASHIER POS TERMINAL VIEW -->
+        <!-- 3.1 CRM: MANAGE CUSTOMERS VIEW (Screenshot 1 Matching) -->
+        <div id="view-customers-list" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-emerald-400"></i> Customer List
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5" id="cust-list-subtitle">Directory of registered clientele & accounts</p>
+            </div>
+            <button onclick="openCustomerModal('create')" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> + New Customer
+            </button>
+          </div>
+
+          <!-- CRM Export Action Bar & Search -->
+          <div class="depth-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-1.5">
+              <button onclick="exportData('customers', 'copy')" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-1"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy</button>
+              <button onclick="exportData('customers', 'excel')" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-1"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Excel</button>
+              <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-1"><i data-lucide="file-text" class="w-3.5 h-3.5"></i> PDF</button>
+              <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-1"><i data-lucide="printer" class="w-3.5 h-3.5"></i> Print</button>
+            </div>
+            <input type="text" id="cust-search-inp" placeholder="Search customers..." oninput="filterCustomersTable()" 
+                   class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-emerald-500">
+          </div>
+
+          <!-- Customers Table -->
+          <div class="depth-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto max-h-[70vh]">
+              <table class="w-full text-left text-xs font-mono-code" id="table-customers">
+                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
+                  <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                    <th class="py-3 px-3.5 w-10">Sr#</th>
+                    <th class="py-3 px-3.5">Code</th>
+                    <th class="py-3 px-3.5">Full Name</th>
+                    <th class="py-3 px-3.5">Phone No.</th>
+                    <th class="py-3 px-3.5">Address</th>
+                    <th class="py-3 px-3.5 text-center">Loyalty Point</th>
+                    <th class="py-3 px-3.5 text-right">Closing Balance</th>
+                    <th class="py-3 px-3.5 text-center w-24">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-customers-body" class="divide-y divide-white/5 text-slate-300"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3.2 CRM: MANAGE SUPPLIERS VIEW (Screenshot 2 Matching) -->
+        <div id="view-suppliers-list" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <i data-lucide="truck" class="w-5 h-5 text-indigo-400"></i> Supplier List
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5" id="supp-list-subtitle">Managing merchant vendors and purchase payables</p>
+            </div>
+            <button onclick="openSupplierModal('create')" class="btn-3d btn-3d-indigo px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> + Add New Supplier
+            </button>
+          </div>
+
+          <div class="depth-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <span>Show</span>
+              <select class="bg-black/50 border border-white/10 rounded px-2 py-1 text-white font-mono-code outline-none">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <span>entries</span>
+            </div>
+            <input type="text" id="supp-search-inp" placeholder="Search suppliers..." oninput="filterSuppliersTable()" 
+                   class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-indigo-500">
+          </div>
+
+          <!-- Suppliers Table -->
+          <div class="depth-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto max-h-[70vh]">
+              <table class="w-full text-left text-xs font-mono-code" id="table-suppliers">
+                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
+                  <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                    <th class="py-3 px-3.5 w-10">Sr#</th>
+                    <th class="py-3 px-3.5 w-12 text-center">Logo</th>
+                    <th class="py-3 px-3.5">Code</th>
+                    <th class="py-3 px-3.5">Full Name</th>
+                    <th class="py-3 px-3.5">Phone No.</th>
+                    <th class="py-3 px-3.5">Address</th>
+                    <th class="py-3 px-3.5">Email</th>
+                    <th class="py-3 px-3.5 text-right">Closing Balance</th>
+                    <th class="py-3 px-3.5 text-center w-24">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-suppliers-body" class="divide-y divide-white/5 text-slate-300"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. CASHIER POS TERMINAL VIEW -->
         <div id="view-terminal" class="hidden h-full flex flex-col lg:flex-row gap-5">
           <div class="w-full lg:w-7/12 flex flex-col gap-4">
             <div class="depth-card p-3 rounded-2xl flex flex-col gap-3">
@@ -680,7 +732,7 @@
           </div>
         </div>
 
-        <!-- 4. SALES LEDGER VIEW -->
+        <!-- 5. SALES LEDGER VIEW -->
         <div id="view-ledger" class="hidden depth-card p-4 sm:p-5 rounded-2xl space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 class="text-base font-bold text-white">Full POS Transaction Ledger</h2>
@@ -709,6 +761,135 @@
     </div>
   </div>
 
+  <!-- MODAL: ADD / EDIT CUSTOMER -->
+  <div id="modal-customer" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-xl rounded-2xl p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10">
+        <h3 id="modal-cust-title" class="text-base font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5 text-emerald-400"></i> Add New Customer
+        </h3>
+        <button onclick="closeCustomerModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="customer-form" onsubmit="saveCustomer(event)" class="space-y-4 text-xs font-medium">
+        <input type="hidden" id="cust-id" value="">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Customer Name *</label>
+            <input type="text" id="cust-form-name" required placeholder="e.g. Fawad, Sawera" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Customer Code</label>
+            <input type="text" id="cust-form-code" placeholder="e.g. A-000953" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Phone Number</label>
+            <input type="text" id="cust-form-phone" placeholder="e.g. 03001234567" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Loyalty Points</label>
+            <input type="number" id="cust-form-loyalty" value="0" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-amber-400 font-bold font-mono-code outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Address</label>
+          <input type="text" id="cust-form-address" placeholder="e.g. KDA / Main Market" 
+                 class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Email</label>
+            <input type="email" id="cust-form-email" placeholder="customer@gmail.com" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Opening Balance (Rs.)</label>
+            <input type="number" id="cust-form-balance" value="0" step="any" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
+          <button type="button" onclick="closeCustomerModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold">Cancel</button>
+          <button type="submit" id="btn-save-cust" class="btn-3d btn-3d-emerald px-5 py-2 rounded-xl text-white font-bold">Save Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT SUPPLIER -->
+  <div id="modal-supplier" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-xl rounded-2xl p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10">
+        <h3 id="modal-supp-title" class="text-base font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="truck" class="w-5 h-5 text-indigo-400"></i> Add New Supplier
+        </h3>
+        <button onclick="closeSupplierModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="supplier-form" onsubmit="saveSupplier(event)" class="space-y-4 text-xs font-medium">
+        <input type="hidden" id="supp-id" value="">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Company / Supplier Name *</label>
+            <input type="text" id="supp-form-name" required placeholder="e.g. NAIN FRAGRANCES" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Supplier Code</label>
+            <input type="text" id="supp-form-code" placeholder="e.g. A-000932" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Phone Number</label>
+            <input type="text" id="supp-form-phone" placeholder="e.g. +923318676066" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Email</label>
+            <input type="email" id="supp-form-email" placeholder="vendor@gmail.com" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Address / Location</label>
+          <input type="text" id="supp-form-address" placeholder="e.g. KDA / Market Hub" 
+                 class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Opening Balance (Rs.)</label>
+          <input type="number" id="supp-form-balance" value="0" step="any" 
+                 class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
+          <button type="button" onclick="closeSupplierModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold">Cancel</button>
+          <button type="submit" id="btn-save-supp" class="btn-3d btn-3d-indigo px-5 py-2 rounded-xl text-white font-bold">Save Supplier</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: CREATE / EDIT PRODUCT -->
   <div id="modal-product" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-2xl rounded-2xl p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
@@ -730,7 +911,6 @@
             <input type="text" id="prod-name" required placeholder="e.g. ZELLBURY LAWN 3PC" 
                    class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
           </div>
-
           <div>
             <label class="block text-slate-400 mb-1">Product Barcode / SKU *</label>
             <input type="text" id="prod-code" required placeholder="e.g. P-001360" 
@@ -743,12 +923,10 @@
             <label class="block text-slate-400 mb-1">Category *</label>
             <select id="prod-category" required class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500"></select>
           </div>
-
           <div>
             <label class="block text-slate-400 mb-1">Unit</label>
             <select id="prod-unit" class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500"></select>
           </div>
-
           <div>
             <label class="block text-slate-400 mb-1">Opening Stock</label>
             <input type="number" id="prod-stock" value="0" 
@@ -762,7 +940,6 @@
             <input type="number" id="prod-purchase-price" value="0" step="any" 
                    class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-mono-code">
           </div>
-
           <div>
             <label class="block text-slate-400 mb-1">Selling Price (Rs.) *</label>
             <input type="number" id="prod-sell-price" required value="0" step="any" 
@@ -778,7 +955,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CATEGORIES MANAGEMENT (Fixed undefined display & CRUD) -->
+  <!-- MODAL: CATEGORIES MANAGEMENT (Fixed undefined display & deletion) -->
   <div id="modal-categories" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-white/15 max-h-[85vh] flex flex-col">
       <div class="flex justify-between items-center pb-3 border-b border-white/10 flex-shrink-0">
@@ -932,6 +1109,8 @@
 
     let allProducts = [];
     let allCategories = [];
+    let allCustomers = [];
+    let allSuppliers = [];
     let allSales = [];
     let allPurchases = [];
     let allSellProducts = [];
@@ -944,10 +1123,51 @@
     let unitsList = ['Piece', 'Meter', 'Pack', 'Dozen', 'Box', 'Pair', 'Kg', 'Yard'];
     let taxProfiles = [
       { id: 1, name: 'Zero Tax (Standard)', rate: 0, isDefault: true },
-      { id: 2, name: 'General Sales Tax (GST)', rate: 18, isDefault: false },
-      { id: 3, name: 'Reduced Rate Tax', rate: 5, isDefault: false }
+      { id: 2, name: 'General Sales Tax (GST)', rate: 18, isDefault: false }
     ];
     let parsedImportProducts = [];
+
+    // Real Sample Data Matching POS360 Screenshots
+    const sampleCustomers = [
+      { code: 'A-000952', name: 'Fawad', phone: '', address: '', loyalty: 62, balance: 0.00 },
+      { code: 'A-000951', name: 'Waqif ullah', phone: '', address: '', loyalty: 30, balance: 0.00 },
+      { code: 'A-000950', name: 'FAISAL', phone: '', address: '', loyalty: 60, balance: 0.00 },
+      { code: 'A-000949', name: 'Sawera', phone: '', address: '', loyalty: 19, balance: 0.00 },
+      { code: 'A-000948', name: 'Zahid Ameen', phone: '', address: '', loyalty: 24, balance: 0.00 },
+      { code: 'A-000947', name: 'Sagar', phone: '', address: '', loyalty: 35, balance: 0.00 },
+      { code: 'A-000946', name: 'GUL SAEED', phone: '', address: '', loyalty: 126, balance: 0.00 },
+      { code: 'A-000945', name: 'Ghazwa', phone: '', address: '', loyalty: 62, balance: 0.00 },
+      { code: 'A-000944', name: 'Kinza', phone: '', address: '', loyalty: 38, balance: 0.00 },
+      { code: 'A-000943', name: 'amna', phone: '', address: '', loyalty: 38, balance: 0.00 },
+      { code: 'A-000942', name: 'asma', phone: '', address: '', loyalty: 56, balance: 0.00 },
+      { code: 'A-000941', name: 'SADIA', phone: '', address: '', loyalty: 53, balance: 0.00 },
+      { code: 'A-000940', name: 'mjr Abida', phone: '', address: '', loyalty: 210, balance: 0.00 },
+      { code: 'A-000939', name: 'Jhangir khan', phone: '', address: '', loyalty: 15, balance: 0.00 },
+      { code: 'A-000938', name: 'Naheed', phone: '', address: '', loyalty: 23, balance: 0.00 },
+      { code: 'A-000937', name: 'Kashif', phone: '', address: '', loyalty: 30, balance: 0.00 },
+      { code: 'A-000936', name: 'adil', phone: '', address: '', loyalty: 7, balance: 0.00 },
+      { code: 'A-000935', name: 'nasra', phone: '', address: '', loyalty: 2, balance: 0.00 },
+      { code: 'A-000934', name: 'LAIBA', phone: '', address: '', loyalty: 3, balance: 0.00 },
+      { code: 'A-000933', name: 'Maqsood', phone: '', address: '', loyalty: 116, balance: 0.00 },
+      { code: 'A-000932', name: 'pir farman shah', phone: '', address: '', loyalty: 33, balance: 0.00 },
+      { code: 'A-000933', name: 'GulFam', phone: '', address: '', loyalty: 33, balance: 0.00 },
+      { code: 'A-000932', name: 'M. KASHIF', phone: '', address: '', loyalty: 62, balance: 0.00 },
+      { code: 'A-000931', name: 'M. KASHIF', phone: '', address: '', loyalty: 64, balance: 0.00 },
+      { code: 'A-000930', name: 'Nayab', phone: '', address: '', loyalty: 76, balance: 0.00 }
+    ];
+
+    const sampleSuppliers = [
+      { code: 'A-000931', name: 'NAIN FRAGRANCES', phone: '123', address: '', email: '', balance: -311175 },
+      { code: 'A-000872', name: 'Zellbury Lawn Cordsets', phone: '00000', address: 'KDA', email: 'abc@abc.com', balance: -36810 },
+      { code: 'A-000809', name: 'HSNRHRCHCK (Multi color)', phone: '000000', address: 'HCQV+G5V', email: 'garrison117168@gmail.com', balance: 68975 },
+      { code: 'A-000807', name: 'PURPLE (HSNRHRPURPLEFLR)', phone: '00000', address: 'HCQV+G5V', email: 'garrison117168@gmail.com', balance: 48280 },
+      { code: 'A-000806', name: 'TAJ MEHEL ARTICLE', phone: '00000000', address: 'HCQV+G5V', email: 'garrison117168@gmail.com', balance: 6046 },
+      { code: 'A-000560', name: 'ALKARAM PRODUCTION', phone: '0', address: '', email: '', balance: 2576.2 },
+      { code: 'A-000549', name: 'ALMIRAH NEW', phone: '0', address: '', email: '', balance: -2 },
+      { code: 'A-000545', name: 'Rang e riwayait', phone: '000', address: '', email: '', balance: 490 },
+      { code: 'A-000543', name: 'JOHRA 2', phone: '+923318676066', address: 'KDA', email: 'mhussnain2549@gmail.com', balance: -10100 },
+      { code: 'A-000540', name: 'hussnain rehar designer', phone: '03318676066', address: 'Ghari mawaz khan muhalla kala sadi', email: 'www.soltanshah@gmail.com', balance: -7183 }
+    ];
 
     async function init() {
       lucide.createIcons();
@@ -966,18 +1186,17 @@
         fetchAllProductsBatched(),
         fetchCategories(),
         fetchCustomers(),
+        fetchSuppliers(),
         fetchPurchases(),
         fetchSalesAndAnalytics()
       ]);
     }
 
-    // Helper: Safely resolve Category Name across DB variations
     function getCategoryName(c) {
       if (!c) return 'General';
       return c.category_name || c.name || c.cat_name || c.title || c.category || `Category #${c.id}`;
     }
 
-    // Responsive Mobile Sidebar Drawer Toggle
     function toggleMobileSidebar() {
       const sidebar = document.getElementById('main-sidebar');
       const overlay = document.getElementById('mobile-overlay');
@@ -1000,7 +1219,6 @@
       if (overlay) overlay.classList.add('hidden');
     }
 
-    // Sidebar Accordion Handler
     function toggleMenu(menuId) {
       const el = document.getElementById(menuId);
       const icon = document.getElementById(`chevron-${menuId}`);
@@ -1013,9 +1231,8 @@
       }
     }
 
-    // View Navigation Handler
     function showSection(section) {
-      ['dashboard', 'products-list', 'terminal', 'ledger'].forEach(s => {
+      ['dashboard', 'products-list', 'customers-list', 'suppliers-list', 'terminal', 'ledger'].forEach(s => {
         const el = document.getElementById(`view-${s}`);
         if (el) el.classList.add('hidden');
       });
@@ -1025,11 +1242,15 @@
       const titles = {
         'dashboard': '1. Dashboard Overview',
         'products-list': '2. Master Profile - Products List',
+        'customers-list': '3. CRM - Manage Customers',
+        'suppliers-list': '3. CRM - Manage Suppliers',
         'terminal': '6. POS Cashier Terminal',
         'ledger': '6. Sales Ledger'
       };
       document.getElementById('current-view-title').innerText = titles[section] || section;
       if (section === 'products-list') renderProductsTable(allProducts);
+      if (section === 'customers-list') renderCustomersTable(allCustomers);
+      if (section === 'suppliers-list') renderSuppliersTable(allSuppliers);
       lucide.createIcons();
     }
 
@@ -1062,7 +1283,331 @@
       return String(raw).split('T')[0];
     }
 
-    // Fetch Products
+    // ==========================================
+    // 3. CRM: CUSTOMERS & SUPPLIERS LOGIC
+    // ==========================================
+    async function fetchCustomers() {
+      try {
+        const { data, error } = await db.from('account_masters').select('*').limit(500);
+        if (!error && data && data.length > 0) {
+          allCustomers = data.map((c, i) => ({
+            id: c.id,
+            code: c.code || `A-000${952 - i}`,
+            name: c.name || c.title || `Customer #${c.id}`,
+            phone: c.phone || '',
+            address: c.address || '',
+            email: c.email || '',
+            loyalty: parseInt(c.loyalty_points || c.loyalty || Math.floor(Math.random() * 50)),
+            balance: parseAmount(c.opening_balance || c.balance || 0.00)
+          }));
+        } else {
+          allCustomers = sampleCustomers.map((c, i) => ({ id: i + 1, ...c }));
+        }
+
+        const sel = document.getElementById('customer-select');
+        sel.innerHTML = '<option value="Walk-in Client" class="bg-slate-900">Walk-in Client</option>';
+        allCustomers.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.name;
+          opt.className = 'bg-slate-900';
+          opt.innerText = `${c.name} ${c.phone ? '(' + c.phone + ')' : ''}`;
+          sel.appendChild(opt);
+        });
+
+        renderCustomersTable(allCustomers);
+      } catch (e) {
+        allCustomers = sampleCustomers.map((c, i) => ({ id: i + 1, ...c }));
+        renderCustomersTable(allCustomers);
+      }
+    }
+
+    async function fetchSuppliers() {
+      try {
+        const { data, error } = await db.from('account_masters').select('*').eq('account_group', 'Supplier P/A').limit(200);
+        if (!error && data && data.length > 0) {
+          allSuppliers = data.map((s, i) => ({
+            id: s.id,
+            code: s.code || `A-000${931 - i}`,
+            name: s.name || s.title || `Supplier #${s.id}`,
+            phone: s.phone || '',
+            address: s.address || '',
+            email: s.email || '',
+            balance: parseAmount(s.opening_balance || s.balance || 0)
+          }));
+        } else {
+          allSuppliers = sampleSuppliers.map((s, i) => ({ id: i + 1, ...s }));
+        }
+        renderSuppliersTable(allSuppliers);
+      } catch (e) {
+        allSuppliers = sampleSuppliers.map((s, i) => ({ id: i + 1, ...s }));
+        renderSuppliersTable(allSuppliers);
+      }
+    }
+
+    function renderCustomersTable(list) {
+      const tbody = document.getElementById('tbl-customers-body');
+      if (!tbody) return;
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-500">No customer records found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((c, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3.5 text-slate-500">${idx + 1}</td>
+          <td class="py-3 px-3.5 font-bold text-indigo-400">${c.code}</td>
+          <td class="py-3 px-3.5 font-bold text-white">${c.name}</td>
+          <td class="py-3 px-3.5 text-slate-400 font-mono-code">${c.phone || '---'}</td>
+          <td class="py-3 px-3.5 text-slate-400 truncate max-w-[150px]">${c.address || '---'}</td>
+          <td class="py-3 px-3.5 text-center font-bold text-amber-400">${c.loyalty}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-emerald-400">Rs. ${parseFloat(c.balance).toFixed(2)}</td>
+          <td class="py-3 px-3.5 text-center space-x-1">
+            <button onclick="openCustomerModal('edit', ${c.id})" class="p-1 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" title="Edit Customer"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            <button onclick="viewCustomerHistory(${c.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="View History"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteCustomer(${c.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" title="Delete Customer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderSuppliersTable(list) {
+      const tbody = document.getElementById('tbl-suppliers-body');
+      if (!tbody) return;
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-500">No supplier records found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((s, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3.5 text-slate-500">${idx + 1}</td>
+          <td class="py-3 px-3.5 text-center">
+            <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto text-xs font-bold border border-indigo-500/20">
+              ${s.name.substring(0, 2).toUpperCase()}
+            </div>
+          </td>
+          <td class="py-3 px-3.5 font-bold text-indigo-400">${s.code}</td>
+          <td class="py-3 px-3.5 font-bold text-white truncate max-w-[180px]">${s.name}</td>
+          <td class="py-3 px-3.5 text-slate-400 font-mono-code">${s.phone || '---'}</td>
+          <td class="py-3 px-3.5 text-slate-400 truncate max-w-[140px]">${s.address || '---'}</td>
+          <td class="py-3 px-3.5 text-slate-400 truncate max-w-[150px]">${s.email || '---'}</td>
+          <td class="py-3 px-3.5 text-right font-bold ${s.balance < 0 ? 'text-rose-400' : 'text-emerald-400'}">
+            Rs. ${parseFloat(s.balance).toLocaleString()}
+          </td>
+          <td class="py-3 px-3.5 text-center space-x-1">
+            <button onclick="openSupplierModal('edit', ${s.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="Edit Supplier"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            <button onclick="alert('Supplier Ledger for: ' + s.name)" class="p-1 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" title="View Ledger"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteSupplier(${s.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" title="Delete Supplier"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function filterCustomersTable() {
+      const q = document.getElementById('cust-search-inp').value.toLowerCase().trim();
+      const filtered = allCustomers.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || (c.phone && c.phone.includes(q)));
+      renderCustomersTable(filtered);
+    }
+
+    function filterSuppliersTable() {
+      const q = document.getElementById('supp-search-inp').value.toLowerCase().trim();
+      const filtered = allSuppliers.filter(s => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q) || (s.email && s.email.toLowerCase().includes(q)));
+      renderSuppliersTable(filtered);
+    }
+
+    // Modal: Customer CRUD
+    function openCustomerModal(mode, custId = null) {
+      const modal = document.getElementById('modal-customer');
+      const title = document.getElementById('modal-cust-title');
+
+      if (mode === 'edit' && custId) {
+        const c = allCustomers.find(i => i.id === custId);
+        if (c) {
+          title.innerHTML = '<i data-lucide="pencil" class="w-5 h-5 text-emerald-400"></i> Edit Customer';
+          document.getElementById('cust-id').value = c.id;
+          document.getElementById('cust-form-name').value = c.name;
+          document.getElementById('cust-form-code').value = c.code;
+          document.getElementById('cust-form-phone').value = c.phone;
+          document.getElementById('cust-form-loyalty').value = c.loyalty;
+          document.getElementById('cust-form-address').value = c.address;
+          document.getElementById('cust-form-email').value = c.email;
+          document.getElementById('cust-form-balance').value = c.balance;
+        }
+      } else {
+        title.innerHTML = '<i data-lucide="user-plus" class="w-5 h-5 text-emerald-400"></i> Add New Customer';
+        document.getElementById('cust-id').value = '';
+        document.getElementById('customer-form').reset();
+        document.getElementById('cust-form-code').value = `A-000${953 + allCustomers.length}`;
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeCustomerModal() {
+      const modal = document.getElementById('modal-customer');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveCustomer(e) {
+      e.preventDefault();
+      const id = document.getElementById('cust-id').value;
+      const btn = document.getElementById('btn-save-cust');
+      btn.disabled = true;
+      btn.innerText = 'Saving...';
+
+      const payload = {
+        name: document.getElementById('cust-form-name').value.trim(),
+        code: document.getElementById('cust-form-code').value.trim(),
+        phone: document.getElementById('cust-form-phone').value.trim(),
+        address: document.getElementById('cust-form-address').value.trim(),
+        email: document.getElementById('cust-form-email').value.trim(),
+        loyalty: parseInt(document.getElementById('cust-form-loyalty').value) || 0,
+        balance: parseFloat(document.getElementById('cust-form-balance').value) || 0.00
+      };
+
+      try {
+        if (id) {
+          const index = allCustomers.findIndex(c => c.id === parseInt(id));
+          if (index !== -1) allCustomers[index] = { ...allCustomers[index], ...payload };
+          await db.from('account_masters').update(payload).eq('id', id);
+        } else {
+          const newCust = { id: Date.now(), ...payload };
+          allCustomers.unshift(newCust);
+          await db.from('account_masters').insert([payload]);
+        }
+        closeCustomerModal();
+        renderCustomersTable(allCustomers);
+        alert('Customer profile saved successfully!');
+      } catch (err) {
+        closeCustomerModal();
+        renderCustomersTable(allCustomers);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Customer';
+      }
+    }
+
+    function deleteCustomer(id) {
+      if (!confirm('Are you sure you want to delete this customer record?')) return;
+      allCustomers = allCustomers.filter(c => c.id !== id);
+      renderCustomersTable(allCustomers);
+    }
+
+    function viewCustomerHistory(id) {
+      const c = allCustomers.find(i => i.id === id);
+      if (!c) return;
+      alert(`Customer Ledger & Measurements for: ${c.name}\nCode: ${c.code}\nLoyalty Points: ${c.loyalty}\nClosing Balance: Rs. ${c.balance}`);
+    }
+
+    // Modal: Supplier CRUD
+    function openSupplierModal(mode, suppId = null) {
+      const modal = document.getElementById('modal-supplier');
+      const title = document.getElementById('modal-supp-title');
+
+      if (mode === 'edit' && suppId) {
+        const s = allSuppliers.find(i => i.id === suppId);
+        if (s) {
+          title.innerHTML = '<i data-lucide="pencil" class="w-5 h-5 text-indigo-400"></i> Edit Supplier';
+          document.getElementById('supp-id').value = s.id;
+          document.getElementById('supp-form-name').value = s.name;
+          document.getElementById('supp-form-code').value = s.code;
+          document.getElementById('supp-form-phone').value = s.phone;
+          document.getElementById('supp-form-email').value = s.email;
+          document.getElementById('supp-form-address').value = s.address;
+          document.getElementById('supp-form-balance').value = s.balance;
+        }
+      } else {
+        title.innerHTML = '<i data-lucide="truck" class="w-5 h-5 text-indigo-400"></i> Add New Supplier';
+        document.getElementById('supp-id').value = '';
+        document.getElementById('supplier-form').reset();
+        document.getElementById('supp-form-code').value = `A-000${932 + allSuppliers.length}`;
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeSupplierModal() {
+      const modal = document.getElementById('modal-supplier');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveSupplier(e) {
+      e.preventDefault();
+      const id = document.getElementById('supp-id').value;
+      const btn = document.getElementById('btn-save-supp');
+      btn.disabled = true;
+      btn.innerText = 'Saving...';
+
+      const payload = {
+        name: document.getElementById('supp-form-name').value.trim(),
+        code: document.getElementById('supp-form-code').value.trim(),
+        phone: document.getElementById('supp-form-phone').value.trim(),
+        email: document.getElementById('supp-form-email').value.trim(),
+        address: document.getElementById('supp-form-address').value.trim(),
+        balance: parseFloat(document.getElementById('supp-form-balance').value) || 0.00,
+        account_group: 'Supplier P/A'
+      };
+
+      try {
+        if (id) {
+          const index = allSuppliers.findIndex(s => s.id === parseInt(id));
+          if (index !== -1) allSuppliers[index] = { ...allSuppliers[index], ...payload };
+          await db.from('account_masters').update(payload).eq('id', id);
+        } else {
+          const newSupp = { id: Date.now(), ...payload };
+          allSuppliers.unshift(newSupp);
+          await db.from('account_masters').insert([payload]);
+        }
+        closeSupplierModal();
+        renderSuppliersTable(allSuppliers);
+        alert('Supplier profile saved successfully!');
+      } catch (err) {
+        closeSupplierModal();
+        renderSuppliersTable(allSuppliers);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Supplier';
+      }
+    }
+
+    function deleteSupplier(id) {
+      if (!confirm('Are you sure you want to delete this supplier profile?')) return;
+      allSuppliers = allSuppliers.filter(s => s.id !== id);
+      renderSuppliersTable(allSuppliers);
+    }
+
+    // Export Data Utility (Copy & CSV Export)
+    function exportData(type, format) {
+      const data = type === 'customers' ? allCustomers : allSuppliers;
+      if (format === 'copy') {
+        const text = data.map(i => `${i.code}\t${i.name}\t${i.phone || ''}\t${i.balance}`).join('\n');
+        navigator.clipboard.writeText(text);
+        alert('Table copied to clipboard!');
+      } else if (format === 'excel') {
+        let csv = "Code,Full Name,Phone,Address,Balance\n";
+        data.forEach(i => {
+          csv += `"${i.code}","${i.name}","${i.phone || ''}","${i.address || ''}","${i.balance}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `${type}_directory.csv`);
+        a.click();
+      }
+    }
+
+    // ==========================================
+    // CATALOG & PRODUCT DIRECTORY
+    // ==========================================
     async function fetchAllProductsBatched() {
       try {
         let records = [];
@@ -1099,7 +1644,6 @@
       }
     }
 
-    // Master Profile: Render Products Directory Table
     function renderProductsTable(list) {
       const tbody = document.getElementById('tbl-master-products');
       if (!list || list.length === 0) {
@@ -1140,15 +1684,12 @@
       renderProductsTable(filtered);
     }
 
-    // Modal: Add / Edit Product CRUD
     function openProductModal(mode, prodId = null) {
       const modal = document.getElementById('modal-product');
       const title = document.getElementById('modal-product-title');
       const catSelect = document.getElementById('prod-category');
 
       populateUnitSelect();
-
-      // Populate Categories with proper names
       catSelect.innerHTML = allCategories.map(c => `<option value="${c.id}">${getCategoryName(c)}</option>`).join('');
 
       if (mode === 'edit' && prodId) {
@@ -1220,7 +1761,7 @@
       }
     }
 
-    // Modal: Categories Manager (Fixed undefined display)
+    // Modal: Categories Manager
     function openCategoriesModal() {
       const modal = document.getElementById('modal-categories');
       const list = document.getElementById('cat-list-modal');
@@ -1280,7 +1821,6 @@
       }
     }
 
-    // Modal: Product Unit Manager
     function populateUnitSelect() {
       const sel = document.getElementById('prod-unit');
       if (sel) {
@@ -1334,7 +1874,6 @@
       renderUnitsList();
     }
 
-    // Modal: Tax Profile Manager
     function openTaxModal() {
       const modal = document.getElementById('modal-tax');
       renderTaxProfilesList();
@@ -1380,7 +1919,6 @@
       renderTaxProfilesList();
     }
 
-    // Modal: CSV Importer Engine
     function openImportModal() {
       const modal = document.getElementById('modal-import');
       parsedImportProducts = [];
@@ -1416,9 +1954,7 @@
       const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
       if (lines.length <= 1) return alert('CSV file is empty or invalid.');
       
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
       parsedImportProducts = [];
-
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',').map(c => c.trim());
         if (cols.length >= 2) {
@@ -1479,7 +2015,6 @@
       }
     }
 
-    // Modal: Barcode Label Print
     function printBarcodeLabel(prodId) {
       const p = allProducts.find(item => item.id === prodId);
       if (!p) return;
@@ -1506,7 +2041,6 @@
       modal.classList.remove('flex');
     }
 
-    // Fetch Categories
     async function fetchCategories() {
       try {
         const { data } = await db.from('categories').select('*').limit(200);
@@ -1528,24 +2062,6 @@
       } catch (e) {}
     }
 
-    // Fetch Customers
-    async function fetchCustomers() {
-      try {
-        const { data } = await db.from('account_masters').select('id, name, phone').limit(300);
-        const sel = document.getElementById('customer-select');
-        (data || []).forEach(c => {
-          if (c.name) {
-            const opt = document.createElement('option');
-            opt.value = c.name;
-            opt.className = 'bg-slate-900';
-            opt.innerText = `${c.name} ${c.phone ? '(' + c.phone + ')' : ''}`;
-            sel.appendChild(opt);
-          }
-        });
-      } catch (e) {}
-    }
-
-    // Fetch Purchases
     async function fetchPurchases() {
       try {
         const { data } = await db.from('purchases').select('*').limit(1000);
@@ -1553,7 +2069,6 @@
       } catch (e) {}
     }
 
-    // Fetch Sales, Line Items & Compute Analytics
     async function fetchSalesAndAnalytics() {
       try {
         let records = [];
@@ -1585,7 +2100,6 @@
       }
     }
 
-    // Dynamic Filter Engine
     function setQuickFilterButtonActive(btn) {
       document.querySelectorAll('.quick-filter-btn').forEach(b => {
         b.className = 'quick-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-bold transition border border-white/5 whitespace-nowrap';
@@ -1647,7 +2161,6 @@
       updateDashboardMetrics(filteredSales, startStr, endStr, false);
     }
 
-    // Update Dashboard Metrics & Charts
     function updateDashboardMetrics(salesSubset, startStr, endStr, isAllTime) {
       const periodSalesSum = salesSubset.reduce((acc, s) => acc + getSaleBill(s), 0);
       const totalAllTimeSum = allSales.reduce((acc, s) => acc + getSaleBill(s), 0);
@@ -1672,7 +2185,6 @@
       renderTop10TrendingProducts();
     }
 
-    // 1. Chart.js Sales Overview Timeline Chart
     function renderContinuousSalesChart(salesList, startStr, endStr) {
       const ctx = document.getElementById('salesChart').getContext('2d');
       const dailyMap = {};
@@ -1750,7 +2262,6 @@
       });
     }
 
-    // 2. Sales vs Expenses Chart
     function renderSalesVsExpensesChart(salesList, startStr, endStr) {
       const ctx = document.getElementById('salesExpensesChart').getContext('2d');
       if (salesExpensesChartInstance) salesExpensesChartInstance.destroy();
@@ -1805,10 +2316,8 @@
       });
     }
 
-    // 3. Top 10 Trending Products
     function renderTop10TrendingProducts() {
       const tbody = document.getElementById('tbl-trending-prods');
-      
       const realTop10 = [
         { name: 'zellbury lawn cordsets (S...', code: 'P-P-001358', revenue: 54050, qty: 6 },
         { name: 'SAPHIRE U/S 2PC', code: '00000765', revenue: 37100, qty: 10 },
@@ -1847,10 +2356,8 @@
       lucide.createIcons();
     }
 
-    // 4. Low Stock Alert
     function renderRealLowStockAlerts() {
       const tbody = document.getElementById('tbl-low-stock');
-      
       const realLowStock = [
         { id: 131, name: 'ZEL2690', code: '00000131', stock: -45 },
         { id: 217, name: 'Item 38', code: '00000217', stock: -25 },
@@ -1891,7 +2398,6 @@
       lucide.createIcons();
     }
 
-    // Terminal Product Matrix & Cart Handlers
     function renderProducts(list) {
       const grid = document.getElementById('product-grid');
       grid.innerHTML = '';

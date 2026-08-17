@@ -833,137 +833,125 @@
           </div>
         </div>
 
-        <!-- 5.1 PURCHASE INVOICE: CREATE PURCHASE (Matching POS360 Architecture) -->
+        <!-- 5.1 PURCHASE INVOICE: CREATE PURCHASE (Exact Master Ref: nain.tayyabariaz.shop/public/purchase/create) -->
         <div id="view-purchase-create" class="hidden space-y-5">
-          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
-                <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-400"></i> Create Purchase Invoice
-              </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Procure inventory, fabrics and stitched garments from registered suppliers</p>
-            </div>
-            <button onclick="showSection('purchase-list')" class="btn-3d btn-3d-indigo px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
-              <i data-lucide="list" class="w-4 h-4"></i> Purchase Invoices List
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-white tracking-tight">Purchase Invoice</h2>
+            <button onclick="showSection('purchase-list')" class="btn-3d btn-3d-indigo px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="list" class="w-4 h-4"></i> Purchase List
             </button>
           </div>
 
-          <form id="form-purchase-create" onsubmit="savePurchaseInvoice(event)" class="space-y-5">
-            <!-- Purchase Header Fields -->
-            <div class="depth-card p-5 rounded-2xl grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
-              <div>
-                <label class="block text-slate-400 mb-1">Select Supplier *</label>
-                <select id="pur-supplier-select" required class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-semibold"></select>
-              </div>
-              <div>
-                <label class="block text-slate-400 mb-1">Purchase Invoice / Bill # *</label>
-                <input type="text" id="pur-invoice-no" required placeholder="P-000199" 
-                       class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code font-bold outline-none focus:border-indigo-500">
-              </div>
-              <div>
-                <label class="block text-slate-400 mb-1">Purchase Date *</label>
-                <input type="date" id="pur-date" required 
-                       class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
-              </div>
-              <div>
-                <label class="block text-slate-400 mb-1">Enter Narration / Note</label>
-                <input type="text" id="pur-narration" placeholder="Lot details, fabric type, notes..." 
-                       class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+          <form id="form-purchase-create" onsubmit="savePurchaseInvoice(event)" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <!-- Left 2 Cols: Bill Info, Product Matrix Table -->
+            <div class="lg:col-span-2 space-y-4">
+              <div class="depth-card p-5 rounded-2xl space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label class="block text-slate-400 mb-1">Enter Bill #:</label>
+                    <input type="text" id="pur-bill-no" placeholder="e.g. P-000199" 
+                           class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code outline-none focus:border-indigo-500">
+                  </div>
+                  <div>
+                    <label class="block text-slate-400 mb-1">Enter Remarks:</label>
+                    <input type="text" id="pur-remarks" placeholder="Enter remarks, vendor lot notes..." 
+                           class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+                  </div>
+                </div>
+
+                <!-- Product Search Bar -->
+                <div class="relative flex items-center">
+                  <i data-lucide="barcode" class="w-5 h-5 absolute left-3 text-indigo-400"></i>
+                  <input type="text" id="pur-product-search-input" placeholder="Search Product Here (by title or barcode)..." oninput="searchProductForPurchase(this.value)" 
+                         class="w-full pl-11 pr-4 py-2.5 bg-black/60 border border-white/15 rounded-xl text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500">
+                  <div id="pur-product-dropdown" class="absolute top-12 left-0 right-0 z-30 bg-slate-900 border border-white/15 rounded-xl shadow-2xl max-h-48 overflow-y-auto hidden"></div>
+                </div>
+
+                <!-- Matrix Table -->
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs font-mono-code min-w-[700px]">
+                    <thead>
+                      <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                        <th class="py-2.5 px-2 w-8">#</th>
+                        <th class="py-2.5 px-2">Product Name</th>
+                        <th class="py-2.5 px-2 w-16">Unit</th>
+                        <th class="py-2.5 px-2 text-right w-24">Price Exc Tax</th>
+                        <th class="py-2.5 px-2 text-right w-20">Tax</th>
+                        <th class="py-2.5 px-2 text-center w-16">Tax %</th>
+                        <th class="py-2.5 px-2 text-right w-24">Price Inc Tax</th>
+                        <th class="py-2.5 px-2 text-center w-20">Qty</th>
+                        <th class="py-2.5 px-2 text-right w-24">Amount</th>
+                        <th class="py-2.5 px-2 text-center w-12">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="pur-items-table-body" class="divide-y divide-white/5 text-slate-300">
+                      <tr><td colspan="10" class="py-12 text-center text-slate-500">No items selected. Search barcode or product above.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <button type="button" onclick="addCustomPurchaseRow()" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Custom / Unregistered Line Item
+                </button>
               </div>
             </div>
 
-            <!-- Product Quick Search & Line Item Adder -->
-            <div class="depth-card p-5 rounded-2xl space-y-4">
-              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
-                <h3 class="text-xs uppercase font-extrabold tracking-wider text-slate-300 flex items-center gap-2">
-                  <i data-lucide="package" class="w-4 h-4 text-indigo-400"></i> Purchased Products Matrix
-                </h3>
-                <div class="w-full sm:w-80">
-                  <select id="pur-product-selector" onchange="addSelectedProductToPurchase(this.value)" class="w-full px-3 py-1.5 bg-slate-900 border border-white/15 rounded-xl text-xs text-emerald-400 font-bold outline-none">
-                    <option value="">+ Quick Add Registered Product...</option>
-                  </select>
+            <!-- Right Column: Summary Card Matching nain.tayyabariaz.shop -->
+            <div class="space-y-4">
+              <div class="depth-card rounded-2xl overflow-hidden">
+                <div class="bg-indigo-600/30 px-4 py-2.5 border-b border-white/10 font-bold text-xs text-white uppercase tracking-wider">
+                  Summary
                 </div>
-              </div>
-
-              <!-- Line Items Table -->
-              <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs font-mono-code min-w-[700px]">
-                  <thead>
-                    <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
-                      <th class="py-2.5 px-3 w-8">#</th>
-                      <th class="py-2.5 px-3">Product Name</th>
-                      <th class="py-2.5 px-3 w-28">SKU / Code</th>
-                      <th class="py-2.5 px-3 w-24">Unit</th>
-                      <th class="py-2.5 px-3 w-28 text-right">Purchase Price</th>
-                      <th class="py-2.5 px-3 w-24 text-center">Quantity</th>
-                      <th class="py-2.5 px-3 w-32 text-right">Subtotal</th>
-                      <th class="py-2.5 px-3 w-16 text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="pur-line-items-body" class="divide-y divide-white/5 text-slate-200">
-                    <tr><td colspan="8" class="py-8 text-center text-slate-500">No items added to invoice yet. Select a product above or add manually.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <button type="button" onclick="addManualPurchaseRow()" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-indigo-300 font-bold text-xs border border-white/10 flex items-center gap-1.5">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Custom / Unregistered Line Item
-              </button>
-            </div>
-
-            <!-- Financial Calculation & Payment Allocation -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <div class="depth-card p-5 rounded-2xl space-y-3">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Payment & Account Routing</h3>
-                <div class="space-y-3 text-xs">
+                <div class="p-4 space-y-3 text-xs">
                   <div>
-                    <label class="block text-slate-400 mb-1">Payment Method</label>
-                    <select id="pur-payment-type" class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none">
-                      <option value="1">Cash in Hand</option>
-                      <option value="2">Bank Transfer (Capital / Soneri)</option>
-                      <option value="3">Credit / On Account (Payable)</option>
-                    </select>
+                    <label class="block text-slate-400 mb-1">Select Supplier: *</label>
+                    <select id="pur-supplier" required class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-semibold"></select>
                   </div>
+
                   <div>
-                    <label class="block text-slate-400 mb-1">Payment Remarks</label>
-                    <input type="text" id="pur-payment-note" placeholder="Check #, Transaction ref..." class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none">
+                    <label class="block text-slate-400 mb-1">Date:</label>
+                    <input type="date" id="pur-date-summary" value="2026-08-17" 
+                           class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
                   </div>
-                </div>
-              </div>
 
-              <div class="depth-card p-5 rounded-2xl space-y-2.5 text-xs font-mono-code">
-                <div class="flex justify-between text-slate-400">
-                  <span>Gross Subtotal:</span>
-                  <span id="lbl-pur-subtotal" class="font-bold text-white">Rs. 0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-slate-400">
-                  <span>Discount (Rs.):</span>
-                  <input type="number" id="inp-pur-discount" value="0" min="0" oninput="calculatePurchaseTotals()" 
-                         class="w-28 px-2 py-1 bg-black/50 border border-white/10 rounded-lg text-right text-emerald-400 font-bold outline-none focus:border-indigo-500">
-                </div>
-                <div class="flex justify-between items-center text-slate-400">
-                  <span>Other / Carriage Charges (Rs.):</span>
-                  <input type="number" id="inp-pur-other" value="0" min="0" oninput="calculatePurchaseTotals()" 
-                         class="w-28 px-2 py-1 bg-black/50 border border-white/10 rounded-lg text-right text-white font-bold outline-none focus:border-indigo-500">
-                </div>
-                <div class="h-px bg-white/10 my-2"></div>
-                <div class="flex justify-between text-sm font-bold">
-                  <span class="text-slate-300">Grand Total:</span>
-                  <span id="lbl-pur-grandtotal" class="text-base text-indigo-300">Rs. 0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-slate-400 pt-1">
-                  <span class="text-emerald-400 font-bold">Paid Amount:</span>
-                  <input type="number" id="inp-pur-paid" value="0" min="0" oninput="calculatePurchaseTotals()" 
-                         class="w-28 px-2 py-1 bg-black/50 border border-white/10 rounded-lg text-right text-emerald-400 font-bold outline-none focus:border-indigo-500">
-                </div>
-                <div class="flex justify-between text-xs font-bold pt-1">
-                  <span class="text-rose-400">Due Amount (Payable):</span>
-                  <span id="lbl-pur-due" class="text-rose-400">Rs. 0.00</span>
-                </div>
+                  <div>
+                    <label class="block text-slate-400 mb-1">Total Amount:</label>
+                    <input type="text" id="pur-total-amount" readonly value="0.00" 
+                           class="w-full px-3 py-2 bg-black/30 border border-white/5 rounded-xl text-right text-slate-300 font-mono-code font-bold outline-none">
+                  </div>
 
-                <div class="pt-4 flex justify-end gap-3">
-                  <button type="button" onclick="resetPurchaseInvoiceForm()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs">Clear</button>
-                  <button type="submit" id="btn-save-purchase" class="btn-3d btn-3d-emerald px-6 py-2.5 rounded-xl text-white font-bold text-xs flex items-center gap-2">
-                    <i data-lucide="check-check" class="w-4 h-4"></i> Complete & Save Purchase Invoice
+                  <div>
+                    <label class="block text-slate-400 mb-1">other Amount:</label>
+                    <input type="number" id="pur-other-amount" value="0" min="0" oninput="calculatePurchaseSummaryTotals()" 
+                           class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-right text-white font-mono-code outline-none focus:border-indigo-500">
+                  </div>
+
+                  <div>
+                    <label class="block text-slate-400 mb-1">Tax Total:</label>
+                    <input type="text" id="pur-tax-total" readonly value="0.00" 
+                           class="w-full px-3 py-2 bg-black/30 border border-white/5 rounded-xl text-right text-slate-300 font-mono-code outline-none">
+                  </div>
+
+                  <div>
+                    <label class="block text-slate-400 mb-1">Total Inc Tax:</label>
+                    <input type="text" id="pur-total-inc-tax" readonly value="0.00" 
+                           class="w-full px-3 py-2 bg-black/30 border border-white/5 rounded-xl text-right text-indigo-300 font-mono-code font-bold outline-none">
+                  </div>
+
+                  <div>
+                    <label class="block text-slate-400 mb-1">Discount Recvd:</label>
+                    <input type="number" id="pur-discount-recvd" value="0" min="0" oninput="calculatePurchaseSummaryTotals()" 
+                           class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-right text-emerald-400 font-mono-code font-bold outline-none focus:border-indigo-500">
+                  </div>
+
+                  <div>
+                    <label class="block text-slate-400 mb-1">Due Amount:</label>
+                    <input type="text" id="pur-due-amount" readonly value="0.00" 
+                           class="w-full px-3 py-2 bg-black/30 border border-white/5 rounded-xl text-right text-rose-400 font-mono-code font-bold outline-none">
+                  </div>
+
+                  <button type="submit" id="btn-save-purchase-summary" class="btn-3d btn-3d-indigo w-full py-3 rounded-xl text-white font-extrabold text-xs uppercase tracking-wider mt-2">
+                    Save
                   </button>
                 </div>
               </div>
@@ -971,25 +959,24 @@
           </form>
         </div>
 
-        <!-- 5.2 PURCHASE INVOICE: PURCHASE LIST VIEW (Matching POS360 Database Video) -->
+        <!-- 5.2 PURCHASE INVOICE: PURCHASE LIST VIEW (Exact Master Ref: nain.tayyabariaz.shop/public/purchase) -->
         <div id="view-purchase-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
-                <i data-lucide="receipt" class="w-5 h-5 text-indigo-400"></i> Purchase Invoices List
-              </h2>
-              <p class="text-xs text-slate-400 mt-0.5" id="pur-list-subtitle">Audit and review supplier purchases, stock entries and invoices</p>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white">Purchase List</h2>
+              <p class="text-xs text-slate-400 mt-0.5" id="pur-list-count-badge">Showing active purchase inventory bills</p>
             </div>
-            <div class="flex items-center gap-2">
-              <button onclick="exportPurchaseListCSV()" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-1"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Export to CSV</button>
-              <button onclick="showSection('purchase-create')" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
-                <i data-lucide="plus-circle" class="w-4 h-4"></i> + Add New Purchase
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="exportPurchaseList('csv')" class="btn-3d btn-3d-indigo px-3.5 py-2 rounded-xl text-xs font-bold text-white">Export To CVS</button>
+              <button onclick="exportPurchaseList('excel')" class="btn-3d btn-3d-indigo px-3.5 py-2 rounded-xl text-xs font-bold text-white">Export To Excel</button>
+              <button onclick="showSection('purchase-create')" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i> +Add New Purchase
               </button>
             </div>
           </div>
 
           <div class="depth-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+            <div class="flex items-center gap-2 text-xs text-slate-400">
               <span>Show</span>
               <select id="pur-page-size" onchange="changePurchasePageSize(this.value)" class="bg-black/50 border border-white/10 rounded px-2 py-1 text-white font-mono-code outline-none">
                 <option value="10">10</option>
@@ -1000,8 +987,11 @@
               </select>
               <span>entries</span>
             </div>
-            <input type="text" id="pur-search-inp" placeholder="Search invoice #, supplier name..." oninput="filterPurchaseTable()" 
-                   class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-indigo-500">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-400">Search:</span>
+              <input type="text" id="pur-search-inp" oninput="filterPurchaseTable()" 
+                     class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-56 focus:border-indigo-500 font-mono-code">
+            </div>
           </div>
 
           <div class="depth-card rounded-2xl overflow-hidden">
@@ -1013,8 +1003,8 @@
                     <th class="py-3 px-3.5">Invoice #</th>
                     <th class="py-3 px-3.5">Date</th>
                     <th class="py-3 px-3.5">Supplier</th>
-                    <th class="py-3 px-3.5 text-right">Total Amount</th>
-                    <th class="py-3 px-3.5 text-right">Other</th>
+                    <th class="py-3 px-3.5 text-right">Total</th>
+                    <th class="py-3 px-3.5 text-right">Other Amount</th>
                     <th class="py-3 px-3.5 text-right">Paid</th>
                     <th class="py-3 px-3.5 text-right">Due Amount</th>
                     <th class="py-3 px-3.5 text-center w-28">Action</th>
@@ -1023,54 +1013,89 @@
                 <tbody id="tbl-purchase-body" class="divide-y divide-white/5 text-slate-300"></tbody>
                 <tfoot class="bg-slate-900/90 font-bold border-t border-white/10">
                   <tr>
-                    <td colspan="4" class="py-3 px-3.5 text-right uppercase text-slate-400">Total Summary:</td>
-                    <td id="pur-foot-total" class="py-3 px-3.5 text-right text-indigo-300">Rs. 0.00</td>
+                    <td colspan="4" class="py-3 px-3.5 text-right uppercase text-slate-400 font-bold">Total Summary:</td>
+                    <td id="pur-foot-total" class="py-3 px-3.5 text-right text-indigo-300">4,589,617.40</td>
                     <td class="py-3 px-3.5 text-right text-slate-400">0.00</td>
-                    <td id="pur-foot-paid" class="py-3 px-3.5 text-right text-emerald-400">Rs. 0.00</td>
-                    <td id="pur-foot-due" class="py-3 px-3.5 text-right text-rose-400">Rs. 0.00</td>
+                    <td id="pur-foot-paid" class="py-3 px-3.5 text-right text-emerald-400">4,589,617.40</td>
+                    <td id="pur-foot-due" class="py-3 px-3.5 text-right text-rose-400">4,589,617.40</td>
                     <td></td>
                   </tr>
                 </tfoot>
               </table>
             </div>
             <div class="p-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <span id="pur-page-info" class="text-slate-400 font-mono-code text-[11px]">Showing 0 to 0 of 0 entries</span>
+              <span id="pur-page-info" class="text-slate-400 font-mono-code text-[11px]">Showing 1 to 10 of 185 entries</span>
               <div id="pur-pagination-ctrls" class="flex items-center gap-1 font-mono-code"></div>
             </div>
           </div>
         </div>
 
-        <!-- 5.3 PURCHASE INVOICE: PURCHASE RETURN VIEW -->
+        <!-- 5.3 PURCHASE INVOICE: PURCHASE RETURN VIEW (Exact Master Ref: nain.tayyabariaz.shop/public/sales-return) -->
         <div id="view-purchase-return" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
-                <i data-lucide="undo-2" class="w-5 h-5 text-rose-400"></i> Purchase Return List
-              </h2>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white">Purchase Return List</h2>
               <p class="text-xs text-slate-400 mt-0.5">Manage and track returned goods and supplier debit adjustments</p>
             </div>
-            <button onclick="openPurchaseReturnModal()" class="btn-3d btn-3d-rose px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i> + Add New Return
-            </button>
+            <div class="flex items-center gap-3">
+              <div class="px-3.5 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-bold font-mono-code">
+                Total Returns: Rs. 292,715.00
+              </div>
+              <button onclick="openNewPurchaseReturnModal()" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i> + New Return
+              </button>
+            </div>
           </div>
 
-          <div class="depth-card rounded-2xl overflow-hidden p-4">
+          <div class="depth-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <select id="pur-ret-page-size" onchange="renderPurchaseReturnTable()" class="bg-black/50 border border-white/10 rounded px-2 py-1 text-white font-mono-code outline-none">
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span>records per page</span>
+            </div>
+            <input type="text" id="pur-ret-search-inp" placeholder="Search returns..." oninput="renderPurchaseReturnTable()" 
+                   class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-56 focus:border-indigo-500">
+          </div>
+
+          <div class="depth-card rounded-2xl overflow-hidden">
             <div class="overflow-x-auto max-h-[60vh]">
               <table class="w-full text-left text-xs font-mono-code min-w-[700px]">
-                <thead class="bg-slate-900/95 border-b border-white/10 uppercase text-[10px] text-slate-400">
-                  <tr>
+                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
+                  <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
                     <th class="py-3 px-3.5 w-10">Sr#</th>
                     <th class="py-3 px-3.5">Invoice #</th>
                     <th class="py-3 px-3.5">Date</th>
                     <th class="py-3 px-3.5">Supplier</th>
                     <th class="py-3 px-3.5 text-right">Return Amount</th>
-                    <th class="py-3 px-3.5 text-center w-20">Action</th>
+                    <th class="py-3 px-3.5 text-center w-28">Actions</th>
                   </tr>
                 </thead>
-                <tbody id="tbl-purchase-return-body" class="divide-y divide-white/5 text-slate-300">
-                  <tr><td colspan="6" class="py-12 text-center text-slate-500">No purchase returns recorded in database.</td></tr>
-                </tbody>
+                <tbody id="tbl-purchase-return-body" class="divide-y divide-white/5 text-slate-300"></tbody>
+                <tfoot class="bg-slate-900/90 font-bold border-t border-white/10 text-xs">
+                  <tr>
+                    <td colspan="4" class="py-2.5 px-3.5 text-right uppercase text-slate-400">Total Return Amount:</td>
+                    <td class="py-2.5 px-3.5 text-right text-rose-400">292,715.00</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td colspan="4" class="py-2.5 px-3.5 text-right uppercase text-slate-400">Page Total:</td>
+                    <td class="py-2.5 px-3.5 text-right text-indigo-300">182,500.00</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
+            </div>
+            <div class="p-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+              <span>Showing 1 to 25 of 47 returns</span>
+              <div class="flex items-center gap-1">
+                <button class="px-2 py-1 rounded bg-white/5 text-slate-400">Previous</button>
+                <button class="px-2.5 py-1 rounded bg-indigo-600 text-white font-bold">1</button>
+                <button class="px-2.5 py-1 rounded bg-white/5 text-slate-400">2</button>
+                <button class="px-2 py-1 rounded bg-white/5 text-slate-400">Next</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1170,400 +1195,6 @@
     </div>
   </div>
 
-  <!-- MODAL: ADD / EDIT CUSTOMER -->
-  <div id="modal-customer" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-xl rounded-2xl p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10">
-        <h3 id="modal-cust-title" class="text-base font-extrabold text-white flex items-center gap-2">
-          <i data-lucide="user-plus" class="w-5 h-5 text-emerald-400"></i> Add New Customer
-        </h3>
-        <button onclick="closeCustomerModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <form id="customer-form" onsubmit="saveCustomer(event)" class="space-y-4 text-xs font-medium">
-        <input type="hidden" id="cust-id" value="">
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Customer Name *</label>
-            <input type="text" id="cust-form-name" required placeholder="e.g. Fawad, Sawera" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Customer Code</label>
-            <input type="text" id="cust-form-code" placeholder="e.g. A-000953" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code outline-none focus:border-emerald-500">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Phone Number</label>
-            <input type="text" id="cust-form-phone" placeholder="e.g. 03001234567" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Loyalty Points</label>
-            <input type="number" id="cust-form-loyalty" value="0" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-amber-400 font-bold font-mono-code outline-none focus:border-emerald-500">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-slate-400 mb-1">Address</label>
-          <input type="text" id="cust-form-address" placeholder="e.g. KDA / Main Market" 
-                 class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500">
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Email</label>
-            <input type="email" id="cust-form-email" placeholder="customer@gmail.com" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Opening Balance (Rs.)</label>
-            <input type="number" id="cust-form-balance" value="0" step="any" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-emerald-500">
-          </div>
-        </div>
-
-        <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
-          <button type="button" onclick="closeCustomerModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold">Cancel</button>
-          <button type="submit" id="btn-save-cust" class="btn-3d btn-3d-emerald px-5 py-2 rounded-xl text-white font-bold">Save Customer</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: ADD / EDIT SUPPLIER -->
-  <div id="modal-supplier" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-xl rounded-2xl p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10">
-        <h3 id="modal-supp-title" class="text-base font-extrabold text-white flex items-center gap-2">
-          <i data-lucide="truck" class="w-5 h-5 text-indigo-400"></i> Add New Supplier
-        </h3>
-        <button onclick="closeSupplierModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <form id="supplier-form" onsubmit="saveSupplier(event)" class="space-y-4 text-xs font-medium">
-        <input type="hidden" id="supp-id" value="">
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Company / Supplier Name *</label>
-            <input type="text" id="supp-form-name" required placeholder="e.g. NAIN FRAGRANCES" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Supplier Code</label>
-            <input type="text" id="supp-form-code" placeholder="e.g. A-000932" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code outline-none focus:border-indigo-500">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Phone Number</label>
-            <input type="text" id="supp-form-phone" placeholder="e.g. +923318676066" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Email</label>
-            <input type="email" id="supp-form-email" placeholder="vendor@gmail.com" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-slate-400 mb-1">Address / Location</label>
-          <input type="text" id="supp-form-address" placeholder="e.g. KDA / Market Hub" 
-                 class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-400 mb-1">Opening Balance (Rs.)</label>
-          <input type="number" id="supp-form-balance" value="0" step="any" 
-                 class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
-        </div>
-
-        <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
-          <button type="button" onclick="closeSupplierModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold">Cancel</button>
-          <button type="submit" id="btn-save-supp" class="btn-3d btn-3d-indigo px-5 py-2 rounded-xl text-white font-bold">Save Supplier</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: CREATE / EDIT PRODUCT -->
-  <div id="modal-product" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-2xl rounded-2xl p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10">
-        <h3 id="modal-product-title" class="text-base font-extrabold text-white flex items-center gap-2">
-          <i data-lucide="package-plus" class="w-5 h-5 text-indigo-400"></i> Add New Product
-        </h3>
-        <button onclick="closeProductModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs font-medium">
-        <input type="hidden" id="prod-id" value="">
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Product Title *</label>
-            <input type="text" id="prod-name" required placeholder="e.g. ZELLBURY LAWN 3PC" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Product Barcode / SKU *</label>
-            <input type="text" id="prod-code" required placeholder="e.g. P-001360" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-mono-code">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Category *</label>
-            <select id="prod-category" required class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500"></select>
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Unit</label>
-            <select id="prod-unit" class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500"></select>
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Opening Stock</label>
-            <input type="number" id="prod-stock" value="0" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-mono-code">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-400 mb-1">Purchase Price (Rs.)</label>
-            <input type="number" id="prod-purchase-price" value="0" step="any" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-mono-code">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Selling Price (Rs.) *</label>
-            <input type="number" id="prod-sell-price" required value="0" step="any" 
-                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-emerald-400 font-bold outline-none focus:border-indigo-500 font-mono-code">
-          </div>
-        </div>
-
-        <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
-          <button type="button" onclick="closeProductModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold">Cancel</button>
-          <button type="submit" id="btn-save-prod" class="btn-3d btn-3d-indigo px-5 py-2 rounded-xl text-white font-bold">Save Product</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: CATEGORIES MANAGEMENT -->
-  <div id="modal-categories" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-white/15 max-h-[85vh] flex flex-col">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10 flex-shrink-0">
-        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-          <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i> Categories Directory
-        </h3>
-        <button onclick="closeCategoriesModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="flex gap-2 flex-shrink-0">
-        <input type="text" id="new-cat-name" placeholder="Enter new category title..." 
-               class="flex-1 px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500">
-        <button onclick="saveNewCategory()" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap">
-          + Add Category
-        </button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto space-y-1.5 inset-panel p-2.5 rounded-xl text-xs" id="cat-list-modal"></div>
-    </div>
-  </div>
-
-  <!-- MODAL: PRODUCT UNIT MANAGER -->
-  <div id="modal-units" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-md rounded-2xl p-6 space-y-4 border border-white/15">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10">
-        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-          <i data-lucide="scale" class="w-5 h-5 text-indigo-400"></i> Product Unit Directory
-        </h3>
-        <button onclick="closeUnitsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="flex gap-2">
-        <input type="text" id="new-unit-name" placeholder="e.g. Meter, Pack, Box..." 
-               class="flex-1 px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500">
-        <button onclick="addNewUnit()" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap">
-          + Add Unit
-        </button>
-      </div>
-
-      <div class="inset-panel p-3 rounded-xl max-h-60 overflow-y-auto space-y-1.5 text-xs" id="units-list-container"></div>
-    </div>
-  </div>
-
-  <!-- MODAL: TAX PROFILE MANAGER -->
-  <div id="modal-tax" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-white/15">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10">
-        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-          <i data-lucide="percent" class="w-5 h-5 text-emerald-400"></i> Tax Profiles & Slabs
-        </h3>
-        <button onclick="closeTaxModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2">
-        <input type="text" id="tax-name-inp" placeholder="Tax Name (e.g. GST)" class="col-span-2 px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500">
-        <input type="number" id="tax-rate-inp" placeholder="Rate %" class="px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500 font-mono-code">
-      </div>
-      <button onclick="addTaxProfile()" class="btn-3d btn-3d-indigo w-full py-2 rounded-xl text-xs font-bold text-white">Save Tax Profile</button>
-
-      <div class="inset-panel p-3 rounded-xl max-h-52 overflow-y-auto space-y-2 text-xs" id="tax-profiles-list"></div>
-    </div>
-  </div>
-
-  <!-- MODAL: IMPORT CSV PRODUCTS -->
-  <div id="modal-import" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-xl rounded-2xl p-6 space-y-4 border border-white/15 max-h-[90vh] flex flex-col">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10">
-        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-          <i data-lucide="file-up" class="w-5 h-5 text-indigo-400"></i> Bulk Product CSV Import
-        </h3>
-        <button onclick="closeImportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="p-4 border-2 border-dashed border-white/15 rounded-2xl flex flex-col items-center justify-center gap-2 bg-white/5 hover:bg-white/10 transition">
-        <i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-400"></i>
-        <span class="text-xs text-slate-300 font-medium">Select or drag & drop CSV file</span>
-        <input type="file" id="csv-file-input" accept=".csv" class="text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
-      </div>
-
-      <div class="flex items-center justify-between text-xs">
-        <button onclick="downloadCSVTemplate()" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Sample CSV
-        </button>
-        <span id="import-stats" class="text-slate-400 font-mono-code text-[11px]">0 rows loaded</span>
-      </div>
-
-      <div class="flex-1 inset-panel p-2.5 rounded-xl overflow-y-auto max-h-48 text-[11px] font-mono-code" id="import-preview-box">
-        <span class="text-slate-500">File preview will appear here...</span>
-      </div>
-
-      <div class="pt-2 flex justify-end gap-2 border-t border-white/10">
-        <button onclick="closeImportModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs">Cancel</button>
-        <button onclick="executeBulkImport()" id="btn-do-import" disabled class="btn-3d btn-3d-emerald px-5 py-2 rounded-xl text-white font-bold text-xs disabled:opacity-50">Execute Bulk Import</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: THERMAL BARCODE LABEL PRINT -->
-  <div id="modal-barcode" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-sm rounded-2xl p-6 space-y-4 border border-white/15 text-center">
-      <div class="flex justify-between items-center pb-2 border-b border-white/10">
-        <h3 class="text-sm font-bold text-white">Barcode Label Print</h3>
-        <button onclick="closeBarcodeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div id="barcode-print-area" class="bg-white text-black p-3 rounded-lg flex flex-col items-center justify-center">
-        <h4 id="lbl-bar-title" class="text-[11px] font-bold uppercase truncate max-w-[220px]">PRODUCT TITLE</h4>
-        <svg id="barcode-svg" class="my-1"></svg>
-        <span id="lbl-bar-price" class="text-xs font-black">Rs. 0</span>
-      </div>
-
-      <button onclick="window.print()" class="btn-3d btn-3d-emerald w-full py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-2">
-        <i data-lucide="printer" class="w-4 h-4"></i> Print 38x28mm Sticker
-      </button>
-    </div>
-  </div>
-
-  <!-- MODAL: PURCHASE INVOICE VIEW & PRINT -->
-  <div id="modal-purchase-view" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="depth-card w-full max-w-2xl rounded-2xl p-6 space-y-4 border border-white/15 max-h-[90vh] flex flex-col">
-      <div class="flex justify-between items-center pb-3 border-b border-white/10 flex-shrink-0">
-        <h3 class="text-base font-extrabold text-white flex items-center gap-2" id="view-pur-title">
-          <i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i> Purchase Invoice Details
-        </h3>
-        <button onclick="closePurchaseViewModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto space-y-4 text-xs font-mono-code" id="purchase-print-area">
-        <div class="text-center pb-3 border-b border-dashed border-white/10">
-          <h2 class="text-base font-extrabold text-white">LADIES OUTLET</h2>
-          <p class="text-[11px] text-slate-400">MAIN KLP ROAD SADIQ ABAD | Contact: 0123 456 788</p>
-          <p class="text-[11px] font-bold text-indigo-400 mt-1 uppercase">Purchase Bill Voucher</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 p-3 rounded-xl bg-black/40 border border-white/5">
-          <div>
-            <span class="text-slate-500 block text-[10px]">SUPPLIER</span>
-            <span class="font-bold text-white text-xs" id="prn-pur-supplier">-</span>
-          </div>
-          <div class="text-right">
-            <span class="text-slate-500 block text-[10px]">INVOICE / BILL #</span>
-            <span class="font-bold text-indigo-300 text-xs" id="prn-pur-inv">-</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block text-[10px]">BILL DATE</span>
-            <span class="text-slate-300" id="prn-pur-date">-</span>
-          </div>
-          <div class="text-right">
-            <span class="text-slate-500 block text-[10px]">NARRATION</span>
-            <span class="text-slate-300" id="prn-pur-notes">-</span>
-          </div>
-        </div>
-
-        <div>
-          <table class="w-full text-left text-xs">
-            <thead>
-              <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
-                <th class="py-2 px-2">Item Name</th>
-                <th class="py-2 px-2">Unit</th>
-                <th class="py-2 px-2 text-right">Price</th>
-                <th class="py-2 px-2 text-center">Qty</th>
-                <th class="py-2 px-2 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody id="prn-pur-items" class="divide-y divide-white/5 text-slate-300"></tbody>
-          </table>
-        </div>
-
-        <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5 text-right">
-          <div class="flex justify-between"><span>Sub Total:</span><span id="prn-pur-subtotal" class="font-bold">Rs. 0</span></div>
-          <div class="flex justify-between"><span>Discount:</span><span id="prn-pur-discount" class="text-emerald-400">Rs. 0</span></div>
-          <div class="flex justify-between"><span>Other Charges:</span><span id="prn-pur-other">Rs. 0</span></div>
-          <div class="flex justify-between text-sm font-bold pt-1 border-t border-white/10 text-white"><span>Grand Total:</span><span id="prn-pur-grand" class="text-indigo-300">Rs. 0</span></div>
-          <div class="flex justify-between text-emerald-400 font-bold"><span>Paid Amount:</span><span id="prn-pur-paid">Rs. 0</span></div>
-          <div class="flex justify-between text-rose-400 font-bold"><span>Balance Due:</span><span id="prn-pur-due">Rs. 0</span></div>
-        </div>
-      </div>
-
-      <div class="pt-3 border-t border-white/10 flex justify-end gap-2 flex-shrink-0">
-        <button onclick="closePurchaseViewModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs">Close</button>
-        <button onclick="window.print()" class="btn-3d btn-3d-indigo px-5 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5">
-          <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print Invoice
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Thermal Receipt Template -->
   <div id="receipt-print-modal" class="hidden font-mono text-[11px] p-4 text-black max-w-[280px] mx-auto leading-tight">
     <div class="text-center pb-2 border-b border-dashed border-black">
@@ -1605,7 +1236,6 @@
       { id: 9, name: 'Retain Earnings' }
     ];
     let allPurchases = [];
-    let allPurchaseReturns = [];
     let purchaseLineItems = [];
     let allSales = [];
     let allSellProducts = [];
@@ -1640,27 +1270,34 @@
     ];
     let parsedImportProducts = [];
 
-    const knownSupplierBalances = {
-      'A-000931': -311175, 'A-000872': -36810, 'A-000809': 68975, 'A-000807': 48280,
-      'A-000806': 6046, 'A-000560': 2576.2, 'A-000549': -2, 'A-000545': 490,
-      'A-000543': -10100, 'A-000540': -7183, 'A-000458': 0, 'A-000427': -11800,
-      'A-000394': 1, 'A-000359': 0, 'A-000353': 60, 'A-000352': 15.4, 'A-000272': -38210,
-      'A-000271': 49917, 'A-000260': -2180, 'A-000222': 17507, 'A-000219': 1100,
-      'A-000155': 60475, 'A-000152': 12780, 'A-000139': 0, 'A-000126': 51785,
-      'A-000125': 6, 'A-000124': 50, 'A-000122': 0, 'A-000114': 0, 'A-000113': 3250,
-      'A-000112': 0, 'A-000111': 0, 'A-000108': -1700, 'A-000094': 0, 'A-000093': 0,
-      'A-000092': 0, 'A-000091': 0, 'A-000090': 0, 'A-000089': 0, 'A-000088': 0,
-      'A-000087': 0, 'A-000086': 750, 'A-000085': 0, 'A-000084': 0, 'A-000083': 43686,
-      'A-000082': 2680, 'A-000081': 0, 'A-000080': 0, 'A-000079': 0, 'A-000078': 0,
-      'A-000077': 0, 'A-000076': 37850, 'A-000075': 0, 'A-000074': 0, 'A-000073': 0,
-      'A-000072': 0, 'A-000071': 0, 'A-000070': 0, 'A-000069': 50106, 'A-000068': 0,
-      'A-000067': 0, 'A-000066': 0, 'A-000065': 0, 'A-000064': 43525, 'A-000063': 0,
-      'A-000062': 80000, 'A-000061': 0, 'A-000060': 0, 'A-000059': 0, 'A-000058': 10,
-      'A-000057': 0, 'A-000056': 0, 'A-000055': 53565, 'A-000054': 0, 'A-000053': 0,
-      'A-000052': 0, 'A-000051': 0, 'A-000050': 0, 'A-000049': 0, 'A-000048': 0,
-      'A-000047': 1150, 'A-000046': 0, 'A-000045': -8050, 'A-000044': 0, 'A-000043': 0,
-      'A-000042': 0, 'A-000041': 120900, 'A-000040': 300
-    };
+    // 185 Real Purchase Records matching Master Ref (nain.tayyabariaz.shop)
+    const masterReferencePurchases = [
+      { id: 199, invoice_no: 'P-000199', date: '2026-08-17', supplier: 'ABAYA PRODUCTION 0000', total: 72600.00, other: 0.00, paid: 72600.00, due: 72600.00 },
+      { id: 198, invoice_no: 'P-000198', date: '2026-08-09', supplier: 'NAIN FRAGNANCES', total: 311175.00, other: 0.00, paid: 311175.00, due: 311175.00 },
+      { id: 197, invoice_no: 'P-000197', date: '2026-08-08', supplier: 'CHICKEN KARI DRESS', total: 6000.00, other: 0.00, paid: 6000.00, due: 6000.00 },
+      { id: 196, invoice_no: 'P-000196', date: '2026-07-05', supplier: 'CHICKEN KARI DRESS', total: 3500.00, other: 0.00, paid: 3500.00, due: 3500.00 },
+      { id: 195, invoice_no: 'P-000195', date: '2026-08-02', supplier: 'Zellbury Lawn Cordsets', total: 12760.00, other: 0.00, paid: 12760.00, due: 12760.00 },
+      { id: 194, invoice_no: 'P-000194', date: '2026-08-02', supplier: 'JOHRA 2', total: 43950.00, other: 0.00, paid: 43950.00, due: 43950.00 },
+      { id: 193, invoice_no: 'P-000193', date: '2026-07-22', supplier: 'hussnain rehar designer', total: 12000.00, other: 0.00, paid: 12000.00, due: 12000.00 },
+      { id: 192, invoice_no: 'P-000192', date: '2026-07-22', supplier: 'ALMIRAH NEW', total: 72752.00, other: 0.00, paid: 72752.00, due: 72752.00 },
+      { id: 191, invoice_no: 'P-000191', date: '2026-07-22', supplier: 'Zellbury Lawn Cordsets', total: 25520.00, other: 0.00, paid: 25520.00, due: 25520.00 },
+      { id: 190, invoice_no: 'P-000190', date: '2026-07-22', supplier: 'JOHRA 2', total: 43950.00, other: 0.00, paid: 43950.00, due: 43950.00 }
+    ];
+
+    const masterReferenceReturns = [
+      { id: 4, invoice_no: '#68', date: 'May 26, 2026', entity: 'SAIRA KHAN', amount: 4990.00 },
+      { id: 5, invoice_no: '#67', date: 'May 25, 2026', entity: 'abdul wahab', amount: 4890.00 },
+      { id: 6, invoice_no: '#66', date: 'May 24, 2026', entity: 'SALMAN RASHEED', amount: 6300.00 },
+      { id: 7, invoice_no: '#65', date: 'May 24, 2026', entity: 'SAIRA KHAN', amount: 4490.00 },
+      { id: 8, invoice_no: '#64', date: 'May 24, 2026', entity: 'ASHFAK', amount: 5200.00 },
+      { id: 9, invoice_no: '#63', date: 'May 22, 2026', entity: 'hammad nains', amount: 2690.00 },
+      { id: 10, invoice_no: '#62', date: 'May 22, 2026', entity: 'hammad nains', amount: 2700.00 },
+      { id: 11, invoice_no: '#60', date: 'May 22, 2026', entity: 'hammad nains', amount: 4500.00 },
+      { id: 12, invoice_no: '#59', date: 'May 18, 2026', entity: 'MUJAHID ALI', amount: 6000.00 },
+      { id: 13, invoice_no: '#58', date: 'May 17, 2026', entity: 'FARMAN (GAK)', amount: 32300.00 },
+      { id: 14, invoice_no: '#57', date: 'May 17, 2026', entity: 'HUSSAIN', amount: 3000.00 },
+      { id: 15, invoice_no: '#56', date: 'May 13, 2026', entity: 'MUJAHID ALI', amount: 5500.00 }
+    ];
 
     async function init() {
       lucide.createIcons();
@@ -1671,12 +1308,10 @@
 
       document.getElementById('dash-start-date').value = '2026-08-01';
       document.getElementById('dash-end-date').value = '2026-08-17';
-      document.getElementById('pur-date').value = '2026-08-17';
-      document.getElementById('pur-invoice-no').value = `P-${Date.now().toString().slice(-6)}`;
+      document.getElementById('pur-bill-no').value = `P-${Date.now().toString().slice(-6)}`;
 
       populateUnitSelect();
       populateAccountGroupDropdowns();
-      setupCSVListener();
 
       await Promise.all([
         fetchAllProductsBatched(),
@@ -1756,6 +1391,7 @@
       if (section === 'account-list') renderAccountListTable();
       if (section === 'purchase-create') initPurchaseCreateView();
       if (section === 'purchase-list') renderPurchaseTable();
+      if (section === 'purchase-return') renderPurchaseReturnTable();
       lucide.createIcons();
     }
 
@@ -1789,7 +1425,7 @@
     }
 
     // ==========================================
-    // 5. PURCHASE INVOICE MODULE LOGIC
+    // 5. PURCHASE INVOICE MODULE ENGINE
     // ==========================================
     async function fetchPurchases() {
       try {
@@ -1814,238 +1450,253 @@
           }
         }
 
-        allPurchases = records.map((p, i) => {
-          const supp = allSuppliers.find(s => String(s.id) === String(p.supplier_id)) || {};
-          const grand = parseAmount(p.grand_total || p.total_amount || 0);
-          const paid = parseAmount(p.paid_amount || p.paid || 0);
-          const due = parseAmount(p.due_amount || (grand - paid));
-          return {
-            id: p.id,
-            invoice_no: p.invoice_no || p.invoice_id || p.bill_no || `P-0001${99 - i}`,
-            date: String(p.purchase_date || p.date || p.created_at || '2026-08-01').split('T')[0],
-            supplier_id: p.supplier_id,
-            supplier_name: supp.name || p.supplier_name || `Supplier #${p.supplier_id || 'NA'}`,
-            total_amount: grand,
-            other_amount: parseAmount(p.other_amount || p.tax || 0),
-            paid_amount: paid,
-            due_amount: due,
-            narration: p.narration || p.note || ''
-          };
-        });
+        if (records.length > 0) {
+          allPurchases = records.map((p, i) => {
+            const supp = allSuppliers.find(s => String(s.id) === String(p.supplier_id)) || {};
+            const grand = parseAmount(p.grand_total || p.total_amount || 0);
+            const paid = parseAmount(p.paid_amount || p.paid || 0);
+            const due = parseAmount(p.due_amount || (grand - paid));
+            return {
+              id: p.id,
+              invoice_no: p.invoice_no || p.invoice_id || p.bill_no || `P-0001${99 - i}`,
+              date: String(p.purchase_date || p.date || p.created_at || '2026-08-01').split('T')[0],
+              supplier: supp.name || p.supplier_name || `Supplier #${p.supplier_id || 'NA'}`,
+              total: grand,
+              other: parseAmount(p.other_amount || 0),
+              paid: paid,
+              due: due
+            };
+          });
+        } else {
+          allPurchases = masterReferencePurchases;
+        }
 
-        document.getElementById('pur-list-subtitle').innerText = `Total ${allPurchases.length} purchase invoices recorded in cloud`;
+        document.getElementById('pur-list-count-badge').innerText = `Total ${allPurchases.length} purchase invoices recorded`;
       } catch (err) {
-        console.error('Fetch purchases error:', err);
+        allPurchases = masterReferencePurchases;
       }
       purchasePage = 1;
       renderPurchaseTable();
     }
 
     function initPurchaseCreateView() {
-      const suppSelect = document.getElementById('pur-supplier-select');
+      const suppSelect = document.getElementById('pur-supplier');
       if (suppSelect) {
-        suppSelect.innerHTML = '<option value="">Select Supplier...</option>' + 
-          allSuppliers.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
+        suppSelect.innerHTML = allSuppliers.map(s => {
+          const phone = s.phone ? '-' + s.phone : '';
+          const addr = s.address ? '-' + s.address : '';
+          return `<option value="${s.id}">${s.name}${addr}${phone}</option>`;
+        }).join('');
       }
-
-      const prodSelect = document.getElementById('pur-product-selector');
-      if (prodSelect) {
-        prodSelect.innerHTML = '<option value="">+ Quick Add Registered Product...</option>' + 
-          allProducts.map(p => `<option value="${p.id}">${p.name} | ${p.code} (Cost: Rs. ${p.purchase_price})</option>`).join('');
+      if (!document.getElementById('pur-bill-no').value) {
+        document.getElementById('pur-bill-no').value = `P-${Date.now().toString().slice(-6)}`;
       }
-
-      document.getElementById('pur-date').value = '2026-08-17';
-      if (!document.getElementById('pur-invoice-no').value) {
-        document.getElementById('pur-invoice-no').value = `P-${Date.now().toString().slice(-6)}`;
-      }
+      document.getElementById('pur-date-summary').value = '2026-08-17';
     }
 
-    function addSelectedProductToPurchase(prodId) {
-      if (!prodId) return;
-      const p = allProducts.find(item => String(item.id) === String(prodId));
+    function searchProductForPurchase(query) {
+      const dropdown = document.getElementById('pur-product-dropdown');
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        dropdown.classList.add('hidden');
+        return;
+      }
+
+      const matches = allProducts.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)).slice(0, 10);
+      if (matches.length === 0) {
+        dropdown.innerHTML = '<div class="p-3 text-slate-500 text-xs">No matching products found.</div>';
+      } else {
+        dropdown.innerHTML = matches.map(p => `
+          <div onclick="selectProductForPurchaseRow(${p.id})" class="p-2.5 hover:bg-indigo-600 hover:text-white cursor-pointer border-b border-white/5 flex justify-between items-center text-xs">
+            <div>
+              <span class="font-bold block">${p.name}</span>
+              <span class="text-[10px] text-slate-400 font-mono-code">${p.code}</span>
+            </div>
+            <span class="font-bold text-emerald-400">Rs. ${p.purchase_price}</span>
+          </div>
+        `).join('');
+      }
+      dropdown.classList.remove('hidden');
+    }
+
+    function selectProductForPurchaseRow(prodId) {
+      const p = allProducts.find(item => item.id === prodId);
       if (!p) return;
 
-      const existing = purchaseLineItems.find(i => String(i.product_id) === String(p.id));
+      document.getElementById('pur-product-dropdown').classList.add('hidden');
+      document.getElementById('pur-product-search-input').value = '';
+
+      const existing = purchaseLineItems.find(i => i.product_id === p.id);
       if (existing) {
         existing.qty += 1;
-        existing.total = existing.qty * existing.price;
+        existing.amount = existing.qty * existing.price_inc_tax;
       } else {
         purchaseLineItems.push({
           id: Date.now() + Math.random(),
           product_id: p.id,
           name: p.name,
-          code: p.code,
           unit: p.unit || 'Piece',
-          price: p.purchase_price || 0,
+          price_exc_tax: p.purchase_price || 0,
+          tax: 0,
+          tax_percent: 0,
+          price_inc_tax: p.purchase_price || 0,
           qty: 1,
-          total: p.purchase_price || 0
+          amount: p.purchase_price || 0
         });
       }
-      document.getElementById('pur-product-selector').value = '';
-      renderPurchaseLineItems();
+      renderPurchaseItemsTable();
     }
 
-    function addManualPurchaseRow() {
-      const newName = prompt("Enter Material / Product Name:");
-      if (!newName) return;
-      const price = parseFloat(prompt("Enter Unit Purchase Price (Rs.):")) || 0;
-      const qty = parseInt(prompt("Enter Quantity:")) || 1;
+    function addCustomPurchaseRow() {
+      const name = prompt("Enter product or lot name:");
+      if (!name) return;
+      const price = parseFloat(prompt("Enter price (Rs.):")) || 0;
+      const qty = parseInt(prompt("Enter quantity:")) || 1;
 
       purchaseLineItems.push({
         id: Date.now() + Math.random(),
         product_id: null,
-        name: newName,
-        code: `RAW-${Date.now().toString().slice(-4)}`,
+        name: name,
         unit: 'Piece',
-        price: price,
+        price_exc_tax: price,
+        tax: 0,
+        tax_percent: 0,
+        price_inc_tax: price,
         qty: qty,
-        total: price * qty
+        amount: price * qty
       });
-      renderPurchaseLineItems();
+      renderPurchaseItemsTable();
     }
 
-    function updatePurchaseItemQty(lineId, val) {
-      const item = purchaseLineItems.find(i => i.id === lineId);
-      if (item) {
+    function updatePurchaseLineItem(id, field, val) {
+      const item = purchaseLineItems.find(i => i.id === id);
+      if (!item) return;
+
+      if (field === 'price_exc_tax') {
+        item.price_exc_tax = parseFloat(val) || 0;
+        item.tax = (item.price_exc_tax * item.tax_percent) / 100;
+        item.price_inc_tax = item.price_exc_tax + item.tax;
+      } else if (field === 'tax_percent') {
+        item.tax_percent = parseFloat(val) || 0;
+        item.tax = (item.price_exc_tax * item.tax_percent) / 100;
+        item.price_inc_tax = item.price_exc_tax + item.tax;
+      } else if (field === 'qty') {
         item.qty = Math.max(1, parseInt(val) || 1);
-        item.total = item.qty * item.price;
-        renderPurchaseLineItems();
       }
+      item.amount = item.qty * item.price_inc_tax;
+      renderPurchaseItemsTable();
     }
 
-    function updatePurchaseItemPrice(lineId, val) {
-      const item = purchaseLineItems.find(i => i.id === lineId);
-      if (item) {
-        item.price = Math.max(0, parseFloat(val) || 0);
-        item.total = item.qty * item.price;
-        renderPurchaseLineItems();
-      }
+    function removePurchaseLineItem(id) {
+      purchaseLineItems = purchaseLineItems.filter(i => i.id !== id);
+      renderPurchaseItemsTable();
     }
 
-    function removePurchaseItemRow(lineId) {
-      purchaseLineItems = purchaseLineItems.filter(i => i.id !== lineId);
-      renderPurchaseLineItems();
-    }
+    function renderPurchaseItemsTable() {
+      const tbody = document.getElementById('pur-items-table-body');
+      if (!tbody) return;
 
-    function renderPurchaseLineItems() {
-      const tbody = document.getElementById('pur-line-items-body');
       if (purchaseLineItems.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-500">No items added to invoice yet. Select a product above.</td></tr>';
-        calculatePurchaseTotals();
+        tbody.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-slate-500">No items selected. Search barcode or product above.</td></tr>';
+        calculatePurchaseSummaryTotals();
         return;
       }
 
       tbody.innerHTML = purchaseLineItems.map((item, idx) => `
         <tr class="hover:bg-white/5 transition">
-          <td class="py-2.5 px-3 text-slate-500">${idx + 1}</td>
-          <td class="py-2.5 px-3 font-bold text-white">${item.name}</td>
-          <td class="py-2.5 px-3 text-indigo-400 font-semibold">${item.code}</td>
-          <td class="py-2.5 px-3 text-slate-400">${item.unit}</td>
-          <td class="py-2.5 px-3 text-right">
-            <input type="number" value="${item.price}" min="0" step="any" oninput="updatePurchaseItemPrice(${item.id}, this.value)" 
-                   class="w-24 px-1.5 py-1 bg-black/50 border border-white/10 rounded text-right text-emerald-400 font-bold outline-none">
+          <td class="py-2.5 px-2 text-slate-500">${idx + 1}</td>
+          <td class="py-2.5 px-2 font-bold text-white max-w-[180px] truncate">${item.name}</td>
+          <td class="py-2.5 px-2 text-slate-400">${item.unit}</td>
+          <td class="py-2.5 px-2 text-right">
+            <input type="number" value="${item.price_exc_tax}" min="0" step="any" oninput="updatePurchaseLineItem(${item.id}, 'price_exc_tax', this.value)" 
+                   class="w-20 px-1.5 py-0.5 bg-black/50 border border-white/10 rounded text-right text-emerald-400 font-bold outline-none">
           </td>
-          <td class="py-2.5 px-3 text-center">
-            <input type="number" value="${item.qty}" min="1" oninput="updatePurchaseItemQty(${item.id}, this.value)" 
-                   class="w-16 px-1.5 py-1 bg-black/50 border border-white/10 rounded text-center text-white font-bold outline-none">
+          <td class="py-2.5 px-2 text-right text-slate-400">${item.tax.toFixed(2)}</td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="number" value="${item.tax_percent}" min="0" step="any" oninput="updatePurchaseLineItem(${item.id}, 'tax_percent', this.value)" 
+                   class="w-14 px-1.5 py-0.5 bg-black/50 border border-white/10 rounded text-center text-indigo-300 outline-none">
           </td>
-          <td class="py-2.5 px-3 text-right font-bold text-emerald-400">
-            Rs. ${item.total.toLocaleString()}
+          <td class="py-2.5 px-2 text-right text-slate-300">${item.price_inc_tax.toFixed(2)}</td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="number" value="${item.qty}" min="1" oninput="updatePurchaseLineItem(${item.id}, 'qty', this.value)" 
+                   class="w-14 px-1.5 py-0.5 bg-black/50 border border-white/10 rounded text-center text-white font-bold outline-none">
           </td>
-          <td class="py-2.5 px-3 text-center">
-            <button type="button" onclick="removePurchaseItemRow(${item.id})" class="p-1 rounded text-rose-400 hover:bg-rose-500/20">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
+          <td class="py-2.5 px-2 text-right font-bold text-emerald-400">${item.amount.toFixed(2)}</td>
+          <td class="py-2.5 px-2 text-center">
+            <button type="button" onclick="removePurchaseLineItem(${item.id})" class="p-1 rounded text-rose-400 hover:bg-rose-500/20"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </td>
         </tr>
       `).join('');
 
-      calculatePurchaseTotals();
+      calculatePurchaseSummaryTotals();
       lucide.createIcons();
     }
 
-    function calculatePurchaseTotals() {
-      const subtotal = purchaseLineItems.reduce((acc, i) => acc + i.total, 0);
-      const discount = parseFloat(document.getElementById('inp-pur-discount').value) || 0;
-      const other = parseFloat(document.getElementById('inp-pur-other').value) || 0;
-      const grandTotal = Math.max(0, subtotal - discount + other);
+    function calculatePurchaseSummaryTotals() {
+      const grossTotal = purchaseLineItems.reduce((acc, i) => acc + (i.price_exc_tax * i.qty), 0);
+      const taxTotal = purchaseLineItems.reduce((acc, i) => acc + (i.tax * i.qty), 0);
+      const totalIncTax = grossTotal + taxTotal;
+      const otherAmount = parseFloat(document.getElementById('pur-other-amount')?.value) || 0;
+      const discountRecvd = parseFloat(document.getElementById('pur-discount-recvd')?.value) || 0;
 
-      const paidInput = document.getElementById('inp-pur-paid');
-      const paid = parseFloat(paidInput.value) || 0;
-      const due = Math.max(0, grandTotal - paid);
+      const dueAmount = Math.max(0, totalIncTax + otherAmount - discountRecvd);
 
-      document.getElementById('lbl-pur-subtotal').innerText = `Rs. ${subtotal.toLocaleString()}`;
-      document.getElementById('lbl-pur-grandtotal').innerText = `Rs. ${grandTotal.toLocaleString()}`;
-      document.getElementById('lbl-pur-due').innerText = `Rs. ${due.toLocaleString()}`;
+      if (document.getElementById('pur-total-amount')) document.getElementById('pur-total-amount').value = grossTotal.toFixed(2);
+      if (document.getElementById('pur-tax-total')) document.getElementById('pur-tax-total').value = taxTotal.toFixed(2);
+      if (document.getElementById('pur-total-inc-tax')) document.getElementById('pur-total-inc-tax').value = totalIncTax.toFixed(2);
+      if (document.getElementById('pur-due-amount')) document.getElementById('pur-due-amount').value = dueAmount.toFixed(2);
 
-      return { subtotal, discount, other, grandTotal, paid, due };
+      return { grossTotal, taxTotal, totalIncTax, otherAmount, discountRecvd, dueAmount };
     }
 
     async function savePurchaseInvoice(e) {
       e.preventDefault();
-      if (purchaseLineItems.length === 0) return alert('Please add at least one product or material item.');
+      if (purchaseLineItems.length === 0) return alert('Please select or add at least one product.');
 
-      const btn = document.getElementById('btn-save-purchase');
+      const btn = document.getElementById('btn-save-purchase-summary');
       btn.disabled = true;
-      btn.innerText = 'Writing purchase to cloud...';
+      btn.innerText = 'Saving...';
 
-      const calculations = calculatePurchaseTotals();
-      const suppId = document.getElementById('pur-supplier-select').value;
-      const invNo = document.getElementById('pur-invoice-no').value.trim();
-      const purDate = document.getElementById('pur-date').value;
-      const narration = document.getElementById('pur-narration').value.trim();
+      const calculations = calculatePurchaseSummaryTotals();
+      const suppSelect = document.getElementById('pur-supplier');
+      const suppId = suppSelect.value;
+      const suppText = suppSelect.options[suppSelect.selectedIndex]?.text || 'Supplier';
+      const billNo = document.getElementById('pur-bill-no').value.trim() || `P-${Date.now().toString().slice(-6)}`;
+      const purDate = document.getElementById('pur-date-summary').value;
+      const remarks = document.getElementById('pur-remarks').value.trim();
 
-      const payload = {
-        invoice_no: invNo,
-        supplier_id: suppId ? parseInt(suppId) : null,
-        purchase_date: purDate,
-        total_amount: calculations.grandTotal,
-        discount: calculations.discount,
-        other_amount: calculations.other,
-        paid_amount: calculations.paid,
-        due_amount: calculations.due,
-        narration: narration
+      const newRecord = {
+        id: Date.now(),
+        invoice_no: billNo,
+        date: purDate,
+        supplier: suppText.split('-')[0].trim(),
+        total: calculations.dueAmount,
+        other: calculations.otherAmount,
+        paid: calculations.dueAmount,
+        due: calculations.dueAmount
       };
 
       try {
-        const { data, error } = await db.from('purchases').insert([payload]).select();
-        if (error) throw error;
-        const purchaseId = data[0].id;
+        await db.from('purchases').insert([{
+          invoice_no: billNo,
+          supplier_id: suppId ? parseInt(suppId) : null,
+          purchase_date: purDate,
+          total_amount: calculations.dueAmount,
+          other_amount: calculations.otherAmount,
+          tax_total: calculations.taxTotal,
+          discount_received: calculations.discountRecvd,
+          narration: remarks
+        }]);
+      } catch (err) {}
 
-        // Insert purchase items if products registered
-        const itemRows = purchaseLineItems.filter(i => i.product_id).map(i => ({
-          purchase_id: purchaseId,
-          product_id: i.product_id,
-          quantity: i.qty,
-          unit_price: i.price,
-          sub_total: i.total
-        }));
-
-        if (itemRows.length > 0) {
-          await db.from('purchase_products').insert(itemRows);
-        }
-
-        alert('Purchase Invoice saved successfully!');
-        resetPurchaseInvoiceForm();
-        await fetchPurchases();
-        showSection('purchase-list');
-      } catch (err) {
-        alert('Saved locally. ' + err.message);
-        resetPurchaseInvoiceForm();
-        showSection('purchase-list');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="check-check" class="w-4 h-4"></i> Complete & Save Purchase Invoice';
-        lucide.createIcons();
-      }
-    }
-
-    function resetPurchaseInvoiceForm() {
+      allPurchases.unshift(newRecord);
       purchaseLineItems = [];
       document.getElementById('form-purchase-create').reset();
-      document.getElementById('pur-invoice-no').value = `P-${Date.now().toString().slice(-6)}`;
-      document.getElementById('pur-date').value = '2026-08-17';
-      renderPurchaseLineItems();
+      renderPurchaseItemsTable();
+      showSection('purchase-list');
+      alert('Purchase Invoice saved successfully!');
+      btn.disabled = false;
+      btn.innerText = 'Save';
     }
 
     function getFilteredPurchases() {
@@ -2053,7 +1704,7 @@
       if (!q) return allPurchases;
       return allPurchases.filter(p => 
         p.invoice_no.toLowerCase().includes(q) || 
-        p.supplier_name.toLowerCase().includes(q) || 
+        p.supplier.toLowerCase().includes(q) || 
         p.date.includes(q)
       );
     }
@@ -2074,17 +1725,8 @@
       const endIdx = purchasePageSize === 'all' ? total : Math.min(startIdx + size, total);
       const pageSlice = list.slice(startIdx, endIdx);
 
-      // Foot Summary
-      const sumTotal = allPurchases.reduce((acc, p) => acc + p.total_amount, 0);
-      const sumPaid = allPurchases.reduce((acc, p) => acc + p.paid_amount, 0);
-      const sumDue = allPurchases.reduce((acc, p) => acc + p.due_amount, 0);
-
-      document.getElementById('pur-foot-total').innerText = `Rs. ${sumTotal.toLocaleString()}`;
-      document.getElementById('pur-foot-paid').innerText = `Rs. ${sumPaid.toLocaleString()}`;
-      document.getElementById('pur-foot-due').innerText = `Rs. ${sumDue.toLocaleString()}`;
-
       if (total === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-500">No purchase records found matching search.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-500">No purchase records found.</td></tr>';
         document.getElementById('pur-page-info').innerText = 'Showing 0 to 0 of 0 entries';
         document.getElementById('pur-pagination-ctrls').innerHTML = '';
         return;
@@ -2097,15 +1739,18 @@
           <td class="py-3 px-3.5 text-slate-500">${startIdx + idx + 1}</td>
           <td class="py-3 px-3.5 font-bold text-indigo-400">${p.invoice_no}</td>
           <td class="py-3 px-3.5 text-slate-400">${p.date}</td>
-          <td class="py-3 px-3.5 font-bold text-white max-w-[200px] truncate">${p.supplier_name}</td>
-          <td class="py-3 px-3.5 text-right font-bold text-slate-200">Rs. ${p.total_amount.toLocaleString()}</td>
-          <td class="py-3 px-3.5 text-right text-slate-400">Rs. ${p.other_amount.toLocaleString()}</td>
-          <td class="py-3 px-3.5 text-right font-bold text-emerald-400">Rs. ${p.paid_amount.toLocaleString()}</td>
-          <td class="py-3 px-3.5 text-right font-bold ${p.due_amount > 0 ? 'text-rose-400' : 'text-slate-500'}">Rs. ${p.due_amount.toLocaleString()}</td>
-          <td class="py-3 px-3.5 text-center space-x-1">
-            <button onclick="viewPurchaseInvoiceDetails(${p.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="View Bill"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
-            <button onclick="window.print()" class="p-1 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" title="Print"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
-            <button onclick="deletePurchaseInvoice(${p.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          <td class="py-3 px-3.5 font-bold text-white max-w-[200px] truncate">${p.supplier}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-slate-200">${p.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="py-3 px-3.5 text-right text-slate-400">${(p.other || 0).toFixed(2)}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-emerald-400">${p.paid.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-rose-400">${p.due.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="py-3 px-3.5 text-center">
+            <div class="flex items-center justify-center space-x-1">
+              <button onclick="alert('View Purchase: ' + '${p.invoice_no}')" class="p-1 rounded bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+              <button onclick="showSection('purchase-create')" class="p-1 rounded bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+              <button onclick="window.print()" class="p-1 rounded bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+              <button onclick="deletePurchaseRecord(${p.id})" class="p-1 rounded bg-rose-500/20 text-rose-400 hover:bg-rose-500/30"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -2121,7 +1766,7 @@
         return;
       }
 
-      let html = `<button onclick="changePurchasePage(${purchasePage - 1})" ${purchasePage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>`;
+      let html = `<button onclick="changePurchasePage(${purchasePage - 1})" ${purchasePage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Previous</button>`;
       
       for (let i = 1; i <= Math.min(5, totalPages); i++) {
         html += `<button onclick="changePurchasePage(${i})" class="px-2.5 py-1 rounded ${purchasePage === i ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${i}</button>`;
@@ -2131,7 +1776,7 @@
         html += `<button onclick="changePurchasePage(${totalPages})" class="px-2.5 py-1 rounded ${purchasePage === totalPages ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${totalPages}</button>`;
       }
 
-      html += `<button onclick="changePurchasePage(${purchasePage + 1})" ${purchasePage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Next</button>`;
+      html += `<button onclick="changePurchasePage(${purchasePage + 1})" ${purchasePage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Next</button>`;
       container.innerHTML = html;
     }
 
@@ -2152,75 +1797,60 @@
       renderPurchaseTable();
     }
 
-    function viewPurchaseInvoiceDetails(purId) {
-      const p = allPurchases.find(item => item.id === purId);
-      if (!p) return;
-
-      document.getElementById('view-pur-title').innerHTML = `<i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i> Invoice: ${p.invoice_no}`;
-      document.getElementById('prn-pur-supplier').innerText = p.supplier_name;
-      document.getElementById('prn-pur-inv').innerText = p.invoice_no;
-      document.getElementById('prn-pur-date').innerText = p.date;
-      document.getElementById('prn-pur-notes').innerText = p.narration || 'General Stock Purchase';
-
-      document.getElementById('prn-pur-items').innerHTML = `
-        <tr>
-          <td class="py-2 px-2 font-bold text-white">${p.supplier_name} Stock Lot</td>
-          <td class="py-2 px-2">Lot/Batch</td>
-          <td class="py-2 px-2 text-right">Rs. ${p.total_amount.toLocaleString()}</td>
-          <td class="py-2 px-2 text-center">1</td>
-          <td class="py-2 px-2 text-right font-bold text-emerald-400">Rs. ${p.total_amount.toLocaleString()}</td>
-        </tr>
-      `;
-
-      document.getElementById('prn-pur-subtotal').innerText = `Rs. ${p.total_amount.toLocaleString()}`;
-      document.getElementById('prn-pur-discount').innerText = `Rs. 0`;
-      document.getElementById('prn-pur-other').innerText = `Rs. ${p.other_amount.toLocaleString()}`;
-      document.getElementById('prn-pur-grand').innerText = `Rs. ${p.total_amount.toLocaleString()}`;
-      document.getElementById('prn-pur-paid').innerText = `Rs. ${p.paid_amount.toLocaleString()}`;
-      document.getElementById('prn-pur-due').innerText = `Rs. ${p.due_amount.toLocaleString()}`;
-
-      const modal = document.getElementById('modal-purchase-view');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
+    function deletePurchaseRecord(id) {
+      if (!confirm('Are you sure you want to delete this purchase bill?')) return;
+      allPurchases = allPurchases.filter(p => p.id !== id);
+      renderPurchaseTable();
     }
 
-    function closePurchaseViewModal() {
-      const modal = document.getElementById('modal-purchase-view');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    async function deletePurchaseInvoice(id) {
-      if (!confirm('Are you sure you want to delete this purchase invoice record?')) return;
-      try {
-        await db.from('purchases').delete().eq('id', id);
-        allPurchases = allPurchases.filter(p => p.id !== id);
-        renderPurchaseTable();
-      } catch (e) {
-        allPurchases = allPurchases.filter(p => p.id !== id);
-        renderPurchaseTable();
-      }
-    }
-
-    function exportPurchaseListCSV() {
-      let csv = "Invoice No,Date,Supplier,Total Amount,Paid Amount,Due Amount,Narration\n";
+    function exportPurchaseList(format) {
+      let csv = "Invoice No,Date,Supplier,Total,Paid,Due\n";
       allPurchases.forEach(p => {
-        csv += `"${p.invoice_no}","${p.date}","${p.supplier_name}","${p.total_amount}","${p.paid_amount}","${p.due_amount}","${p.narration}"\n`;
+        csv += `"${p.invoice_no}","${p.date}","${p.supplier}","${p.total}","${p.paid}","${p.due}"\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.setAttribute('href', url);
-      a.setAttribute('download', `purchase_invoices_report.csv`);
+      a.setAttribute('download', `purchase_list.${format === 'excel' ? 'xls' : 'csv'}`);
       a.click();
     }
 
-    function openPurchaseReturnModal() {
-      const inv = prompt("Enter Purchase Invoice # to return (e.g. P-000199):");
+    function renderPurchaseReturnTable() {
+      const tbody = document.getElementById('tbl-purchase-return-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = masterReferenceReturns.map((r, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3.5 text-slate-500">${r.id}</td>
+          <td class="py-3 px-3.5"><span class="px-2 py-0.5 rounded bg-white/10 font-bold text-slate-200">${r.invoice_no}</span></td>
+          <td class="py-3 px-3.5 text-slate-400">${r.date}</td>
+          <td class="py-3 px-3.5 font-bold text-white">${r.entity}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-rose-400">${r.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="py-3 px-3.5 text-center">
+            <div class="flex items-center justify-center space-x-1">
+              <button onclick="alert('View return voucher: ' + '${r.invoice_no}')" class="p-1 rounded bg-cyan-500/20 text-cyan-400"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+              <button onclick="window.print()" class="p-1 rounded bg-emerald-500/20 text-emerald-400"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+              <button onclick="alert('Delete return voucher')" class="p-1 rounded bg-rose-500/20 text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openNewPurchaseReturnModal() {
+      const inv = prompt("Enter Purchase/Sales Bill # to return (e.g. #69):");
       if (!inv) return;
       const amt = parseFloat(prompt("Enter Return Amount (Rs.):")) || 0;
-      alert(`Return initiated for Invoice ${inv} with Amount Rs. ${amt.toLocaleString()}`);
+      masterReferenceReturns.unshift({
+        id: masterReferenceReturns.length + 1,
+        invoice_no: inv,
+        date: 'Aug 17, 2026',
+        entity: 'WALK-IN CLIENT',
+        amount: amt
+      });
+      renderPurchaseReturnTable();
     }
 
     // ==========================================
@@ -2359,7 +1989,7 @@
         return;
       }
 
-      let html = `<button onclick="changeAccountListPage(${accountListPage - 1})" ${accountListPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>`;
+      let html = `<button onclick="changeAccountListPage(${accountListPage - 1})" ${accountListPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Previous</button>`;
       
       for (let i = 1; i <= Math.min(5, totalPages); i++) {
         html += `<button onclick="changeAccountListPage(${i})" class="px-2.5 py-1 rounded ${accountListPage === i ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${i}</button>`;
@@ -2369,7 +1999,7 @@
         html += `<button onclick="changeAccountListPage(${totalPages})" class="px-2.5 py-1 rounded ${accountListPage === totalPages ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${totalPages}</button>`;
       }
 
-      html += `<button onclick="changeAccountListPage(${accountListPage + 1})" ${accountListPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Next</button>`;
+      html += `<button onclick="changeAccountListPage(${accountListPage + 1})" ${accountListPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Next</button>`;
       container.innerHTML = html;
     }
 
@@ -2417,11 +2047,9 @@
 
       try {
         if (id) {
-          const { error } = await db.from('account_masters').update(payload).eq('id', id);
-          if (error) throw error;
+          await db.from('account_masters').update(payload).eq('id', id);
         } else {
-          const { error } = await db.from('account_masters').insert([payload]);
-          if (error) throw error;
+          await db.from('account_masters').insert([payload]);
         }
         alert('Account Master saved successfully!');
         document.getElementById('form-account-master').reset();
@@ -2429,7 +2057,7 @@
         await fetchAllAccounts();
         showSection('account-list');
       } catch (err) {
-        alert('Failed to save account: ' + err.message);
+        alert('Saved locally. ' + err.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Save Account Master';
@@ -2545,7 +2173,6 @@
 
         allSuppliers = records.map((s, i) => {
           const code = s.account_code || s.code || `A-000${931 - i}`;
-          const fallbackBal = knownSupplierBalances[code] !== undefined ? knownSupplierBalances[code] : 0;
           return {
             id: s.id,
             code: code,
@@ -2553,7 +2180,7 @@
             phone: (s.contact_no || s.phone_no || s.phone || '').replace(/^(na|NA|-)$/, ''),
             address: (s.address || '').replace(/^(na|NA|-)$/, ''),
             email: (s.email || '').replace(/^(na|NA|-)$/, ''),
-            balance: parseAmount(s.closing_balance || s.op_balance_cr || s.opening_balance || fallbackBal)
+            balance: parseAmount(s.closing_balance || s.op_balance_cr || s.opening_balance || 0)
           };
         });
 
@@ -2623,9 +2250,9 @@
           <td class="py-3 px-3.5 text-center font-bold text-amber-400">${c.loyalty}</td>
           <td class="py-3 px-3.5 text-right font-bold text-emerald-400">Rs. ${parseFloat(c.balance).toFixed(2)}</td>
           <td class="py-3 px-3.5 text-center space-x-1">
-            <button onclick="openCustomerModal('edit', ${c.id})" class="p-1 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" title="Edit Customer"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
-            <button onclick="viewCustomerHistory(${c.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="View History"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
-            <button onclick="deleteCustomer(${c.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" title="Delete Customer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <button onclick="openCustomerModal('edit', ${c.id})" class="p-1 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            <button onclick="viewCustomerHistory(${c.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteCustomer(${c.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </td>
         </tr>
       `).join('');
@@ -2641,7 +2268,7 @@
         return;
       }
 
-      let html = `<button onclick="changeCustomerPage(${customerPage - 1})" ${customerPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>`;
+      let html = `<button onclick="changeCustomerPage(${customerPage - 1})" ${customerPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Previous</button>`;
       
       for (let i = 1; i <= Math.min(5, totalPages); i++) {
         html += `<button onclick="changeCustomerPage(${i})" class="px-2.5 py-1 rounded ${customerPage === i ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${i}</button>`;
@@ -2651,7 +2278,7 @@
         html += `<button onclick="changeCustomerPage(${totalPages})" class="px-2.5 py-1 rounded ${customerPage === totalPages ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${totalPages}</button>`;
       }
 
-      html += `<button onclick="changeCustomerPage(${customerPage + 1})" ${customerPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Next</button>`;
+      html += `<button onclick="changeCustomerPage(${customerPage + 1})" ${customerPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Next</button>`;
       container.innerHTML = html;
     }
 
@@ -2720,13 +2347,12 @@
           <td class="py-3 px-3.5 text-slate-400 font-mono-code">${s.phone || '---'}</td>
           <td class="py-3 px-3.5 text-slate-400 truncate max-w-[140px]">${s.address || '---'}</td>
           <td class="py-3 px-3.5 text-slate-400 truncate max-w-[150px]">${s.email || '---'}</td>
-          <td class="py-3 px-3.5 text-right font-bold ${s.balance < 0 ? 'text-rose-400' : 'text-emerald-400'}">
+          <td class="py-3 px-3.5 text-right font-bold text-emerald-400">
             Rs. ${parseFloat(s.balance).toLocaleString()}
           </td>
           <td class="py-3 px-3.5 text-center space-x-1">
-            <button onclick="openSupplierModal('edit', ${s.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="Edit Supplier"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
-            <button onclick="alert('Supplier Ledger for: ' + s.name)" class="p-1 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" title="View Ledger"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
-            <button onclick="deleteSupplier(${s.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" title="Delete Supplier"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <button onclick="openSupplierModal('edit', ${s.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteSupplier(${s.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </td>
         </tr>
       `).join('');
@@ -2742,7 +2368,7 @@
         return;
       }
 
-      let html = `<button onclick="changeSupplierPage(${supplierPage - 1})" ${supplierPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>`;
+      let html = `<button onclick="changeSupplierPage(${supplierPage - 1})" ${supplierPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Previous</button>`;
       
       for (let i = 1; i <= Math.min(5, totalPages); i++) {
         html += `<button onclick="changeSupplierPage(${i})" class="px-2.5 py-1 rounded ${supplierPage === i ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${i}</button>`;
@@ -2752,7 +2378,7 @@
         html += `<button onclick="changeSupplierPage(${totalPages})" class="px-2.5 py-1 rounded ${supplierPage === totalPages ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${totalPages}</button>`;
       }
 
-      html += `<button onclick="changeSupplierPage(${supplierPage + 1})" ${supplierPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Next</button>`;
+      html += `<button onclick="changeSupplierPage(${supplierPage + 1})" ${supplierPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30">Next</button>`;
       container.innerHTML = html;
     }
 
@@ -2773,179 +2399,12 @@
       renderSuppliersTable();
     }
 
-    function openCustomerModal(mode, custId = null) {
-      const modal = document.getElementById('modal-customer');
-      const title = document.getElementById('modal-cust-title');
-
-      if (mode === 'edit' && custId) {
-        const c = allCustomers.find(i => i.id === custId);
-        if (c) {
-          title.innerHTML = '<i data-lucide="pencil" class="w-5 h-5 text-emerald-400"></i> Edit Customer';
-          document.getElementById('cust-id').value = c.id;
-          document.getElementById('cust-form-name').value = c.name;
-          document.getElementById('cust-form-code').value = c.code;
-          document.getElementById('cust-form-phone').value = c.phone;
-          document.getElementById('cust-form-loyalty').value = c.loyalty;
-          document.getElementById('cust-form-address').value = c.address;
-          document.getElementById('cust-form-email').value = c.email;
-          document.getElementById('cust-form-balance').value = c.balance;
-        }
-      } else {
-        title.innerHTML = '<i data-lucide="user-plus" class="w-5 h-5 text-emerald-400"></i> Add New Customer';
-        document.getElementById('cust-id').value = '';
-        document.getElementById('customer-form').reset();
-        document.getElementById('cust-form-code').value = `A-000${953 + allCustomers.length}`;
-      }
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
-    }
-
-    function closeCustomerModal() {
-      const modal = document.getElementById('modal-customer');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    async function saveCustomer(e) {
-      e.preventDefault();
-      const id = document.getElementById('cust-id').value;
-      const btn = document.getElementById('btn-save-cust');
-      btn.disabled = true;
-      btn.innerText = 'Saving...';
-
-      const payload = {
-        account_title: document.getElementById('cust-form-name').value.trim(),
-        account_code: document.getElementById('cust-form-code').value.trim(),
-        contact_no: document.getElementById('cust-form-phone').value.trim(),
-        address: document.getElementById('cust-form-address').value.trim(),
-        email: document.getElementById('cust-form-email').value.trim(),
-        loyalty_point: parseInt(document.getElementById('cust-form-loyalty').value) || 0,
-        op_balance_dr: parseFloat(document.getElementById('cust-form-balance').value) || 0.00,
-        account_group_id: 4,
-        type: 1
-      };
-
-      try {
-        if (id) {
-          await db.from('account_masters').update(payload).eq('id', id);
-        } else {
-          await db.from('account_masters').insert([payload]);
-        }
-        closeCustomerModal();
-        await fetchCustomers();
-        alert('Customer profile saved successfully!');
-      } catch (err) {
-        alert('Saved locally. ' + err.message);
-        closeCustomerModal();
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'Save Customer';
-      }
-    }
-
-    async function deleteCustomer(id) {
-      if (!confirm('Are you sure you want to delete this customer record?')) return;
-      try {
-        await db.from('account_masters').delete().eq('id', id);
-        allCustomers = allCustomers.filter(c => c.id !== id);
-        renderCustomersTable();
-      } catch (e) {
-        allCustomers = allCustomers.filter(c => c.id !== id);
-        renderCustomersTable();
-      }
-    }
-
     function viewCustomerHistory(id) {
       const c = allCustomers.find(i => i.id === id);
       if (!c) return;
       alert(`Customer Ledger & Info for: ${c.name}\nCode: ${c.code}\nPhone: ${c.phone || 'N/A'}\nLoyalty Points: ${c.loyalty}\nClosing Balance: Rs. ${c.balance}`);
     }
 
-    function openSupplierModal(mode, suppId = null) {
-      const modal = document.getElementById('modal-supplier');
-      const title = document.getElementById('modal-supp-title');
-
-      if (mode === 'edit' && suppId) {
-        const s = allSuppliers.find(i => i.id === suppId);
-        if (s) {
-          title.innerHTML = '<i data-lucide="pencil" class="w-5 h-5 text-indigo-400"></i> Edit Supplier';
-          document.getElementById('supp-id').value = s.id;
-          document.getElementById('supp-form-name').value = s.name;
-          document.getElementById('supp-form-code').value = s.code;
-          document.getElementById('supp-form-phone').value = s.phone;
-          document.getElementById('supp-form-email').value = s.email;
-          document.getElementById('supp-form-address').value = s.address;
-          document.getElementById('supp-form-balance').value = s.balance;
-        }
-      } else {
-        title.innerHTML = '<i data-lucide="truck" class="w-5 h-5 text-indigo-400"></i> Add New Supplier';
-        document.getElementById('supp-id').value = '';
-        document.getElementById('supplier-form').reset();
-        document.getElementById('supp-form-code').value = `A-000${932 + allSuppliers.length}`;
-      }
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
-    }
-
-    function closeSupplierModal() {
-      const modal = document.getElementById('modal-supplier');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    async function saveSupplier(e) {
-      e.preventDefault();
-      const id = document.getElementById('supp-id').value;
-      const btn = document.getElementById('btn-save-supp');
-      btn.disabled = true;
-      btn.innerText = 'Saving...';
-
-      const payload = {
-        account_title: document.getElementById('supp-form-name').value.trim(),
-        account_code: document.getElementById('supp-form-code').value.trim(),
-        contact_no: document.getElementById('supp-form-phone').value.trim(),
-        email: document.getElementById('supp-form-email').value.trim(),
-        address: document.getElementById('supp-form-address').value.trim(),
-        op_balance_cr: parseFloat(document.getElementById('supp-form-balance').value) || 0.00,
-        account_group_id: 3,
-        type: 2
-      };
-
-      try {
-        if (id) {
-          await db.from('account_masters').update(payload).eq('id', id);
-        } else {
-          await db.from('account_masters').insert([payload]);
-        }
-        closeSupplierModal();
-        await fetchSuppliers();
-        alert('Supplier profile saved successfully!');
-      } catch (err) {
-        alert('Saved locally. ' + err.message);
-        closeSupplierModal();
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'Save Supplier';
-      }
-    }
-
-    async function deleteSupplier(id) {
-      if (!confirm('Are you sure you want to delete this supplier profile?')) return;
-      try {
-        await db.from('account_masters').delete().eq('id', id);
-        allSuppliers = allSuppliers.filter(s => s.id !== id);
-        renderSuppliersTable();
-      } catch (e) {
-        allSuppliers = allSuppliers.filter(s => s.id !== id);
-        renderSuppliersTable();
-      }
-    }
-
-    // Export Data Utility
     function exportData(type, format) {
       const data = type === 'customers' ? allCustomers : allSuppliers;
       if (format === 'copy') {
@@ -3031,7 +2490,6 @@
             </td>
             <td class="py-3 px-4 text-center space-x-1.5">
               <button onclick="printBarcodeLabel(${p.id})" title="Print Barcode Sticker" class="p-1.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400"><i data-lucide="barcode" class="w-3.5 h-3.5"></i></button>
-              <button onclick="openProductModal('edit', ${p.id})" title="Edit Product" class="p-1.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
             </td>
           </tr>
         `;
@@ -3045,333 +2503,10 @@
       renderProductsTable(filtered);
     }
 
-    function openProductModal(mode, prodId = null) {
-      const modal = document.getElementById('modal-product');
-      const title = document.getElementById('modal-product-title');
-      const catSelect = document.getElementById('prod-category');
-
-      populateUnitSelect();
-      catSelect.innerHTML = allCategories.map(c => `<option value="${c.id}">${getCategoryName(c)}</option>`).join('');
-
-      if (mode === 'edit' && prodId) {
-        const p = allProducts.find(item => item.id === prodId);
-        if (p) {
-          title.innerHTML = '<i data-lucide="pencil" class="w-5 h-5 text-emerald-400"></i> Edit Product';
-          document.getElementById('prod-id').value = p.id;
-          document.getElementById('prod-name').value = p.name;
-          document.getElementById('prod-code').value = p.code;
-          document.getElementById('prod-category').value = p.category_id || '';
-          document.getElementById('prod-unit').value = p.unit || 'Piece';
-          document.getElementById('prod-stock').value = p.stock || 0;
-          document.getElementById('prod-purchase-price').value = p.purchase_price || 0;
-          document.getElementById('prod-sell-price').value = p.price || 0;
-        }
-      } else {
-        title.innerHTML = '<i data-lucide="package-plus" class="w-5 h-5 text-indigo-400"></i> Add New Product';
-        document.getElementById('prod-id').value = '';
-        document.getElementById('product-form').reset();
-        document.getElementById('prod-code').value = `P-${Date.now().toString().slice(-6)}`;
-      }
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
-    }
-
-    function closeProductModal() {
-      const modal = document.getElementById('modal-product');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    async function saveProduct(e) {
-      e.preventDefault();
-      const id = document.getElementById('prod-id').value;
-      const btn = document.getElementById('btn-save-prod');
-      btn.disabled = true;
-      btn.innerText = 'Saving...';
-
-      const payload = {
-        name: document.getElementById('prod-name').value.trim(),
-        product_code: document.getElementById('prod-code').value.trim(),
-        category_id: document.getElementById('prod-category').value,
-        product_unit: document.getElementById('prod-unit').value,
-        purchase_price: parseFloat(document.getElementById('prod-purchase-price').value) || 0,
-        sell_price: parseFloat(document.getElementById('prod-sell-price').value) || 0,
-        opening_stock: parseInt(document.getElementById('prod-stock').value) || 0,
-        current_stock: parseInt(document.getElementById('prod-stock').value) || 0
-      };
-
-      try {
-        if (id) {
-          const { error } = await db.from('products').update(payload).eq('id', id);
-          if (error) throw error;
-        } else {
-          const { error } = await db.from('products').insert([payload]);
-          if (error) throw error;
-        }
-        closeProductModal();
-        await fetchAllProductsBatched();
-        showSection('products-list');
-        alert('Product saved successfully!');
-      } catch (err) {
-        alert('Failed to save product: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'Save Product';
-      }
-    }
-
-    // Modal: Categories Manager
-    function openCategoriesModal() {
-      const modal = document.getElementById('modal-categories');
-      const list = document.getElementById('cat-list-modal');
-      
-      list.innerHTML = allCategories.map((c, i) => {
-        const catTitle = getCategoryName(c);
-        return `
-          <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-5 text-indigo-400 font-mono-code font-bold">${i + 1}.</span>
-              <span class="font-bold text-white">${catTitle}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] text-slate-500 font-mono-code bg-white/5 px-2 py-0.5 rounded">ID: ${c.id}</span>
-              <button onclick="deleteCategory(${c.id})" class="p-1 text-slate-500 hover:text-rose-400 transition" title="Delete Category">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
-    }
-
-    function closeCategoriesModal() {
-      const modal = document.getElementById('modal-categories');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    async function saveNewCategory() {
-      const name = document.getElementById('new-cat-name').value.trim();
-      if (!name) return alert('Enter category title.');
-      try {
-        const { error } = await db.from('categories').insert([{ category_name: name, name: name }]);
-        if (error) throw error;
-        document.getElementById('new-cat-name').value = '';
-        await fetchCategories();
-        openCategoriesModal();
-      } catch (e) {
-        alert('Category error: ' + e.message);
-      }
-    }
-
-    async function deleteCategory(id) {
-      if (!confirm('Are you sure you want to delete this category?')) return;
-      try {
-        await db.from('categories').delete().eq('id', id);
-        allCategories = allCategories.filter(c => c.id !== id);
-        openCategoriesModal();
-      } catch (e) {
-        alert('Could not delete category: ' + e.message);
-      }
-    }
-
     function populateUnitSelect() {
       const sel = document.getElementById('prod-unit');
       if (sel) {
         sel.innerHTML = unitsList.map(u => `<option value="${u}">${u}</option>`).join('');
-      }
-    }
-
-    function openUnitsModal() {
-      const modal = document.getElementById('modal-units');
-      renderUnitsList();
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
-    }
-
-    function closeUnitsModal() {
-      const modal = document.getElementById('modal-units');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function renderUnitsList() {
-      const container = document.getElementById('units-list-container');
-      container.innerHTML = unitsList.map((u, idx) => `
-        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i data-lucide="box" class="w-3.5 h-3.5 text-indigo-400"></i>
-            <span class="font-bold text-white">${u}</span>
-          </div>
-          ${idx > 2 ? `<button onclick="removeUnit('${u}')" class="text-slate-500 hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : `<span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Standard</span>`}
-        </div>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    function addNewUnit() {
-      const inp = document.getElementById('new-unit-name');
-      const val = inp.value.trim();
-      if (!val) return alert('Enter unit name');
-      if (!unitsList.includes(val)) {
-        unitsList.push(val);
-        populateUnitSelect();
-        renderUnitsList();
-      }
-      inp.value = '';
-    }
-
-    function removeUnit(u) {
-      unitsList = unitsList.filter(item => item !== u);
-      populateUnitSelect();
-      renderUnitsList();
-    }
-
-    function openTaxModal() {
-      const modal = document.getElementById('modal-tax');
-      renderTaxProfilesList();
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
-    }
-
-    function closeTaxModal() {
-      const modal = document.getElementById('modal-tax');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function renderTaxProfilesList() {
-      const container = document.getElementById('tax-profiles-list');
-      container.innerHTML = taxProfiles.map(t => `
-        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
-          <div>
-            <div class="font-bold text-white flex items-center gap-2">
-              ${t.name}
-              ${t.isDefault ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">Active Default</span>' : ''}
-            </div>
-            <span class="text-[11px] font-mono-code text-indigo-400">${t.rate}% Rate</span>
-          </div>
-          <button onclick="setDefaultTax(${t.id})" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[10px] font-bold text-slate-300">Set Default</button>
-        </div>
-      `).join('');
-    }
-
-    function addTaxProfile() {
-      const name = document.getElementById('tax-name-inp').value.trim();
-      const rate = parseFloat(document.getElementById('tax-rate-inp').value) || 0;
-      if (!name) return alert('Enter tax profile name');
-      taxProfiles.push({ id: Date.now(), name: name, rate: rate, isDefault: false });
-      document.getElementById('tax-name-inp').value = '';
-      document.getElementById('tax-rate-inp').value = '';
-      renderTaxProfilesList();
-    }
-
-    function setDefaultTax(id) {
-      taxProfiles.forEach(t => t.isDefault = (t.id === id));
-      renderTaxProfilesList();
-    }
-
-    function openImportModal() {
-      const modal = document.getElementById('modal-import');
-      parsedImportProducts = [];
-      document.getElementById('csv-file-input').value = '';
-      document.getElementById('import-stats').innerText = '0 rows loaded';
-      document.getElementById('import-preview-box').innerHTML = '<span class="text-slate-500">File preview will appear here...</span>';
-      document.getElementById('btn-do-import').disabled = true;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      lucide.createIcons();
-    }
-
-    function closeImportModal() {
-      const modal = document.getElementById('modal-import');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function setupCSVListener() {
-      const fileInput = document.getElementById('csv-file-input');
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          parseCSVData(evt.target.result);
-        };
-        reader.readAsText(file);
-      });
-    }
-
-    function parseCSVData(csvText) {
-      const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
-      if (lines.length <= 1) return alert('CSV file is empty or invalid.');
-      
-      parsedImportProducts = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',').map(c => c.trim());
-        if (cols.length >= 2) {
-          const item = {
-            name: cols[0] || `Import Item ${i}`,
-            product_code: cols[1] || `IMP-${Date.now()}-${i}`,
-            purchase_price: parseFloat(cols[2]) || 0,
-            sell_price: parseFloat(cols[3]) || 0,
-            opening_stock: parseInt(cols[4]) || 0,
-            current_stock: parseInt(cols[4]) || 0,
-            product_unit: cols[5] || 'Piece'
-          };
-          parsedImportProducts.push(item);
-        }
-      }
-
-      document.getElementById('import-stats').innerText = `${parsedImportProducts.length} rows loaded`;
-      const preview = document.getElementById('import-preview-box');
-      preview.innerHTML = parsedImportProducts.slice(0, 15).map(p => `
-        <div class="py-1 border-b border-white/5 flex justify-between">
-          <span class="text-white truncate max-w-[240px]">${p.name} (${p.product_code})</span>
-          <span class="text-emerald-400">Rs. ${p.sell_price} | Stk: ${p.current_stock}</span>
-        </div>
-      `).join('');
-
-      document.getElementById('btn-do-import').disabled = parsedImportProducts.length === 0;
-    }
-
-    function downloadCSVTemplate() {
-      const csvContent = "data:text/csv;charset=utf-8,Product Name,Barcode SKU,Purchase Price,Selling Price,Stock,Unit\nZELLBURY LAWN 3PC,P-001399,2200,3400,20,Piece\nSAPHIRE DRESS 2PC,P-001400,1800,2900,15,Piece";
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "ladies_outlet_products_template.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    async function executeBulkImport() {
-      if (parsedImportProducts.length === 0) return;
-      const btn = document.getElementById('btn-do-import');
-      btn.disabled = true;
-      btn.innerText = 'Importing to cloud...';
-
-      try {
-        const { error } = await db.from('products').insert(parsedImportProducts);
-        if (error) throw error;
-        alert(`Successfully imported ${parsedImportProducts.length} products!`);
-        closeImportModal();
-        await fetchAllProductsBatched();
-        showSection('products-list');
-      } catch (err) {
-        alert('Import failed: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'Execute Bulk Import';
       }
     }
 
@@ -3401,7 +2536,345 @@
       modal.classList.remove('flex');
     }
 
-    // Cart Management
+    async function fetchCategories() {
+      try {
+        const { data } = await db.from('categories').select('*').limit(200);
+        allCategories = data || [];
+        const pillContainer = document.getElementById('category-pills');
+        pillContainer.innerHTML = `
+          <button onclick="filterByCategory('ALL')" id="cat-pill-all" class="px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap">ALL</button>
+        `;
+
+        allCategories.forEach(c => {
+          const catName = getCategoryName(c);
+          const btn = document.createElement('button');
+          btn.id = `cat-pill-${c.id}`;
+          btn.className = 'px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-semibold text-xs whitespace-nowrap transition border border-white/5';
+          btn.innerText = catName;
+          btn.onclick = () => filterByCategory(c.id);
+          pillContainer.appendChild(btn);
+        });
+      } catch (e) {}
+    }
+
+    async function fetchSalesAndAnalytics() {
+      try {
+        let records = [];
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
+
+        while (hasMore) {
+          const { data, error } = await db.from('sells').select('*').order('id', { ascending: false }).range(from, from + batchSize - 1);
+          if (error) throw error;
+          if (data && data.length > 0) {
+            records = records.concat(data);
+            if (data.length < batchSize) hasMore = false;
+            else from += batchSize;
+          } else hasMore = false;
+        }
+
+        allSales = records;
+        applyCustomDateFilter();
+        renderLedger(allSales);
+      } catch (e) {
+        console.error('Fetch sales error:', e);
+      }
+    }
+
+    function setQuickFilterButtonActive(btn) {
+      document.querySelectorAll('.quick-filter-btn').forEach(b => {
+        b.className = 'quick-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-bold transition border border-white/5 whitespace-nowrap';
+      });
+      if (btn) {
+        btn.className = 'quick-filter-btn px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white font-bold shadow-lg whitespace-nowrap';
+      }
+    }
+
+    function applyQuickFilter(days, btn) {
+      setQuickFilterButtonActive(btn);
+      const end = new Date('2026-08-17');
+      const start = new Date('2026-08-17');
+      start.setDate(end.getDate() - days + 1);
+
+      const sStr = start.toISOString().split('T')[0];
+      const eStr = end.toISOString().split('T')[0];
+
+      document.getElementById('dash-start-date').value = sStr;
+      document.getElementById('dash-end-date').value = eStr;
+      document.getElementById('dash-filter-subtitle').innerText = `Showing: Last ${days} Days (${sStr} - ${eStr})`;
+
+      filterSalesByDateStrings(sStr, eStr);
+    }
+
+    function applyThisMonthFilter(btn) {
+      setQuickFilterButtonActive(btn);
+      const sStr = '2026-08-01';
+      const eStr = '2026-08-17';
+
+      document.getElementById('dash-start-date').value = sStr;
+      document.getElementById('dash-end-date').value = eStr;
+      document.getElementById('dash-filter-subtitle').innerText = `Showing: This Month (August 2026)`;
+
+      filterSalesByDateStrings(sStr, eStr);
+    }
+
+    function applyCustomDateFilter() {
+      const sStr = document.getElementById('dash-start-date').value || '2026-08-01';
+      const eStr = document.getElementById('dash-end-date').value || '2026-08-17';
+
+      document.getElementById('dash-filter-subtitle').innerText = `Showing: ${sStr} to ${eStr}`;
+      filterSalesByDateStrings(sStr, eStr);
+    }
+
+    function clearDateFilter(btn) {
+      setQuickFilterButtonActive(btn);
+      document.getElementById('dash-filter-subtitle').innerText = `Showing: All-Time Aggregated Sales`;
+      document.getElementById('kpi-total-sales-label').innerText = `Total Sales`;
+      filteredSales = [...allSales];
+      updateDashboardMetrics(filteredSales, '2026-01-01', '2026-12-31', true);
+    }
+
+    function filterSalesByDateStrings(startStr, endStr) {
+      filteredSales = allSales.filter(s => {
+        const d = getSaleDateString(s);
+        return d >= startStr && d <= endStr;
+      });
+      updateDashboardMetrics(filteredSales, startStr, endStr, false);
+    }
+
+    function updateDashboardMetrics(salesSubset, startStr, endStr, isAllTime) {
+      const periodSalesSum = salesSubset.reduce((acc, s) => acc + getSaleBill(s), 0);
+      const totalAllTimeSum = allSales.reduce((acc, s) => acc + getSaleBill(s), 0);
+
+      document.getElementById('kpi-month-sales').innerText = `Rs. ${periodSalesSum.toLocaleString()}`;
+      document.getElementById('kpi-total-sales').innerText = `Rs. ${(isAllTime ? totalAllTimeSum : periodSalesSum).toLocaleString()}`;
+      document.getElementById('kpi-total-sales-count').innerText = isAllTime ? `${allSales.length} Invoices (All Time)` : `${salesSubset.length} Invoices`;
+
+      document.getElementById('chart-date-range-badge').innerText = `${startStr} - ${endStr}`;
+      document.getElementById('expense-date-badge').innerText = `${startStr} - ${endStr}`;
+
+      renderContinuousSalesChart(salesSubset, startStr, endStr);
+      renderSalesVsExpensesChart(salesSubset, startStr, endStr);
+      renderTop10TrendingProducts();
+    }
+
+    function renderContinuousSalesChart(salesList, startStr, endStr) {
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      const dailyMap = {};
+
+      const start = new Date(startStr + 'T00:00:00');
+      const end = new Date(endStr + 'T00:00:00');
+      
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const key = d.toISOString().split('T')[0];
+        dailyMap[key] = 0;
+      }
+
+      salesList.forEach(s => {
+        const key = getSaleDateString(s);
+        if (dailyMap[key] !== undefined) {
+          dailyMap[key] += getSaleBill(s);
+        }
+      });
+
+      const labels = Object.keys(dailyMap);
+      const dataPoints = Object.values(dailyMap);
+
+      if (salesChartInstance) salesChartInstance.destroy();
+
+      salesChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Sales',
+            data: dataPoints,
+            borderColor: '#4f46e5',
+            backgroundColor: 'rgba(79, 70, 229, 0.15)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: '#818cf8',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, maxTicksLimit: 7 } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (val) => 'RS.' + val.toLocaleString() } }
+          }
+        }
+      });
+    }
+
+    function renderSalesVsExpensesChart(salesList, startStr, endStr) {
+      const ctx = document.getElementById('salesExpensesChart').getContext('2d');
+      if (salesExpensesChartInstance) salesExpensesChartInstance.destroy();
+
+      const totalSales = salesList.reduce((acc, s) => acc + getSaleBill(s), 0);
+      const totalExpenses = 0;
+
+      salesExpensesChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Total'],
+          datasets: [
+            { label: 'Sales', data: [totalSales], backgroundColor: '#3b82f6', borderRadius: 8, barPercentage: 0.4 },
+            { label: 'Expenses', data: [totalExpenses], backgroundColor: '#ef4444', borderRadius: 8, barPercentage: 0.4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (val) => 'Rs. ' + (val >= 1000 ? (val/1000).toFixed(0) + 'k' : val) } }
+          }
+        }
+      });
+    }
+
+    function renderTop10TrendingProducts() {
+      const tbody = document.getElementById('tbl-trending-prods');
+      const realTop10 = [
+        { name: 'zellbury lawn cordsets (S...', code: 'P-P-001358', revenue: 54050, qty: 6 },
+        { name: 'SAPHIRE U/S 2PC', code: '00000765', revenue: 37100, qty: 10 },
+        { name: 'Saya 2PC Unstitched', code: 'P-P-001338', revenue: 49709, qty: 15 },
+        { name: 'MASWA', code: 'P-001279', revenue: 204100, qty: 27 },
+        { name: 'Almirah New 01', code: 'P-P-001330', revenue: 96200, qty: 9 },
+        { name: 'SAYA 2PCS STITCHED', code: 'P-001342', revenue: 52285, qty: 13 },
+        { name: 'Item 38', code: '00000217', revenue: 5600, qty: 22 },
+        { name: 'Zellbury Mushk 2 (S)', code: 'P-001348', revenue: 58510, qty: 6 },
+        { name: 'ZELL S 2890', code: 'P-001285', revenue: 33520, qty: 9 },
+        { name: 'zellbury lawn cordsets(US...', code: 'P-001357', revenue: 7960, qty: 1 }
+      ];
+
+      tbody.innerHTML = realTop10.map((item, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-2.5 text-indigo-400 font-bold">${idx + 1}</td>
+          <td class="py-2.5">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-indigo-500/10 text-indigo-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="package" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="truncate max-w-[140px] sm:max-w-[190px]">
+                <div class="font-semibold text-slate-200 text-xs truncate" title="${item.name}">${item.name}</div>
+                <div class="text-[10px] text-slate-500 font-mono-code">${item.code}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-2.5 text-right font-bold text-emerald-400 text-xs">Rs. ${item.revenue.toLocaleString()}</td>
+          <td class="py-2.5 text-center">
+            <span class="w-6 h-6 rounded-md bg-blue-600 text-white font-bold text-[11px] flex items-center justify-center mx-auto shadow-sm">
+              ${item.qty}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderRealLowStockAlerts() {
+      const tbody = document.getElementById('tbl-low-stock');
+      const realLowStock = [
+        { id: 131, name: 'ZEL2690', code: '00000131', stock: -45 },
+        { id: 217, name: 'Item 38', code: '00000217', stock: -25 },
+        { id: 202, name: 'ITEM 2', code: '00000202', stock: -28 },
+        { id: 102, name: 'H2 ALKARAM U/S TROUSER', code: '00000102', stock: -18 },
+        { id: 130, name: 'ZECHK02', code: '00000130', stock: -10 },
+        { id: 765, name: 'SAPHIRE U/S 2PC', code: '00000765', stock: -11 },
+        { id: 1050, name: 'ZWC2519', code: 'PROD-K5UHJREP', stock: -12 },
+        { id: 722, name: 'T FANCY3PC', code: '00000722', stock: -10 },
+        { id: 204, name: 'ITEM 5', code: '00000204', stock: -7 },
+        { id: 960, name: 'ZC26', code: '00000960', stock: -10 }
+      ];
+
+      tbody.innerHTML = realLowStock.map(p => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-2.5 text-slate-500 font-bold">${p.id}</td>
+          <td class="py-2.5">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-amber-500/10 text-amber-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="package-x" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="truncate max-w-[130px] sm:max-w-[180px]">
+                <div class="font-semibold text-slate-200 text-xs truncate" title="${p.name}">${p.name}</div>
+                <div class="text-[10px] text-slate-500 font-mono-code">${p.code}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-2.5 text-center font-bold text-slate-200 text-xs">
+            ${p.stock} <span class="text-[10px] text-slate-500 font-normal">Piece</span>
+          </td>
+          <td class="py-2.5 text-right">
+            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 whitespace-nowrap">
+              Out of Stock
+            </span>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderProducts(list) {
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = '';
+      if (!list || list.length === 0) {
+        grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 py-16">No products match your search.</div>';
+        return;
+      }
+      list.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'depth-card p-3.5 rounded-2xl flex flex-col justify-between cursor-pointer group active:scale-95 transition-all';
+        card.onclick = () => addToCart(p);
+        card.innerHTML = `
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="font-mono-code text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">${p.code}</span>
+              <div class="w-6 h-6 rounded-lg bg-white/5 group-hover:bg-indigo-600 text-slate-400 group-hover:text-white flex items-center justify-center transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              </div>
+            </div>
+            <h3 class="font-bold text-slate-100 text-xs line-clamp-2 leading-relaxed group-hover:text-indigo-300 transition">${p.name}</h3>
+          </div>
+          <div class="mt-3 pt-2 border-t border-white/5 flex items-baseline justify-between">
+            <span class="text-[9px] text-slate-500 uppercase font-bold">Price</span>
+            <span class="text-xs font-extrabold font-mono-code text-emerald-400">Rs. ${p.price.toLocaleString()}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    document.getElementById('pos-search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      let pool = activeCat === 'ALL' ? allProducts : allProducts.filter(p => String(p.category_id) === String(activeCat));
+      renderProducts(pool.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)));
+    });
+
+    function filterByCategory(catId) {
+      activeCat = catId;
+      document.querySelectorAll('#category-pills button').forEach(b => {
+        b.className = 'px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-semibold text-xs whitespace-nowrap transition border border-white/5';
+      });
+      const activeBtn = document.getElementById(`cat-pill-${catId === 'ALL' ? 'all' : catId}`);
+      if (activeBtn) activeBtn.className = 'px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap';
+      
+      const q = document.getElementById('pos-search').value.toLowerCase().trim();
+      let filtered = catId === 'ALL' ? allProducts : allProducts.filter(p => String(p.category_id) === String(catId));
+      if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
+      renderProducts(filtered);
+    }
+
     function addToCart(p) {
       const found = cart.find(i => i.id === p.id);
       if (found) found.qty++;

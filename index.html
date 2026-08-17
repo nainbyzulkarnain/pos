@@ -177,7 +177,7 @@
           </div>
         </div>
 
-        <!-- 4. Accounts -->
+        <!-- 4. Accounts (Account Master & Account List) -->
         <div>
           <button onclick="toggleMenu('menu-accounts')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -187,8 +187,8 @@
             <i data-lucide="chevron-down" id="chevron-menu-accounts" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-accounts" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Account Master</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Account List</a>
+            <a href="#" onclick="showSection('account-master-create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">+ Account Master</a>
+            <a href="#" onclick="showSection('account-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Account List</a>
           </div>
         </div>
 
@@ -567,7 +567,7 @@
           </div>
         </div>
 
-        <!-- 3.1 CRM: MANAGE CUSTOMERS VIEW (Fixed Data & Complete Pagination) -->
+        <!-- 3.1 CRM: MANAGE CUSTOMERS VIEW -->
         <div id="view-customers-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -623,7 +623,6 @@
                 <tbody id="tbl-customers-body" class="divide-y divide-white/5 text-slate-300"></tbody>
               </table>
             </div>
-            <!-- Customer Pagination Bar -->
             <div class="p-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <span id="cust-page-info" class="text-slate-400 font-mono-code text-[11px]">Showing 0 to 0 of 0 entries</span>
               <div id="cust-pagination-ctrls" class="flex items-center gap-1 font-mono-code"></div>
@@ -631,7 +630,7 @@
           </div>
         </div>
 
-        <!-- 3.2 CRM: MANAGE SUPPLIERS VIEW (Full 88+ Vendors & Interactive Pagination) -->
+        <!-- 3.2 CRM: MANAGE SUPPLIERS VIEW -->
         <div id="view-suppliers-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -680,7 +679,6 @@
                 <tbody id="tbl-suppliers-body" class="divide-y divide-white/5 text-slate-300"></tbody>
               </table>
             </div>
-            <!-- Supplier Pagination Bar -->
             <div class="p-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <span id="supp-page-info" class="text-slate-400 font-mono-code text-[11px]">Showing 0 to 0 of 0 entries</span>
               <div id="supp-pagination-ctrls" class="flex items-center gap-1 font-mono-code"></div>
@@ -688,7 +686,145 @@
           </div>
         </div>
 
-        <!-- 4. CASHIER POS TERMINAL VIEW -->
+        <!-- 4.1 ACCOUNTS: CREATE ACCOUNT MASTER PROFILE (Matching POS360 Video) -->
+        <div id="view-account-master-create" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <i data-lucide="wallet-cards" class="w-5 h-5 text-emerald-400"></i> Account Master Profile
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Register new financial head, ledger, bank or customer account</p>
+            </div>
+            <button onclick="showSection('account-list')" class="btn-3d btn-3d-indigo px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+              <i data-lucide="list" class="w-4 h-4"></i> All Account List
+            </button>
+          </div>
+
+          <div class="depth-card p-6 rounded-2xl">
+            <form id="form-account-master" onsubmit="saveAccountMaster(event)" class="space-y-4 text-xs font-medium max-w-4xl mx-auto">
+              <input type="hidden" id="accmast-id" value="">
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-slate-400 mb-1">Select Account Group *</label>
+                  <select id="accmast-group" required class="w-full px-3 py-2.5 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-semibold"></select>
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Enter Account Title *</label>
+                  <input type="text" id="accmast-title" required placeholder="e.g. Meezan Bank, Staff Salaries, Custom Head" 
+                         class="w-full px-3 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-slate-400 mb-1">Account Code</label>
+                  <input type="text" id="accmast-code" placeholder="e.g. A-000955" 
+                         class="w-full px-3 py-2.5 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Phone Number</label>
+                  <input type="text" id="accmast-phone" placeholder="03XXXXXXXXX" 
+                         class="w-full px-3 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Enter Email</label>
+                  <input type="email" id="accmast-email" placeholder="account@company.com" 
+                         class="w-full px-3 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Address / Location</label>
+                <input type="text" id="accmast-address" placeholder="Physical location, branch address or notes" 
+                       class="w-full px-3 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-slate-400 mb-1">Opening Balance (Dr)</label>
+                  <input type="number" id="accmast-op-dr" value="0" step="any" 
+                         class="w-full px-3 py-2.5 bg-black/50 border border-white/10 rounded-xl text-emerald-400 font-bold font-mono-code outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Opening Balance (Cr)</label>
+                  <input type="number" id="accmast-op-cr" value="0" step="any" 
+                         class="w-full px-3 py-2.5 bg-black/50 border border-white/10 rounded-xl text-rose-400 font-bold font-mono-code outline-none focus:border-indigo-500">
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
+                <button type="reset" class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold">Reset Form</button>
+                <button type="submit" id="btn-save-accmast" class="btn-3d btn-3d-emerald px-7 py-2.5 rounded-xl text-white font-bold text-xs flex items-center gap-2">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i> Save Account Master
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 4.2 ACCOUNTS: ALL ACCOUNT LIST VIEW (Matching POS360 Screenshot & Video) -->
+        <div id="view-account-list" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <i data-lucide="book-open-check" class="w-5 h-5 text-indigo-400"></i> All Account List
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5" id="acclist-count-sub">Complete Chart of Accounts Directory</p>
+            </div>
+            <button onclick="showSection('account-master-create')" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> + New Account
+            </button>
+          </div>
+
+          <div class="depth-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-2 text-xs text-slate-400">
+                <span>Show</span>
+                <select id="acclist-page-size" onchange="changeAccountListPageSize(this.value)" class="bg-black/50 border border-white/10 rounded px-2 py-1 text-white font-mono-code outline-none">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="all">All</option>
+                </select>
+                <span>entries</span>
+              </div>
+              <select id="acclist-filter-group" onchange="filterAccountListByGroup(this.value)" class="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-indigo-300 font-semibold outline-none">
+                <option value="ALL">All Account Groups</option>
+              </select>
+            </div>
+            <input type="text" id="acclist-search-inp" placeholder="Search account title, code or phone..." oninput="filterAccountListSearch()" 
+                   class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-indigo-500">
+          </div>
+
+          <div class="depth-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto max-h-[60vh]">
+              <table class="w-full text-left text-xs font-mono-code min-w-[840px]" id="table-account-list">
+                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
+                  <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                    <th class="py-3 px-3.5 w-10">Sr#</th>
+                    <th class="py-3 px-3.5">Code</th>
+                    <th class="py-3 px-3.5">Account Title</th>
+                    <th class="py-3 px-3.5">Account Group</th>
+                    <th class="py-3 px-3.5">Phone No.</th>
+                    <th class="py-3 px-3.5">Address</th>
+                    <th class="py-3 px-3.5 text-right">Opening (Dr)</th>
+                    <th class="py-3 px-3.5 text-right">Opening (Cr)</th>
+                    <th class="py-3 px-3.5 text-center w-24">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-acclist-body" class="divide-y divide-white/5 text-slate-300"></tbody>
+              </table>
+            </div>
+            <div class="p-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <span id="acclist-page-info" class="text-slate-400 font-mono-code text-[11px]">Showing 0 to 0 of 0 entries</span>
+              <div id="acclist-pagination-ctrls" class="flex items-center gap-1 font-mono-code"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. CASHIER POS TERMINAL VIEW -->
         <div id="view-terminal" class="hidden h-full flex flex-col lg:flex-row gap-5">
           <div class="w-full lg:w-7/12 flex flex-col gap-4">
             <div class="depth-card p-3 rounded-2xl flex flex-col gap-3">
@@ -754,7 +890,7 @@
           </div>
         </div>
 
-        <!-- 5. SALES LEDGER VIEW -->
+        <!-- 6. SALES LEDGER VIEW -->
         <div id="view-ledger" class="hidden depth-card p-4 sm:p-5 rounded-2xl space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 class="text-base font-bold text-white">Full POS Transaction Ledger</h2>
@@ -1133,6 +1269,18 @@
     let allCategories = [];
     let allCustomers = [];
     let allSuppliers = [];
+    let allAccounts = [];
+    let allAccountGroups = [
+      { id: 1, name: 'Sales Revenue' },
+      { id: 2, name: 'Purchase' },
+      { id: 3, name: 'Supplier P/A' },
+      { id: 4, name: 'Customer receivable' },
+      { id: 5, name: 'CASH BALANCE' },
+      { id: 6, name: 'OPERATING EXPENSES' },
+      { id: 7, name: 'BANK BALANCE' },
+      { id: 8, name: 'Owner Capital' },
+      { id: 9, name: 'Retain Earnings' }
+    ];
     let allSales = [];
     let allPurchases = [];
     let allSellProducts = [];
@@ -1142,7 +1290,7 @@
     let salesChartInstance = null;
     let salesExpensesChartInstance = null;
 
-    // CRM Pagination States
+    // Pagination States
     let customerPage = 1;
     let customerPageSize = 10;
     let customerSearchQuery = '';
@@ -1151,6 +1299,11 @@
     let supplierPageSize = 10;
     let supplierSearchQuery = '';
 
+    let accountListPage = 1;
+    let accountListPageSize = 10;
+    let accountListSearchQuery = '';
+    let accountListGroupFilter = 'ALL';
+
     let unitsList = ['Piece', 'Meter', 'Pack', 'Dozen', 'Box', 'Pair', 'Kg', 'Yard'];
     let taxProfiles = [
       { id: 1, name: 'Zero Tax (Standard)', rate: 0, isDefault: true },
@@ -1158,7 +1311,6 @@
     ];
     let parsedImportProducts = [];
 
-    // Master Ledger Balances for Vendors
     const knownSupplierBalances = {
       'A-000931': -311175, 'A-000872': -36810, 'A-000809': 68975, 'A-000807': 48280,
       'A-000806': 6046, 'A-000560': 2576.2, 'A-000549': -2, 'A-000545': 490,
@@ -1192,6 +1344,7 @@
       document.getElementById('dash-end-date').value = '2026-08-17';
 
       populateUnitSelect();
+      populateAccountGroupDropdowns();
       setupCSVListener();
 
       await Promise.all([
@@ -1199,6 +1352,7 @@
         fetchCategories(),
         fetchCustomers(),
         fetchSuppliers(),
+        fetchAllAccounts(),
         fetchPurchases(),
         fetchSalesAndAnalytics()
       ]);
@@ -1244,7 +1398,7 @@
     }
 
     function showSection(section) {
-      ['dashboard', 'products-list', 'customers-list', 'suppliers-list', 'terminal', 'ledger'].forEach(s => {
+      ['dashboard', 'products-list', 'customers-list', 'suppliers-list', 'account-master-create', 'account-list', 'terminal', 'ledger'].forEach(s => {
         const el = document.getElementById(`view-${s}`);
         if (el) el.classList.add('hidden');
       });
@@ -1256,6 +1410,8 @@
         'products-list': '2. Master Profile - Products List',
         'customers-list': '3. CRM - Manage Customers',
         'suppliers-list': '3. CRM - Manage Suppliers',
+        'account-master-create': '4. Accounts - Account Master',
+        'account-list': '4. Accounts - Account List',
         'terminal': '6. POS Cashier Terminal',
         'ledger': '6. Sales Ledger'
       };
@@ -1263,6 +1419,7 @@
       if (section === 'products-list') renderProductsTable(allProducts);
       if (section === 'customers-list') renderCustomersTable();
       if (section === 'suppliers-list') renderSuppliersTable();
+      if (section === 'account-list') renderAccountListTable();
       lucide.createIcons();
     }
 
@@ -1296,7 +1453,250 @@
     }
 
     // ==========================================
-    // 3. CRM: CUSTOMERS & SUPPLIERS DATA ENGINE
+    // 4. ACCOUNTS MODULE (MASTER & LIST)
+    // ==========================================
+    function populateAccountGroupDropdowns() {
+      const selForm = document.getElementById('accmast-group');
+      const selFilter = document.getElementById('acclist-filter-group');
+
+      if (selForm) {
+        selForm.innerHTML = allAccountGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+      }
+      if (selFilter) {
+        selFilter.innerHTML = '<option value="ALL">All Account Groups</option>' + 
+          allAccountGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+      }
+    }
+
+    async function fetchAllAccounts() {
+      try {
+        let records = [];
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
+
+        while (hasMore) {
+          const { data, error } = await db.from('account_masters')
+            .select('*')
+            .order('id', { ascending: false })
+            .range(from, from + batchSize - 1);
+
+          if (error) throw error;
+          if (data && data.length > 0) {
+            records = records.concat(data);
+            if (data.length < batchSize) hasMore = false;
+            else from += batchSize;
+          } else {
+            hasMore = false;
+          }
+        }
+
+        allAccounts = records.map((a, i) => {
+          const grp = allAccountGroups.find(g => g.id === a.account_group_id);
+          return {
+            id: a.id,
+            code: a.account_code || `A-000${950 - i}`,
+            title: (a.account_title || `Account #${a.id}`).trim(),
+            group_id: a.account_group_id || 4,
+            group_name: grp ? grp.name : 'General Head',
+            phone: (a.contact_no || a.phone_no || '').replace(/^(na|NA|-)$/, ''),
+            address: (a.address || '').replace(/^(na|NA|-)$/, ''),
+            email: (a.email || '').replace(/^(na|NA|-)$/, ''),
+            op_dr: parseAmount(a.op_balance_dr || 0),
+            op_cr: parseAmount(a.op_balance_cr || 0),
+            status: a.is_active !== 0 ? 'Active' : 'Inactive'
+          };
+        });
+
+        document.getElementById('acclist-count-sub').innerText = `Total ${allAccounts.length} accounts configured in system`;
+      } catch (err) {
+        console.error('Fetch all accounts error:', err);
+      }
+      accountListPage = 1;
+      renderAccountListTable();
+    }
+
+    function getFilteredAccountList() {
+      let list = allAccounts;
+      if (accountListGroupFilter !== 'ALL') {
+        list = list.filter(a => String(a.group_id) === String(accountListGroupFilter));
+      }
+      const q = accountListSearchQuery.toLowerCase().trim();
+      if (q) {
+        list = list.filter(a => 
+          a.title.toLowerCase().includes(q) || 
+          a.code.toLowerCase().includes(q) || 
+          (a.phone && a.phone.includes(q))
+        );
+      }
+      return list;
+    }
+
+    function renderAccountListTable() {
+      const tbody = document.getElementById('tbl-acclist-body');
+      if (!tbody) return;
+
+      const list = getFilteredAccountList();
+      const total = list.length;
+      const size = accountListPageSize === 'all' ? total : parseInt(accountListPageSize);
+      const totalPages = Math.max(1, Math.ceil(total / (size || 10)));
+
+      if (accountListPage > totalPages) accountListPage = totalPages;
+      if (accountListPage < 1) accountListPage = 1;
+
+      const startIdx = (accountListPage - 1) * size;
+      const endIdx = accountListPageSize === 'all' ? total : Math.min(startIdx + size, total);
+      const pageSlice = list.slice(startIdx, endIdx);
+
+      if (total === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-500">No matching accounts found.</td></tr>';
+        document.getElementById('acclist-page-info').innerText = 'Showing 0 to 0 of 0 entries';
+        document.getElementById('acclist-pagination-ctrls').innerHTML = '';
+        return;
+      }
+
+      document.getElementById('acclist-page-info').innerText = `Showing ${startIdx + 1} to ${endIdx} of ${total} entries`;
+
+      tbody.innerHTML = pageSlice.map((a, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3.5 text-slate-500">${startIdx + idx + 1}</td>
+          <td class="py-3 px-3.5 font-bold text-indigo-400">${a.code}</td>
+          <td class="py-3 px-3.5 font-bold text-white max-w-[200px] truncate" title="${a.title}">${a.title}</td>
+          <td class="py-3 px-3.5 text-slate-300">
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">${a.group_name}</span>
+          </td>
+          <td class="py-3 px-3.5 text-slate-400 font-mono-code">${a.phone || '---'}</td>
+          <td class="py-3 px-3.5 text-slate-400 truncate max-w-[140px]">${a.address || '---'}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-emerald-400 font-mono-code">${a.op_dr > 0 ? 'Rs. ' + a.op_dr.toLocaleString() : '0'}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-rose-400 font-mono-code">${a.op_cr > 0 ? 'Rs. ' + a.op_cr.toLocaleString() : '0'}</td>
+          <td class="py-3 px-3.5 text-center space-x-1">
+            <button onclick="editAccountMaster(${a.id})" class="p-1 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" title="Edit Account"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            <button onclick="alert('Account Ledger view: ' + a.title)" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="View Ledger"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteAccountMaster(${a.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" title="Delete Account"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </td>
+        </tr>
+      `).join('');
+
+      renderAccountListPaginationControls(totalPages);
+      lucide.createIcons();
+    }
+
+    function renderAccountListPaginationControls(totalPages) {
+      const container = document.getElementById('acclist-pagination-ctrls');
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = `<button onclick="changeAccountListPage(${accountListPage - 1})" ${accountListPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>`;
+      
+      for (let i = 1; i <= Math.min(5, totalPages); i++) {
+        html += `<button onclick="changeAccountListPage(${i})" class="px-2.5 py-1 rounded ${accountListPage === i ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${i}</button>`;
+      }
+      if (totalPages > 5) {
+        html += `<span class="px-1 text-slate-500">...</span>`;
+        html += `<button onclick="changeAccountListPage(${totalPages})" class="px-2.5 py-1 rounded ${accountListPage === totalPages ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${totalPages}</button>`;
+      }
+
+      html += `<button onclick="changeAccountListPage(${accountListPage + 1})" ${accountListPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Next</button>`;
+      container.innerHTML = html;
+    }
+
+    function changeAccountListPage(p) {
+      accountListPage = p;
+      renderAccountListTable();
+    }
+
+    function changeAccountListPageSize(val) {
+      accountListPageSize = val;
+      accountListPage = 1;
+      renderAccountListTable();
+    }
+
+    function filterAccountListByGroup(val) {
+      accountListGroupFilter = val;
+      accountListPage = 1;
+      renderAccountListTable();
+    }
+
+    function filterAccountListSearch() {
+      accountListSearchQuery = document.getElementById('acclist-search-inp').value;
+      accountListPage = 1;
+      renderAccountListTable();
+    }
+
+    async function saveAccountMaster(e) {
+      e.preventDefault();
+      const id = document.getElementById('accmast-id').value;
+      const btn = document.getElementById('btn-save-accmast');
+      btn.disabled = true;
+      btn.innerText = 'Saving to cloud...';
+
+      const payload = {
+        account_group_id: parseInt(document.getElementById('accmast-group').value),
+        account_title: document.getElementById('accmast-title').value.trim(),
+        account_code: document.getElementById('accmast-code').value.trim() || `A-000${Date.now().toString().slice(-4)}`,
+        contact_no: document.getElementById('accmast-phone').value.trim(),
+        email: document.getElementById('accmast-email').value.trim(),
+        address: document.getElementById('accmast-address').value.trim(),
+        op_balance_dr: parseFloat(document.getElementById('accmast-op-dr').value) || 0,
+        op_balance_cr: parseFloat(document.getElementById('accmast-op-cr').value) || 0,
+        is_active: 1
+      };
+
+      try {
+        if (id) {
+          const { error } = await db.from('account_masters').update(payload).eq('id', id);
+          if (error) throw error;
+        } else {
+          const { error } = await db.from('account_masters').insert([payload]);
+          if (error) throw error;
+        }
+        alert('Account Master saved successfully!');
+        document.getElementById('form-account-master').reset();
+        document.getElementById('accmast-id').value = '';
+        await fetchAllAccounts();
+        showSection('account-list');
+      } catch (err) {
+        alert('Failed to save account: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Save Account Master';
+        lucide.createIcons();
+      }
+    }
+
+    function editAccountMaster(id) {
+      const a = allAccounts.find(item => item.id === id);
+      if (!a) return;
+
+      document.getElementById('accmast-id').value = a.id;
+      document.getElementById('accmast-group').value = a.group_id;
+      document.getElementById('accmast-title').value = a.title;
+      document.getElementById('accmast-code').value = a.code;
+      document.getElementById('accmast-phone').value = a.phone;
+      document.getElementById('accmast-email').value = a.email;
+      document.getElementById('accmast-address').value = a.address;
+      document.getElementById('accmast-op-dr').value = a.op_dr;
+      document.getElementById('accmast-op-cr').value = a.op_cr;
+
+      showSection('account-master-create');
+    }
+
+    async function deleteAccountMaster(id) {
+      if (!confirm('Are you sure you want to delete this account head?')) return;
+      try {
+        await db.from('account_masters').delete().eq('id', id);
+        allAccounts = allAccounts.filter(a => a.id !== id);
+        renderAccountListTable();
+      } catch (e) {
+        allAccounts = allAccounts.filter(a => a.id !== id);
+        renderAccountListTable();
+      }
+    }
+
+    // ==========================================
+    // 3. CRM DATA ENGINE (CUSTOMERS & SUPPLIERS)
     // ==========================================
     async function fetchCustomers() {
       try {
@@ -1322,7 +1722,6 @@
           }
         }
 
-        // Clean any stray accounting titles
         const excludeHeads = ['SALARIES', 'ELECTRICITY', 'Cash in Hand', 'CAPITAL A/C', 'Food expense', 'Inventories', 'Labour Income', 'Daily expences', 'PURCAHSE INVENTORY'];
         const cleanList = records.filter(c => {
           const title = (c.account_title || c.name || '').toUpperCase();
@@ -1408,9 +1807,6 @@
       });
     }
 
-    // ==========================================
-    // 3.1 CUSTOMERS PAGINATION & RENDERER
-    // ==========================================
     function getFilteredCustomers() {
       const q = customerSearchQuery.toLowerCase().trim();
       if (!q) return allCustomers;
@@ -1505,9 +1901,6 @@
       renderCustomersTable();
     }
 
-    // ==========================================
-    // 3.2 SUPPLIERS PAGINATION & RENDERER
-    // ==========================================
     function getFilteredSuppliers() {
       const q = supplierSearchQuery.toLowerCase().trim();
       if (!q) return allSuppliers;
@@ -1609,7 +2002,6 @@
       renderSuppliersTable();
     }
 
-    // Modal: Customer CRUD
     function openCustomerModal(mode, custId = null) {
       const modal = document.getElementById('modal-customer');
       const title = document.getElementById('modal-cust-title');
@@ -1700,7 +2092,6 @@
       alert(`Customer Ledger & Info for: ${c.name}\nCode: ${c.code}\nPhone: ${c.phone || 'N/A'}\nLoyalty Points: ${c.loyalty}\nClosing Balance: Rs. ${c.balance}`);
     }
 
-    // Modal: Supplier CRUD
     function openSupplierModal(mode, suppId = null) {
       const modal = document.getElementById('modal-supplier');
       const title = document.getElementById('modal-supp-title');
@@ -1783,6 +2174,7 @@
       }
     }
 
+    // Export Data Utility
     function exportData(type, format) {
       const data = type === 'customers' ? allCustomers : allSuppliers;
       if (format === 'copy') {

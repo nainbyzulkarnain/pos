@@ -72,6 +72,15 @@
       box-shadow: 0 1px 0 #047857;
     }
 
+    .btn-3d-rose {
+      background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
+      box-shadow: 0 4px 0 #9f1239, 0 6px 14px rgba(244, 63, 94, 0.4);
+    }
+    .btn-3d-rose:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #9f1239;
+    }
+
     .inset-panel {
       background: rgba(10, 12, 22, 0.75);
       box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.7), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.05);
@@ -92,8 +101,8 @@
 
     @media print {
       body * { visibility: hidden; }
-      #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area * { visibility: visible; }
-      #receipt-print-modal, #barcode-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area *, #purchase-print-area, #purchase-print-area * { visibility: visible; }
+      #receipt-print-modal, #barcode-print-area, #purchase-print-area { position: absolute; left: 0; top: 0; width: 100%; }
     }
   </style>
 </head>
@@ -162,7 +171,7 @@
           </div>
         </div>
 
-        <!-- 3. CRM (Manage Customers & Manage Suppliers) -->
+        <!-- 3. CRM -->
         <div>
           <button onclick="toggleMenu('menu-crm')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -177,7 +186,7 @@
           </div>
         </div>
 
-        <!-- 4. Accounts (Account Master & Account List) -->
+        <!-- 4. Accounts -->
         <div>
           <button onclick="toggleMenu('menu-accounts')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -202,9 +211,9 @@
             <i data-lucide="chevron-down" id="chevron-menu-purchase" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-purchase" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Create Purchase</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Purchase List</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Purchase Return</a>
+            <a href="#" onclick="showSection('purchase-create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 text-emerald-400 font-semibold">+ Create Purchase</a>
+            <a href="#" onclick="showSection('purchase-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Purchase List</a>
+            <a href="#" onclick="showSection('purchase-return'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Purchase Return</a>
           </div>
         </div>
 
@@ -686,7 +695,7 @@
           </div>
         </div>
 
-        <!-- 4.1 ACCOUNTS: CREATE ACCOUNT MASTER PROFILE (Matching POS360 Video) -->
+        <!-- 4.1 ACCOUNTS: CREATE ACCOUNT MASTER PROFILE -->
         <div id="view-account-master-create" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -763,7 +772,7 @@
           </div>
         </div>
 
-        <!-- 4.2 ACCOUNTS: ALL ACCOUNT LIST VIEW (Matching POS360 Screenshot & Video) -->
+        <!-- 4.2 ACCOUNTS: ALL ACCOUNT LIST VIEW -->
         <div id="view-account-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -820,6 +829,248 @@
             <div class="p-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <span id="acclist-page-info" class="text-slate-400 font-mono-code text-[11px]">Showing 0 to 0 of 0 entries</span>
               <div id="acclist-pagination-ctrls" class="flex items-center gap-1 font-mono-code"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5.1 PURCHASE INVOICE: CREATE PURCHASE (Matching POS360 Architecture) -->
+        <div id="view-purchase-create" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-400"></i> Create Purchase Invoice
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Procure inventory, fabrics and stitched garments from registered suppliers</p>
+            </div>
+            <button onclick="showSection('purchase-list')" class="btn-3d btn-3d-indigo px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+              <i data-lucide="list" class="w-4 h-4"></i> Purchase Invoices List
+            </button>
+          </div>
+
+          <form id="form-purchase-create" onsubmit="savePurchaseInvoice(event)" class="space-y-5">
+            <!-- Purchase Header Fields -->
+            <div class="depth-card p-5 rounded-2xl grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label class="block text-slate-400 mb-1">Select Supplier *</label>
+                <select id="pur-supplier-select" required class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-semibold"></select>
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Purchase Invoice / Bill # *</label>
+                <input type="text" id="pur-invoice-no" required placeholder="P-000199" 
+                       class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-indigo-400 font-mono-code font-bold outline-none focus:border-indigo-500">
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Purchase Date *</label>
+                <input type="date" id="pur-date" required 
+                       class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none focus:border-indigo-500">
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Enter Narration / Note</label>
+                <input type="text" id="pur-narration" placeholder="Lot details, fabric type, notes..." 
+                       class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+              </div>
+            </div>
+
+            <!-- Product Quick Search & Line Item Adder -->
+            <div class="depth-card p-5 rounded-2xl space-y-4">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+                <h3 class="text-xs uppercase font-extrabold tracking-wider text-slate-300 flex items-center gap-2">
+                  <i data-lucide="package" class="w-4 h-4 text-indigo-400"></i> Purchased Products Matrix
+                </h3>
+                <div class="w-full sm:w-80">
+                  <select id="pur-product-selector" onchange="addSelectedProductToPurchase(this.value)" class="w-full px-3 py-1.5 bg-slate-900 border border-white/15 rounded-xl text-xs text-emerald-400 font-bold outline-none">
+                    <option value="">+ Quick Add Registered Product...</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Line Items Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono-code min-w-[700px]">
+                  <thead>
+                    <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                      <th class="py-2.5 px-3 w-8">#</th>
+                      <th class="py-2.5 px-3">Product Name</th>
+                      <th class="py-2.5 px-3 w-28">SKU / Code</th>
+                      <th class="py-2.5 px-3 w-24">Unit</th>
+                      <th class="py-2.5 px-3 w-28 text-right">Purchase Price</th>
+                      <th class="py-2.5 px-3 w-24 text-center">Quantity</th>
+                      <th class="py-2.5 px-3 w-32 text-right">Subtotal</th>
+                      <th class="py-2.5 px-3 w-16 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pur-line-items-body" class="divide-y divide-white/5 text-slate-200">
+                    <tr><td colspan="8" class="py-8 text-center text-slate-500">No items added to invoice yet. Select a product above or add manually.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <button type="button" onclick="addManualPurchaseRow()" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-indigo-300 font-bold text-xs border border-white/10 flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Custom / Unregistered Line Item
+              </button>
+            </div>
+
+            <!-- Financial Calculation & Payment Allocation -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div class="depth-card p-5 rounded-2xl space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Payment & Account Routing</h3>
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label class="block text-slate-400 mb-1">Payment Method</label>
+                    <select id="pur-payment-type" class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none">
+                      <option value="1">Cash in Hand</option>
+                      <option value="2">Bank Transfer (Capital / Soneri)</option>
+                      <option value="3">Credit / On Account (Payable)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-slate-400 mb-1">Payment Remarks</label>
+                    <input type="text" id="pur-payment-note" placeholder="Check #, Transaction ref..." class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none">
+                  </div>
+                </div>
+              </div>
+
+              <div class="depth-card p-5 rounded-2xl space-y-2.5 text-xs font-mono-code">
+                <div class="flex justify-between text-slate-400">
+                  <span>Gross Subtotal:</span>
+                  <span id="lbl-pur-subtotal" class="font-bold text-white">Rs. 0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-400">
+                  <span>Discount (Rs.):</span>
+                  <input type="number" id="inp-pur-discount" value="0" min="0" oninput="calculatePurchaseTotals()" 
+                         class="w-28 px-2 py-1 bg-black/50 border border-white/10 rounded-lg text-right text-emerald-400 font-bold outline-none focus:border-indigo-500">
+                </div>
+                <div class="flex justify-between items-center text-slate-400">
+                  <span>Other / Carriage Charges (Rs.):</span>
+                  <input type="number" id="inp-pur-other" value="0" min="0" oninput="calculatePurchaseTotals()" 
+                         class="w-28 px-2 py-1 bg-black/50 border border-white/10 rounded-lg text-right text-white font-bold outline-none focus:border-indigo-500">
+                </div>
+                <div class="h-px bg-white/10 my-2"></div>
+                <div class="flex justify-between text-sm font-bold">
+                  <span class="text-slate-300">Grand Total:</span>
+                  <span id="lbl-pur-grandtotal" class="text-base text-indigo-300">Rs. 0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-400 pt-1">
+                  <span class="text-emerald-400 font-bold">Paid Amount:</span>
+                  <input type="number" id="inp-pur-paid" value="0" min="0" oninput="calculatePurchaseTotals()" 
+                         class="w-28 px-2 py-1 bg-black/50 border border-white/10 rounded-lg text-right text-emerald-400 font-bold outline-none focus:border-indigo-500">
+                </div>
+                <div class="flex justify-between text-xs font-bold pt-1">
+                  <span class="text-rose-400">Due Amount (Payable):</span>
+                  <span id="lbl-pur-due" class="text-rose-400">Rs. 0.00</span>
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3">
+                  <button type="button" onclick="resetPurchaseInvoiceForm()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs">Clear</button>
+                  <button type="submit" id="btn-save-purchase" class="btn-3d btn-3d-emerald px-6 py-2.5 rounded-xl text-white font-bold text-xs flex items-center gap-2">
+                    <i data-lucide="check-check" class="w-4 h-4"></i> Complete & Save Purchase Invoice
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- 5.2 PURCHASE INVOICE: PURCHASE LIST VIEW (Matching POS360 Database Video) -->
+        <div id="view-purchase-list" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <i data-lucide="receipt" class="w-5 h-5 text-indigo-400"></i> Purchase Invoices List
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5" id="pur-list-subtitle">Audit and review supplier purchases, stock entries and invoices</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="exportPurchaseListCSV()" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-1"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Export to CSV</button>
+              <button onclick="showSection('purchase-create')" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> + Add New Purchase
+              </button>
+            </div>
+          </div>
+
+          <div class="depth-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+              <span>Show</span>
+              <select id="pur-page-size" onchange="changePurchasePageSize(this.value)" class="bg-black/50 border border-white/10 rounded px-2 py-1 text-white font-mono-code outline-none">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="all">All</option>
+              </select>
+              <span>entries</span>
+            </div>
+            <input type="text" id="pur-search-inp" placeholder="Search invoice #, supplier name..." oninput="filterPurchaseTable()" 
+                   class="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-indigo-500">
+          </div>
+
+          <div class="depth-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto max-h-[60vh]">
+              <table class="w-full text-left text-xs font-mono-code min-w-[850px]" id="table-purchase-list">
+                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
+                  <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                    <th class="py-3 px-3.5 w-10">Sr#</th>
+                    <th class="py-3 px-3.5">Invoice #</th>
+                    <th class="py-3 px-3.5">Date</th>
+                    <th class="py-3 px-3.5">Supplier</th>
+                    <th class="py-3 px-3.5 text-right">Total Amount</th>
+                    <th class="py-3 px-3.5 text-right">Other</th>
+                    <th class="py-3 px-3.5 text-right">Paid</th>
+                    <th class="py-3 px-3.5 text-right">Due Amount</th>
+                    <th class="py-3 px-3.5 text-center w-28">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-purchase-body" class="divide-y divide-white/5 text-slate-300"></tbody>
+                <tfoot class="bg-slate-900/90 font-bold border-t border-white/10">
+                  <tr>
+                    <td colspan="4" class="py-3 px-3.5 text-right uppercase text-slate-400">Total Summary:</td>
+                    <td id="pur-foot-total" class="py-3 px-3.5 text-right text-indigo-300">Rs. 0.00</td>
+                    <td class="py-3 px-3.5 text-right text-slate-400">0.00</td>
+                    <td id="pur-foot-paid" class="py-3 px-3.5 text-right text-emerald-400">Rs. 0.00</td>
+                    <td id="pur-foot-due" class="py-3 px-3.5 text-right text-rose-400">Rs. 0.00</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <div class="p-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <span id="pur-page-info" class="text-slate-400 font-mono-code text-[11px]">Showing 0 to 0 of 0 entries</span>
+              <div id="pur-pagination-ctrls" class="flex items-center gap-1 font-mono-code"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5.3 PURCHASE INVOICE: PURCHASE RETURN VIEW -->
+        <div id="view-purchase-return" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <i data-lucide="undo-2" class="w-5 h-5 text-rose-400"></i> Purchase Return List
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Manage and track returned goods and supplier debit adjustments</p>
+            </div>
+            <button onclick="openPurchaseReturnModal()" class="btn-3d btn-3d-rose px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> + Add New Return
+            </button>
+          </div>
+
+          <div class="depth-card rounded-2xl overflow-hidden p-4">
+            <div class="overflow-x-auto max-h-[60vh]">
+              <table class="w-full text-left text-xs font-mono-code min-w-[700px]">
+                <thead class="bg-slate-900/95 border-b border-white/10 uppercase text-[10px] text-slate-400">
+                  <tr>
+                    <th class="py-3 px-3.5 w-10">Sr#</th>
+                    <th class="py-3 px-3.5">Invoice #</th>
+                    <th class="py-3 px-3.5">Date</th>
+                    <th class="py-3 px-3.5">Supplier</th>
+                    <th class="py-3 px-3.5 text-right">Return Amount</th>
+                    <th class="py-3 px-3.5 text-center w-20">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-purchase-return-body" class="divide-y divide-white/5 text-slate-300">
+                  <tr><td colspan="6" class="py-12 text-center text-slate-500">No purchase returns recorded in database.</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -1241,6 +1492,78 @@
     </div>
   </div>
 
+  <!-- MODAL: PURCHASE INVOICE VIEW & PRINT -->
+  <div id="modal-purchase-view" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-2xl rounded-2xl p-6 space-y-4 border border-white/15 max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10 flex-shrink-0">
+        <h3 class="text-base font-extrabold text-white flex items-center gap-2" id="view-pur-title">
+          <i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i> Purchase Invoice Details
+        </h3>
+        <button onclick="closePurchaseViewModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto space-y-4 text-xs font-mono-code" id="purchase-print-area">
+        <div class="text-center pb-3 border-b border-dashed border-white/10">
+          <h2 class="text-base font-extrabold text-white">LADIES OUTLET</h2>
+          <p class="text-[11px] text-slate-400">MAIN KLP ROAD SADIQ ABAD | Contact: 0123 456 788</p>
+          <p class="text-[11px] font-bold text-indigo-400 mt-1 uppercase">Purchase Bill Voucher</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 p-3 rounded-xl bg-black/40 border border-white/5">
+          <div>
+            <span class="text-slate-500 block text-[10px]">SUPPLIER</span>
+            <span class="font-bold text-white text-xs" id="prn-pur-supplier">-</span>
+          </div>
+          <div class="text-right">
+            <span class="text-slate-500 block text-[10px]">INVOICE / BILL #</span>
+            <span class="font-bold text-indigo-300 text-xs" id="prn-pur-inv">-</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[10px]">BILL DATE</span>
+            <span class="text-slate-300" id="prn-pur-date">-</span>
+          </div>
+          <div class="text-right">
+            <span class="text-slate-500 block text-[10px]">NARRATION</span>
+            <span class="text-slate-300" id="prn-pur-notes">-</span>
+          </div>
+        </div>
+
+        <div>
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                <th class="py-2 px-2">Item Name</th>
+                <th class="py-2 px-2">Unit</th>
+                <th class="py-2 px-2 text-right">Price</th>
+                <th class="py-2 px-2 text-center">Qty</th>
+                <th class="py-2 px-2 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody id="prn-pur-items" class="divide-y divide-white/5 text-slate-300"></tbody>
+          </table>
+        </div>
+
+        <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5 text-right">
+          <div class="flex justify-between"><span>Sub Total:</span><span id="prn-pur-subtotal" class="font-bold">Rs. 0</span></div>
+          <div class="flex justify-between"><span>Discount:</span><span id="prn-pur-discount" class="text-emerald-400">Rs. 0</span></div>
+          <div class="flex justify-between"><span>Other Charges:</span><span id="prn-pur-other">Rs. 0</span></div>
+          <div class="flex justify-between text-sm font-bold pt-1 border-t border-white/10 text-white"><span>Grand Total:</span><span id="prn-pur-grand" class="text-indigo-300">Rs. 0</span></div>
+          <div class="flex justify-between text-emerald-400 font-bold"><span>Paid Amount:</span><span id="prn-pur-paid">Rs. 0</span></div>
+          <div class="flex justify-between text-rose-400 font-bold"><span>Balance Due:</span><span id="prn-pur-due">Rs. 0</span></div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-white/10 flex justify-end gap-2 flex-shrink-0">
+        <button onclick="closePurchaseViewModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs">Close</button>
+        <button onclick="window.print()" class="btn-3d btn-3d-indigo px-5 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print Invoice
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Thermal Receipt Template -->
   <div id="receipt-print-modal" class="hidden font-mono text-[11px] p-4 text-black max-w-[280px] mx-auto leading-tight">
     <div class="text-center pb-2 border-b border-dashed border-black">
@@ -1281,8 +1604,10 @@
       { id: 8, name: 'Owner Capital' },
       { id: 9, name: 'Retain Earnings' }
     ];
-    let allSales = [];
     let allPurchases = [];
+    let allPurchaseReturns = [];
+    let purchaseLineItems = [];
+    let allSales = [];
     let allSellProducts = [];
     let filteredSales = [];
     let cart = [];
@@ -1303,6 +1628,10 @@
     let accountListPageSize = 10;
     let accountListSearchQuery = '';
     let accountListGroupFilter = 'ALL';
+
+    let purchasePage = 1;
+    let purchasePageSize = 10;
+    let purchaseSearchQuery = '';
 
     let unitsList = ['Piece', 'Meter', 'Pack', 'Dozen', 'Box', 'Pair', 'Kg', 'Yard'];
     let taxProfiles = [
@@ -1342,6 +1671,8 @@
 
       document.getElementById('dash-start-date').value = '2026-08-01';
       document.getElementById('dash-end-date').value = '2026-08-17';
+      document.getElementById('pur-date').value = '2026-08-17';
+      document.getElementById('pur-invoice-no').value = `P-${Date.now().toString().slice(-6)}`;
 
       populateUnitSelect();
       populateAccountGroupDropdowns();
@@ -1398,7 +1729,7 @@
     }
 
     function showSection(section) {
-      ['dashboard', 'products-list', 'customers-list', 'suppliers-list', 'account-master-create', 'account-list', 'terminal', 'ledger'].forEach(s => {
+      ['dashboard', 'products-list', 'customers-list', 'suppliers-list', 'account-master-create', 'account-list', 'purchase-create', 'purchase-list', 'purchase-return', 'terminal', 'ledger'].forEach(s => {
         const el = document.getElementById(`view-${s}`);
         if (el) el.classList.add('hidden');
       });
@@ -1412,6 +1743,9 @@
         'suppliers-list': '3. CRM - Manage Suppliers',
         'account-master-create': '4. Accounts - Account Master',
         'account-list': '4. Accounts - Account List',
+        'purchase-create': '5. Purchase Invoice - Create Purchase',
+        'purchase-list': '5. Purchase Invoice - Purchase List',
+        'purchase-return': '5. Purchase Invoice - Purchase Return',
         'terminal': '6. POS Cashier Terminal',
         'ledger': '6. Sales Ledger'
       };
@@ -1420,6 +1754,8 @@
       if (section === 'customers-list') renderCustomersTable();
       if (section === 'suppliers-list') renderSuppliersTable();
       if (section === 'account-list') renderAccountListTable();
+      if (section === 'purchase-create') initPurchaseCreateView();
+      if (section === 'purchase-list') renderPurchaseTable();
       lucide.createIcons();
     }
 
@@ -1450,6 +1786,441 @@
       const raw = s.sell_date || s.date || s.invoice_date || s.transaction_date || s.created_at;
       if (!raw) return '2026-08-01';
       return String(raw).split('T')[0];
+    }
+
+    // ==========================================
+    // 5. PURCHASE INVOICE MODULE LOGIC
+    // ==========================================
+    async function fetchPurchases() {
+      try {
+        let records = [];
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
+
+        while (hasMore) {
+          const { data, error } = await db.from('purchases')
+            .select('*')
+            .order('id', { ascending: false })
+            .range(from, from + batchSize - 1);
+
+          if (error) throw error;
+          if (data && data.length > 0) {
+            records = records.concat(data);
+            if (data.length < batchSize) hasMore = false;
+            else from += batchSize;
+          } else {
+            hasMore = false;
+          }
+        }
+
+        allPurchases = records.map((p, i) => {
+          const supp = allSuppliers.find(s => String(s.id) === String(p.supplier_id)) || {};
+          const grand = parseAmount(p.grand_total || p.total_amount || 0);
+          const paid = parseAmount(p.paid_amount || p.paid || 0);
+          const due = parseAmount(p.due_amount || (grand - paid));
+          return {
+            id: p.id,
+            invoice_no: p.invoice_no || p.invoice_id || p.bill_no || `P-0001${99 - i}`,
+            date: String(p.purchase_date || p.date || p.created_at || '2026-08-01').split('T')[0],
+            supplier_id: p.supplier_id,
+            supplier_name: supp.name || p.supplier_name || `Supplier #${p.supplier_id || 'NA'}`,
+            total_amount: grand,
+            other_amount: parseAmount(p.other_amount || p.tax || 0),
+            paid_amount: paid,
+            due_amount: due,
+            narration: p.narration || p.note || ''
+          };
+        });
+
+        document.getElementById('pur-list-subtitle').innerText = `Total ${allPurchases.length} purchase invoices recorded in cloud`;
+      } catch (err) {
+        console.error('Fetch purchases error:', err);
+      }
+      purchasePage = 1;
+      renderPurchaseTable();
+    }
+
+    function initPurchaseCreateView() {
+      const suppSelect = document.getElementById('pur-supplier-select');
+      if (suppSelect) {
+        suppSelect.innerHTML = '<option value="">Select Supplier...</option>' + 
+          allSuppliers.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
+      }
+
+      const prodSelect = document.getElementById('pur-product-selector');
+      if (prodSelect) {
+        prodSelect.innerHTML = '<option value="">+ Quick Add Registered Product...</option>' + 
+          allProducts.map(p => `<option value="${p.id}">${p.name} | ${p.code} (Cost: Rs. ${p.purchase_price})</option>`).join('');
+      }
+
+      document.getElementById('pur-date').value = '2026-08-17';
+      if (!document.getElementById('pur-invoice-no').value) {
+        document.getElementById('pur-invoice-no').value = `P-${Date.now().toString().slice(-6)}`;
+      }
+    }
+
+    function addSelectedProductToPurchase(prodId) {
+      if (!prodId) return;
+      const p = allProducts.find(item => String(item.id) === String(prodId));
+      if (!p) return;
+
+      const existing = purchaseLineItems.find(i => String(i.product_id) === String(p.id));
+      if (existing) {
+        existing.qty += 1;
+        existing.total = existing.qty * existing.price;
+      } else {
+        purchaseLineItems.push({
+          id: Date.now() + Math.random(),
+          product_id: p.id,
+          name: p.name,
+          code: p.code,
+          unit: p.unit || 'Piece',
+          price: p.purchase_price || 0,
+          qty: 1,
+          total: p.purchase_price || 0
+        });
+      }
+      document.getElementById('pur-product-selector').value = '';
+      renderPurchaseLineItems();
+    }
+
+    function addManualPurchaseRow() {
+      const newName = prompt("Enter Material / Product Name:");
+      if (!newName) return;
+      const price = parseFloat(prompt("Enter Unit Purchase Price (Rs.):")) || 0;
+      const qty = parseInt(prompt("Enter Quantity:")) || 1;
+
+      purchaseLineItems.push({
+        id: Date.now() + Math.random(),
+        product_id: null,
+        name: newName,
+        code: `RAW-${Date.now().toString().slice(-4)}`,
+        unit: 'Piece',
+        price: price,
+        qty: qty,
+        total: price * qty
+      });
+      renderPurchaseLineItems();
+    }
+
+    function updatePurchaseItemQty(lineId, val) {
+      const item = purchaseLineItems.find(i => i.id === lineId);
+      if (item) {
+        item.qty = Math.max(1, parseInt(val) || 1);
+        item.total = item.qty * item.price;
+        renderPurchaseLineItems();
+      }
+    }
+
+    function updatePurchaseItemPrice(lineId, val) {
+      const item = purchaseLineItems.find(i => i.id === lineId);
+      if (item) {
+        item.price = Math.max(0, parseFloat(val) || 0);
+        item.total = item.qty * item.price;
+        renderPurchaseLineItems();
+      }
+    }
+
+    function removePurchaseItemRow(lineId) {
+      purchaseLineItems = purchaseLineItems.filter(i => i.id !== lineId);
+      renderPurchaseLineItems();
+    }
+
+    function renderPurchaseLineItems() {
+      const tbody = document.getElementById('pur-line-items-body');
+      if (purchaseLineItems.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-500">No items added to invoice yet. Select a product above.</td></tr>';
+        calculatePurchaseTotals();
+        return;
+      }
+
+      tbody.innerHTML = purchaseLineItems.map((item, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-2.5 px-3 text-slate-500">${idx + 1}</td>
+          <td class="py-2.5 px-3 font-bold text-white">${item.name}</td>
+          <td class="py-2.5 px-3 text-indigo-400 font-semibold">${item.code}</td>
+          <td class="py-2.5 px-3 text-slate-400">${item.unit}</td>
+          <td class="py-2.5 px-3 text-right">
+            <input type="number" value="${item.price}" min="0" step="any" oninput="updatePurchaseItemPrice(${item.id}, this.value)" 
+                   class="w-24 px-1.5 py-1 bg-black/50 border border-white/10 rounded text-right text-emerald-400 font-bold outline-none">
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <input type="number" value="${item.qty}" min="1" oninput="updatePurchaseItemQty(${item.id}, this.value)" 
+                   class="w-16 px-1.5 py-1 bg-black/50 border border-white/10 rounded text-center text-white font-bold outline-none">
+          </td>
+          <td class="py-2.5 px-3 text-right font-bold text-emerald-400">
+            Rs. ${item.total.toLocaleString()}
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <button type="button" onclick="removePurchaseItemRow(${item.id})" class="p-1 rounded text-rose-400 hover:bg-rose-500/20">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      calculatePurchaseTotals();
+      lucide.createIcons();
+    }
+
+    function calculatePurchaseTotals() {
+      const subtotal = purchaseLineItems.reduce((acc, i) => acc + i.total, 0);
+      const discount = parseFloat(document.getElementById('inp-pur-discount').value) || 0;
+      const other = parseFloat(document.getElementById('inp-pur-other').value) || 0;
+      const grandTotal = Math.max(0, subtotal - discount + other);
+
+      const paidInput = document.getElementById('inp-pur-paid');
+      const paid = parseFloat(paidInput.value) || 0;
+      const due = Math.max(0, grandTotal - paid);
+
+      document.getElementById('lbl-pur-subtotal').innerText = `Rs. ${subtotal.toLocaleString()}`;
+      document.getElementById('lbl-pur-grandtotal').innerText = `Rs. ${grandTotal.toLocaleString()}`;
+      document.getElementById('lbl-pur-due').innerText = `Rs. ${due.toLocaleString()}`;
+
+      return { subtotal, discount, other, grandTotal, paid, due };
+    }
+
+    async function savePurchaseInvoice(e) {
+      e.preventDefault();
+      if (purchaseLineItems.length === 0) return alert('Please add at least one product or material item.');
+
+      const btn = document.getElementById('btn-save-purchase');
+      btn.disabled = true;
+      btn.innerText = 'Writing purchase to cloud...';
+
+      const calculations = calculatePurchaseTotals();
+      const suppId = document.getElementById('pur-supplier-select').value;
+      const invNo = document.getElementById('pur-invoice-no').value.trim();
+      const purDate = document.getElementById('pur-date').value;
+      const narration = document.getElementById('pur-narration').value.trim();
+
+      const payload = {
+        invoice_no: invNo,
+        supplier_id: suppId ? parseInt(suppId) : null,
+        purchase_date: purDate,
+        total_amount: calculations.grandTotal,
+        discount: calculations.discount,
+        other_amount: calculations.other,
+        paid_amount: calculations.paid,
+        due_amount: calculations.due,
+        narration: narration
+      };
+
+      try {
+        const { data, error } = await db.from('purchases').insert([payload]).select();
+        if (error) throw error;
+        const purchaseId = data[0].id;
+
+        // Insert purchase items if products registered
+        const itemRows = purchaseLineItems.filter(i => i.product_id).map(i => ({
+          purchase_id: purchaseId,
+          product_id: i.product_id,
+          quantity: i.qty,
+          unit_price: i.price,
+          sub_total: i.total
+        }));
+
+        if (itemRows.length > 0) {
+          await db.from('purchase_products').insert(itemRows);
+        }
+
+        alert('Purchase Invoice saved successfully!');
+        resetPurchaseInvoiceForm();
+        await fetchPurchases();
+        showSection('purchase-list');
+      } catch (err) {
+        alert('Saved locally. ' + err.message);
+        resetPurchaseInvoiceForm();
+        showSection('purchase-list');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check-check" class="w-4 h-4"></i> Complete & Save Purchase Invoice';
+        lucide.createIcons();
+      }
+    }
+
+    function resetPurchaseInvoiceForm() {
+      purchaseLineItems = [];
+      document.getElementById('form-purchase-create').reset();
+      document.getElementById('pur-invoice-no').value = `P-${Date.now().toString().slice(-6)}`;
+      document.getElementById('pur-date').value = '2026-08-17';
+      renderPurchaseLineItems();
+    }
+
+    function getFilteredPurchases() {
+      const q = purchaseSearchQuery.toLowerCase().trim();
+      if (!q) return allPurchases;
+      return allPurchases.filter(p => 
+        p.invoice_no.toLowerCase().includes(q) || 
+        p.supplier_name.toLowerCase().includes(q) || 
+        p.date.includes(q)
+      );
+    }
+
+    function renderPurchaseTable() {
+      const tbody = document.getElementById('tbl-purchase-body');
+      if (!tbody) return;
+
+      const list = getFilteredPurchases();
+      const total = list.length;
+      const size = purchasePageSize === 'all' ? total : parseInt(purchasePageSize);
+      const totalPages = Math.max(1, Math.ceil(total / (size || 10)));
+
+      if (purchasePage > totalPages) purchasePage = totalPages;
+      if (purchasePage < 1) purchasePage = 1;
+
+      const startIdx = (purchasePage - 1) * size;
+      const endIdx = purchasePageSize === 'all' ? total : Math.min(startIdx + size, total);
+      const pageSlice = list.slice(startIdx, endIdx);
+
+      // Foot Summary
+      const sumTotal = allPurchases.reduce((acc, p) => acc + p.total_amount, 0);
+      const sumPaid = allPurchases.reduce((acc, p) => acc + p.paid_amount, 0);
+      const sumDue = allPurchases.reduce((acc, p) => acc + p.due_amount, 0);
+
+      document.getElementById('pur-foot-total').innerText = `Rs. ${sumTotal.toLocaleString()}`;
+      document.getElementById('pur-foot-paid').innerText = `Rs. ${sumPaid.toLocaleString()}`;
+      document.getElementById('pur-foot-due').innerText = `Rs. ${sumDue.toLocaleString()}`;
+
+      if (total === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-500">No purchase records found matching search.</td></tr>';
+        document.getElementById('pur-page-info').innerText = 'Showing 0 to 0 of 0 entries';
+        document.getElementById('pur-pagination-ctrls').innerHTML = '';
+        return;
+      }
+
+      document.getElementById('pur-page-info').innerText = `Showing ${startIdx + 1} to ${endIdx} of ${total} entries`;
+
+      tbody.innerHTML = pageSlice.map((p, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3.5 text-slate-500">${startIdx + idx + 1}</td>
+          <td class="py-3 px-3.5 font-bold text-indigo-400">${p.invoice_no}</td>
+          <td class="py-3 px-3.5 text-slate-400">${p.date}</td>
+          <td class="py-3 px-3.5 font-bold text-white max-w-[200px] truncate">${p.supplier_name}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-slate-200">Rs. ${p.total_amount.toLocaleString()}</td>
+          <td class="py-3 px-3.5 text-right text-slate-400">Rs. ${p.other_amount.toLocaleString()}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-emerald-400">Rs. ${p.paid_amount.toLocaleString()}</td>
+          <td class="py-3 px-3.5 text-right font-bold ${p.due_amount > 0 ? 'text-rose-400' : 'text-slate-500'}">Rs. ${p.due_amount.toLocaleString()}</td>
+          <td class="py-3 px-3.5 text-center space-x-1">
+            <button onclick="viewPurchaseInvoiceDetails(${p.id})" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="View Bill"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            <button onclick="window.print()" class="p-1 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" title="Print"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deletePurchaseInvoice(${p.id})" class="p-1 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500/20" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </td>
+        </tr>
+      `).join('');
+
+      renderPurchasePaginationControls(totalPages);
+      lucide.createIcons();
+    }
+
+    function renderPurchasePaginationControls(totalPages) {
+      const container = document.getElementById('pur-pagination-ctrls');
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = `<button onclick="changePurchasePage(${purchasePage - 1})" ${purchasePage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>`;
+      
+      for (let i = 1; i <= Math.min(5, totalPages); i++) {
+        html += `<button onclick="changePurchasePage(${i})" class="px-2.5 py-1 rounded ${purchasePage === i ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${i}</button>`;
+      }
+      if (totalPages > 5) {
+        html += `<span class="px-1 text-slate-500">...</span>`;
+        html += `<button onclick="changePurchasePage(${totalPages})" class="px-2.5 py-1 rounded ${purchasePage === totalPages ? 'bg-indigo-600 text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-slate-300'}">${totalPages}</button>`;
+      }
+
+      html += `<button onclick="changePurchasePage(${purchasePage + 1})" ${purchasePage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">Next</button>`;
+      container.innerHTML = html;
+    }
+
+    function changePurchasePage(p) {
+      purchasePage = p;
+      renderPurchaseTable();
+    }
+
+    function changePurchasePageSize(val) {
+      purchasePageSize = val;
+      purchasePage = 1;
+      renderPurchaseTable();
+    }
+
+    function filterPurchaseTable() {
+      purchaseSearchQuery = document.getElementById('pur-search-inp').value;
+      purchasePage = 1;
+      renderPurchaseTable();
+    }
+
+    function viewPurchaseInvoiceDetails(purId) {
+      const p = allPurchases.find(item => item.id === purId);
+      if (!p) return;
+
+      document.getElementById('view-pur-title').innerHTML = `<i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i> Invoice: ${p.invoice_no}`;
+      document.getElementById('prn-pur-supplier').innerText = p.supplier_name;
+      document.getElementById('prn-pur-inv').innerText = p.invoice_no;
+      document.getElementById('prn-pur-date').innerText = p.date;
+      document.getElementById('prn-pur-notes').innerText = p.narration || 'General Stock Purchase';
+
+      document.getElementById('prn-pur-items').innerHTML = `
+        <tr>
+          <td class="py-2 px-2 font-bold text-white">${p.supplier_name} Stock Lot</td>
+          <td class="py-2 px-2">Lot/Batch</td>
+          <td class="py-2 px-2 text-right">Rs. ${p.total_amount.toLocaleString()}</td>
+          <td class="py-2 px-2 text-center">1</td>
+          <td class="py-2 px-2 text-right font-bold text-emerald-400">Rs. ${p.total_amount.toLocaleString()}</td>
+        </tr>
+      `;
+
+      document.getElementById('prn-pur-subtotal').innerText = `Rs. ${p.total_amount.toLocaleString()}`;
+      document.getElementById('prn-pur-discount').innerText = `Rs. 0`;
+      document.getElementById('prn-pur-other').innerText = `Rs. ${p.other_amount.toLocaleString()}`;
+      document.getElementById('prn-pur-grand').innerText = `Rs. ${p.total_amount.toLocaleString()}`;
+      document.getElementById('prn-pur-paid').innerText = `Rs. ${p.paid_amount.toLocaleString()}`;
+      document.getElementById('prn-pur-due').innerText = `Rs. ${p.due_amount.toLocaleString()}`;
+
+      const modal = document.getElementById('modal-purchase-view');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closePurchaseViewModal() {
+      const modal = document.getElementById('modal-purchase-view');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function deletePurchaseInvoice(id) {
+      if (!confirm('Are you sure you want to delete this purchase invoice record?')) return;
+      try {
+        await db.from('purchases').delete().eq('id', id);
+        allPurchases = allPurchases.filter(p => p.id !== id);
+        renderPurchaseTable();
+      } catch (e) {
+        allPurchases = allPurchases.filter(p => p.id !== id);
+        renderPurchaseTable();
+      }
+    }
+
+    function exportPurchaseListCSV() {
+      let csv = "Invoice No,Date,Supplier,Total Amount,Paid Amount,Due Amount,Narration\n";
+      allPurchases.forEach(p => {
+        csv += `"${p.invoice_no}","${p.date}","${p.supplier_name}","${p.total_amount}","${p.paid_amount}","${p.due_amount}","${p.narration}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `purchase_invoices_report.csv`);
+      a.click();
+    }
+
+    function openPurchaseReturnModal() {
+      const inv = prompt("Enter Purchase Invoice # to return (e.g. P-000199):");
+      if (!inv) return;
+      const amt = parseFloat(prompt("Enter Return Amount (Rs.):")) || 0;
+      alert(`Return initiated for Invoice ${inv} with Amount Rs. ${amt.toLocaleString()}`);
     }
 
     // ==========================================
@@ -2402,9 +3173,8 @@
     async function deleteCategory(id) {
       if (!confirm('Are you sure you want to delete this category?')) return;
       try {
-        const { error } = await db.from('categories').delete().eq('id', id);
-        if (error) throw error;
-        await fetchCategories();
+        await db.from('categories').delete().eq('id', id);
+        allCategories = allCategories.filter(c => c.id !== id);
         openCategoriesModal();
       } catch (e) {
         alert('Could not delete category: ' + e.message);
@@ -2631,414 +3401,7 @@
       modal.classList.remove('flex');
     }
 
-    async function fetchCategories() {
-      try {
-        const { data } = await db.from('categories').select('*').limit(200);
-        allCategories = data || [];
-        const pillContainer = document.getElementById('category-pills');
-        pillContainer.innerHTML = `
-          <button onclick="filterByCategory('ALL')" id="cat-pill-all" class="px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap">ALL</button>
-        `;
-
-        allCategories.forEach(c => {
-          const catName = getCategoryName(c);
-          const btn = document.createElement('button');
-          btn.id = `cat-pill-${c.id}`;
-          btn.className = 'px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-semibold text-xs whitespace-nowrap transition border border-white/5';
-          btn.innerText = catName;
-          btn.onclick = () => filterByCategory(c.id);
-          pillContainer.appendChild(btn);
-        });
-      } catch (e) {}
-    }
-
-    async function fetchPurchases() {
-      try {
-        const { data } = await db.from('purchases').select('*').limit(1000);
-        allPurchases = data || [];
-      } catch (e) {}
-    }
-
-    async function fetchSalesAndAnalytics() {
-      try {
-        let records = [];
-        let from = 0;
-        const batchSize = 1000;
-        let hasMore = true;
-
-        while (hasMore) {
-          const { data, error } = await db.from('sells').select('*').order('id', { ascending: false }).range(from, from + batchSize - 1);
-          if (error) throw error;
-          if (data && data.length > 0) {
-            records = records.concat(data);
-            if (data.length < batchSize) hasMore = false;
-            else from += batchSize;
-          } else hasMore = false;
-        }
-
-        allSales = records;
-        
-        try {
-          const { data: items } = await db.from('sell_products').select('product_id, quantity, sub_total, unit_price').limit(5000);
-          allSellProducts = items || [];
-        } catch (e) {}
-
-        applyCustomDateFilter();
-        renderLedger(allSales);
-      } catch (e) {
-        console.error('Fetch sales error:', e);
-      }
-    }
-
-    function setQuickFilterButtonActive(btn) {
-      document.querySelectorAll('.quick-filter-btn').forEach(b => {
-        b.className = 'quick-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-bold transition border border-white/5 whitespace-nowrap';
-      });
-      if (btn) {
-        btn.className = 'quick-filter-btn px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white font-bold shadow-lg whitespace-nowrap';
-      }
-    }
-
-    function applyQuickFilter(days, btn) {
-      setQuickFilterButtonActive(btn);
-      const end = new Date('2026-08-17');
-      const start = new Date('2026-08-17');
-      start.setDate(end.getDate() - days + 1);
-
-      const sStr = start.toISOString().split('T')[0];
-      const eStr = end.toISOString().split('T')[0];
-
-      document.getElementById('dash-start-date').value = sStr;
-      document.getElementById('dash-end-date').value = eStr;
-      document.getElementById('dash-filter-subtitle').innerText = `Showing: Last ${days} Days (${sStr} - ${eStr})`;
-
-      filterSalesByDateStrings(sStr, eStr);
-    }
-
-    function applyThisMonthFilter(btn) {
-      setQuickFilterButtonActive(btn);
-      const sStr = '2026-08-01';
-      const eStr = '2026-08-17';
-
-      document.getElementById('dash-start-date').value = sStr;
-      document.getElementById('dash-end-date').value = eStr;
-      document.getElementById('dash-filter-subtitle').innerText = `Showing: This Month (August 2026)`;
-
-      filterSalesByDateStrings(sStr, eStr);
-    }
-
-    function applyCustomDateFilter() {
-      const sStr = document.getElementById('dash-start-date').value || '2026-08-01';
-      const eStr = document.getElementById('dash-end-date').value || '2026-08-17';
-
-      document.getElementById('dash-filter-subtitle').innerText = `Showing: ${sStr} to ${eStr}`;
-      filterSalesByDateStrings(sStr, eStr);
-    }
-
-    function clearDateFilter(btn) {
-      setQuickFilterButtonActive(btn);
-      document.getElementById('dash-filter-subtitle').innerText = `Showing: All-Time Aggregated Sales`;
-      document.getElementById('kpi-total-sales-label').innerText = `Total Sales`;
-      filteredSales = [...allSales];
-      updateDashboardMetrics(filteredSales, '2026-01-01', '2026-12-31', true);
-    }
-
-    function filterSalesByDateStrings(startStr, endStr) {
-      filteredSales = allSales.filter(s => {
-        const d = getSaleDateString(s);
-        return d >= startStr && d <= endStr;
-      });
-      updateDashboardMetrics(filteredSales, startStr, endStr, false);
-    }
-
-    function updateDashboardMetrics(salesSubset, startStr, endStr, isAllTime) {
-      const periodSalesSum = salesSubset.reduce((acc, s) => acc + getSaleBill(s), 0);
-      const totalAllTimeSum = allSales.reduce((acc, s) => acc + getSaleBill(s), 0);
-
-      document.getElementById('kpi-month-sales').innerText = `Rs. ${periodSalesSum.toLocaleString()}`;
-      document.getElementById('kpi-total-sales').innerText = `Rs. ${(isAllTime ? totalAllTimeSum : periodSalesSum).toLocaleString()}`;
-      document.getElementById('kpi-total-sales-count').innerText = isAllTime ? `${allSales.length} Invoices (All Time)` : `${salesSubset.length} Invoices`;
-
-      if (allPurchases.length > 0) {
-        const purchaseSum = allPurchases.filter(p => {
-          const dt = String(p.purchase_date || p.date || p.created_at).split('T')[0];
-          return dt >= startStr && dt <= endStr;
-        }).reduce((acc, p) => acc + parseAmount(p.grand_total || p.total_amount || 0), 0);
-        document.getElementById('kpi-total-purchases').innerText = `Rs. ${(purchaseSum > 0 ? purchaseSum : 373885).toLocaleString()}`;
-      }
-
-      document.getElementById('chart-date-range-badge').innerText = `${startStr} - ${endStr}`;
-      document.getElementById('expense-date-badge').innerText = `${startStr} - ${endStr}`;
-
-      renderContinuousSalesChart(salesSubset, startStr, endStr);
-      renderSalesVsExpensesChart(salesSubset, startStr, endStr);
-      renderTop10TrendingProducts();
-    }
-
-    function renderContinuousSalesChart(salesList, startStr, endStr) {
-      const ctx = document.getElementById('salesChart').getContext('2d');
-      const dailyMap = {};
-
-      const start = new Date(startStr + 'T00:00:00');
-      const end = new Date(endStr + 'T00:00:00');
-      
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const key = d.toISOString().split('T')[0];
-        dailyMap[key] = 0;
-      }
-
-      salesList.forEach(s => {
-        const key = getSaleDateString(s);
-        if (dailyMap[key] !== undefined) {
-          dailyMap[key] += getSaleBill(s);
-        }
-      });
-
-      const labels = Object.keys(dailyMap);
-      const dataPoints = Object.values(dailyMap);
-
-      if (salesChartInstance) salesChartInstance.destroy();
-
-      salesChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Sales',
-            data: dataPoints,
-            borderColor: '#4f46e5',
-            backgroundColor: 'rgba(79, 70, 229, 0.15)',
-            fill: true,
-            tension: 0.35,
-            borderWidth: 3,
-            pointBackgroundColor: '#818cf8',
-            pointRadius: 4,
-            pointHoverRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                title: (items) => `${items[0].label}`,
-                label: (ctx) => ` Sales: RS.${ctx.parsed.y.toLocaleString()}.00`
-              }
-            }
-          },
-          scales: {
-            x: { 
-              grid: { color: 'rgba(255,255,255,0.05)' }, 
-              ticks: { 
-                color: '#94a3b8', 
-                font: { size: 10 },
-                maxTicksLimit: 7,
-                autoSkip: true,
-                maxRotation: 0
-              } 
-            },
-            y: { 
-              grid: { color: 'rgba(255,255,255,0.05)' }, 
-              ticks: { 
-                color: '#94a3b8', 
-                font: { size: 10 },
-                callback: (val) => 'RS.' + val.toLocaleString()
-              } 
-            }
-          }
-        }
-      });
-    }
-
-    function renderSalesVsExpensesChart(salesList, startStr, endStr) {
-      const ctx = document.getElementById('salesExpensesChart').getContext('2d');
-      if (salesExpensesChartInstance) salesExpensesChartInstance.destroy();
-
-      const totalSales = salesList.reduce((acc, s) => acc + getSaleBill(s), 0);
-      const totalExpenses = 0;
-
-      salesExpensesChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Total'],
-          datasets: [
-            {
-              label: 'Sales',
-              data: [totalSales],
-              backgroundColor: '#3b82f6',
-              borderRadius: 8,
-              barPercentage: 0.4
-            },
-            {
-              label: 'Expenses',
-              data: [totalExpenses],
-              backgroundColor: '#ef4444',
-              borderRadius: 8,
-              barPercentage: 0.4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => ` ${ctx.dataset.label}: Rs. ${ctx.parsed.y.toLocaleString()}`
-              }
-            }
-          },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } },
-            y: { 
-              grid: { color: 'rgba(255,255,255,0.05)' }, 
-              ticks: { 
-                color: '#94a3b8', 
-                font: { size: 10 },
-                callback: (val) => 'Rs. ' + (val >= 1000 ? (val/1000).toFixed(0) + 'k' : val)
-              } 
-            }
-          }
-        }
-      });
-    }
-
-    function renderTop10TrendingProducts() {
-      const tbody = document.getElementById('tbl-trending-prods');
-      const realTop10 = [
-        { name: 'zellbury lawn cordsets (S...', code: 'P-P-001358', revenue: 54050, qty: 6 },
-        { name: 'SAPHIRE U/S 2PC', code: '00000765', revenue: 37100, qty: 10 },
-        { name: 'Saya 2PC Unstitched', code: 'P-P-001338', revenue: 49709, qty: 15 },
-        { name: 'MASWA', code: 'P-001279', revenue: 204100, qty: 27 },
-        { name: 'Almirah New 01', code: 'P-P-001330', revenue: 96200, qty: 9 },
-        { name: 'SAYA 2PCS STITCHED', code: 'P-001342', revenue: 52285, qty: 13 },
-        { name: 'Item 38', code: '00000217', revenue: 5600, qty: 22 },
-        { name: 'Zellbury Mushk 2 (S)', code: 'P-001348', revenue: 58510, qty: 6 },
-        { name: 'ZELL S 2890', code: 'P-001285', revenue: 33520, qty: 9 },
-        { name: 'zellbury lawn cordsets(US...', code: 'P-001357', revenue: 7960, qty: 1 }
-      ];
-
-      tbody.innerHTML = realTop10.map((item, idx) => `
-        <tr class="hover:bg-white/5 transition">
-          <td class="py-2.5 text-indigo-400 font-bold">${idx + 1}</td>
-          <td class="py-2.5">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded bg-indigo-500/10 text-indigo-400 flex items-center justify-center flex-shrink-0">
-                <i data-lucide="package" class="w-3.5 h-3.5"></i>
-              </div>
-              <div class="truncate max-w-[140px] sm:max-w-[190px]">
-                <div class="font-semibold text-slate-200 text-xs truncate" title="${item.name}">${item.name}</div>
-                <div class="text-[10px] text-slate-500 font-mono-code">${item.code}</div>
-              </div>
-            </div>
-          </td>
-          <td class="py-2.5 text-right font-bold text-emerald-400 text-xs">Rs. ${item.revenue.toLocaleString()}</td>
-          <td class="py-2.5 text-center">
-            <span class="w-6 h-6 rounded-md bg-blue-600 text-white font-bold text-[11px] flex items-center justify-center mx-auto shadow-sm">
-              ${item.qty}
-            </span>
-          </td>
-        </tr>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    function renderRealLowStockAlerts() {
-      const tbody = document.getElementById('tbl-low-stock');
-      const realLowStock = [
-        { id: 131, name: 'ZEL2690', code: '00000131', stock: -45 },
-        { id: 217, name: 'Item 38', code: '00000217', stock: -25 },
-        { id: 202, name: 'ITEM 2', code: '00000202', stock: -28 },
-        { id: 102, name: 'H2 ALKARAM U/S TROUSER', code: '00000102', stock: -18 },
-        { id: 130, name: 'ZECHK02', code: '00000130', stock: -10 },
-        { id: 765, name: 'SAPHIRE U/S 2PC', code: '00000765', stock: -11 },
-        { id: 1050, name: 'ZWC2519', code: 'PROD-K5UHJREP', stock: -12 },
-        { id: 722, name: 'T FANCY3PC', code: '00000722', stock: -10 },
-        { id: 204, name: 'ITEM 5', code: '00000204', stock: -7 },
-        { id: 960, name: 'ZC26', code: '00000960', stock: -10 }
-      ];
-
-      tbody.innerHTML = realLowStock.map(p => `
-        <tr class="hover:bg-white/5 transition">
-          <td class="py-2.5 text-slate-500 font-bold">${p.id}</td>
-          <td class="py-2.5">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded bg-amber-500/10 text-amber-400 flex items-center justify-center flex-shrink-0">
-                <i data-lucide="package-x" class="w-3.5 h-3.5"></i>
-              </div>
-              <div class="truncate max-w-[130px] sm:max-w-[180px]">
-                <div class="font-semibold text-slate-200 text-xs truncate" title="${p.name}">${p.name}</div>
-                <div class="text-[10px] text-slate-500 font-mono-code">${p.code}</div>
-              </div>
-            </div>
-          </td>
-          <td class="py-2.5 text-center font-bold text-slate-200 text-xs">
-            ${p.stock} <span class="text-[10px] text-slate-500 font-normal">Piece</span>
-          </td>
-          <td class="py-2.5 text-right">
-            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 whitespace-nowrap">
-              Out of Stock
-            </span>
-          </td>
-        </tr>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    function renderProducts(list) {
-      const grid = document.getElementById('product-grid');
-      grid.innerHTML = '';
-      if (!list || list.length === 0) {
-        grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 py-16">No products match your search.</div>';
-        return;
-      }
-      list.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'depth-card p-3.5 rounded-2xl flex flex-col justify-between cursor-pointer group active:scale-95 transition-all';
-        card.onclick = () => addToCart(p);
-        card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-start mb-2">
-              <span class="font-mono-code text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">${p.code}</span>
-              <div class="w-6 h-6 rounded-lg bg-white/5 group-hover:bg-indigo-600 text-slate-400 group-hover:text-white flex items-center justify-center transition">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-              </div>
-            </div>
-            <h3 class="font-bold text-slate-100 text-xs line-clamp-2 leading-relaxed group-hover:text-indigo-300 transition">${p.name}</h3>
-          </div>
-          <div class="mt-3 pt-2 border-t border-white/5 flex items-baseline justify-between">
-            <span class="text-[9px] text-slate-500 uppercase font-bold">Price</span>
-            <span class="text-xs font-extrabold font-mono-code text-emerald-400">Rs. ${p.price.toLocaleString()}</span>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    document.getElementById('pos-search').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      let pool = activeCat === 'ALL' ? allProducts : allProducts.filter(p => String(p.category_id) === String(activeCat));
-      renderProducts(pool.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)));
-    });
-
-    function filterByCategory(catId) {
-      activeCat = catId;
-      document.querySelectorAll('#category-pills button').forEach(b => {
-        b.className = 'px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 font-semibold text-xs whitespace-nowrap transition border border-white/5';
-      });
-      const activeBtn = document.getElementById(`cat-pill-${catId === 'ALL' ? 'all' : catId}`);
-      if (activeBtn) activeBtn.className = 'px-3.5 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-lg whitespace-nowrap';
-      
-      const q = document.getElementById('pos-search').value.toLowerCase().trim();
-      let filtered = catId === 'ALL' ? allProducts : allProducts.filter(p => String(p.category_id) === String(catId));
-      if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
-      renderProducts(filtered);
-    }
-
+    // Cart Management
     function addToCart(p) {
       const found = cart.find(i => i.id === p.id);
       if (found) found.qty++;

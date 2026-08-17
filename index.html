@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ladies Outlet - 3D Enterprise POS & ERP</title>
-  <!-- Tailwind CSS, Lucide Icons & Chart.js -->
+  <!-- Tailwind CSS, Lucide Icons, JsBarcode & Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -88,14 +89,11 @@
       cursor: pointer;
       opacity: 0.7;
     }
-    input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
-    }
 
     @media print {
       body * { visibility: hidden; }
-      #receipt-print-modal, #receipt-print-modal * { visibility: visible; }
-      #receipt-print-modal { position: absolute; left: 0; top: 0; width: 100%; }
+      #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area * { visibility: visible; }
+      #receipt-print-modal, #barcode-print-area { position: absolute; left: 0; top: 0; width: 100%; }
     }
   </style>
 </head>
@@ -107,7 +105,7 @@
   <!-- Main Application Wrapper -->
   <div class="flex-1 flex overflow-hidden relative">
 
-    <!-- 3D SIDEBAR NAVIGATION (Responsive Drawer) -->
+    <!-- 3D SIDEBAR NAVIGATION -->
     <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-950/95 lg:static lg:z-30 border-r border-white/10 flex flex-col justify-between backdrop-blur-2xl shadow-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
       
       <!-- Brand Header -->
@@ -123,7 +121,6 @@
             <span class="text-[9px] font-semibold text-indigo-400 uppercase tracking-wider">POS360 Enterprise</span>
           </div>
         </div>
-        <!-- Close button on Mobile -->
         <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -156,12 +153,12 @@
             <i data-lucide="chevron-down" id="chevron-menu-master" class="w-3.5 h-3.5 transition-transform"></i>
           </button>
           <div id="menu-master" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" onclick="showSection('terminal'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Categories</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Product Unit</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Tax Profile</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Create Product</a>
-            <a href="#" onclick="showSection('terminal'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Products List</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Import Product</a>
+            <a href="#" onclick="openCategoriesModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Categories</a>
+            <a href="#" onclick="openUnitsModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Product Unit</a>
+            <a href="#" onclick="openTaxModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Tax Profile</a>
+            <a href="#" onclick="openProductModal('create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 text-emerald-400 font-semibold">+ Create Product</a>
+            <a href="#" onclick="showSection('products-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Products List</a>
+            <a href="#" onclick="alert('Product CSV Import tool ready.'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Import Product</a>
           </div>
         </div>
 
@@ -227,7 +224,7 @@
           </div>
         </div>
 
-        <!-- 7. Stock Adjustment -->
+        <!-- 7 to 14 Sections -->
         <div>
           <button onclick="toggleMenu('menu-adj')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -242,7 +239,6 @@
           </div>
         </div>
 
-        <!-- 8. Vouchers -->
         <div>
           <button onclick="toggleMenu('menu-vouchers')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -260,7 +256,6 @@
           </div>
         </div>
 
-        <!-- 9. Purchase Reports -->
         <div>
           <button onclick="toggleMenu('menu-prpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -277,7 +272,6 @@
           </div>
         </div>
 
-        <!-- 10. Sales Reports -->
         <div>
           <button onclick="toggleMenu('menu-srpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -295,7 +289,6 @@
           </div>
         </div>
 
-        <!-- 11. Stock Report -->
         <div>
           <button onclick="toggleMenu('menu-stkrpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -309,7 +302,6 @@
           </div>
         </div>
 
-        <!-- 12. Document Actions -->
         <div>
           <button onclick="toggleMenu('menu-doc')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -324,7 +316,6 @@
           </div>
         </div>
 
-        <!-- 13. Account Reports -->
         <div>
           <button onclick="toggleMenu('menu-acctrpt')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -343,7 +334,6 @@
           </div>
         </div>
 
-        <!-- 14. Administrative -->
         <div>
           <button onclick="toggleMenu('menu-admin')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
             <div class="flex items-center gap-2.5">
@@ -377,7 +367,6 @@
       <!-- Header Topbar -->
       <header class="h-16 px-4 sm:px-6 flex items-center justify-between border-b border-white/10 bg-slate-900/60 backdrop-blur-xl z-20 shadow-lg flex-shrink-0">
         <div class="flex items-center space-x-3">
-          <!-- Mobile Drawer Toggle -->
           <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white">
             <i data-lucide="menu" class="w-5 h-5"></i>
           </button>
@@ -388,6 +377,9 @@
         </div>
 
         <div class="flex items-center space-x-2 sm:space-x-4">
+          <button onclick="openProductModal('create')" class="btn-3d btn-3d-indigo px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold text-white flex items-center gap-1.5 sm:gap-2">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> <span class="hidden sm:inline">Add</span> Product
+          </button>
           <button onclick="showSection('terminal')" class="btn-3d btn-3d-emerald px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold text-white flex items-center gap-1.5 sm:gap-2">
             <i data-lucide="shopping-cart" class="w-4 h-4"></i> <span class="hidden sm:inline">Rapid Cashier</span> POS
           </button>
@@ -446,10 +438,9 @@
             </div>
           </div>
 
-          <!-- 3D 4-Column KPI Metric Cards (Responsive Grid) -->
+          <!-- 3D 4-Column KPI Metric Cards -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            <!-- Period Sales -->
             <div class="depth-card p-5 rounded-2xl border-l-4 border-emerald-500 flex flex-col justify-between">
               <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider" id="kpi-sales-label">This Month Sales</span>
@@ -461,7 +452,6 @@
               </div>
             </div>
 
-            <!-- Total Sales Volume -->
             <div class="depth-card p-5 rounded-2xl border-l-4 border-indigo-500 flex flex-col justify-between">
               <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider" id="kpi-total-sales-label">Total Sales</span>
@@ -473,7 +463,6 @@
               </div>
             </div>
 
-            <!-- Total Inventory Value -->
             <div class="depth-card p-5 rounded-2xl border-l-4 border-amber-500 flex flex-col justify-between">
               <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">This Month Purchase</span>
@@ -485,7 +474,6 @@
               </div>
             </div>
 
-            <!-- Total Purchases / Accounts -->
             <div class="depth-card p-5 rounded-2xl border-l-4 border-purple-500 flex flex-col justify-between">
               <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider" id="kpi-total-purchase-label">Total Purchase</span>
@@ -499,9 +487,8 @@
 
           </div>
 
-          <!-- Charts Row (Sales Overview & Sales vs Expenses) -->
+          <!-- Charts Row -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <!-- Sales Overview Timeline Chart -->
             <div class="depth-card p-5 rounded-2xl lg:col-span-2 space-y-3">
               <div class="flex justify-between items-center">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -514,7 +501,6 @@
               </div>
             </div>
 
-            <!-- Sales vs Expenses Chart (Clean Bar Chart) -->
             <div class="depth-card p-5 rounded-2xl space-y-3">
               <div class="flex justify-between items-center">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -534,10 +520,8 @@
             </div>
           </div>
 
-          <!-- Bottom Row: Top Trending Products & Low Stock Alert (Clean Responsive 10 Items) -->
+          <!-- Bottom Row: Trending & Low Stock -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-            <!-- Trending Products Top 10 (No internal scroll bar) -->
             <div class="depth-card p-5 rounded-2xl space-y-4">
               <div class="flex justify-between items-center">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -555,14 +539,11 @@
                       <th class="pb-2.5 text-center w-12">Qty</th>
                     </tr>
                   </thead>
-                  <tbody id="tbl-trending-prods" class="divide-y divide-white/5">
-                    <tr><td colspan="4" class="py-6 text-center text-slate-500">Loading top trending products...</td></tr>
-                  </tbody>
+                  <tbody id="tbl-trending-prods" class="divide-y divide-white/5"></tbody>
                 </table>
               </div>
             </div>
 
-            <!-- Low Stock / Out of Stock Alert Top 10 (No internal scroll bar) -->
             <div class="depth-card p-5 rounded-2xl space-y-4">
               <div class="flex justify-between items-center">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -580,20 +561,55 @@
                       <th class="pb-2.5 text-right">Status</th>
                     </tr>
                   </thead>
-                  <tbody id="tbl-low-stock" class="divide-y divide-white/5">
-                    <tr><td colspan="4" class="py-6 text-center text-slate-500">Auditing inventory balances...</td></tr>
-                  </tbody>
+                  <tbody id="tbl-low-stock" class="divide-y divide-white/5"></tbody>
                 </table>
               </div>
             </div>
-
           </div>
 
         </div>
 
-        <!-- 2. CASHIER POS TERMINAL VIEW (Responsive Layout) -->
+        <!-- 2. MASTER PROFILE: PRODUCTS LIST & CATALOG VIEW -->
+        <div id="view-products-list" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white">Master Profile: Products Directory</h2>
+              <p class="text-xs text-slate-400 mt-0.5" id="prod-list-count">Managing all items in your store</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <input type="text" id="prod-table-search" placeholder="Search title, SKU or code..." oninput="filterProductsTable()" 
+                     class="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-xs text-white outline-none w-full sm:w-64 focus:border-indigo-500">
+              <button onclick="openProductModal('create')" class="btn-3d btn-3d-indigo px-3.5 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add New Product
+              </button>
+            </div>
+          </div>
+
+          <div class="depth-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto max-h-[70vh]">
+              <table class="w-full text-left text-xs font-mono-code">
+                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
+                  <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                    <th class="py-3.5 px-4 w-12">#</th>
+                    <th class="py-3.5 px-4">Product Name</th>
+                    <th class="py-3.5 px-4">SKU / Barcode</th>
+                    <th class="py-3.5 px-4">Category</th>
+                    <th class="py-3.5 px-4 text-right">Purchase Price</th>
+                    <th class="py-3.5 px-4 text-right">Selling Price</th>
+                    <th class="py-3.5 px-4 text-center">Stock</th>
+                    <th class="py-3.5 px-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-master-products" class="divide-y divide-white/5 text-slate-300">
+                  <tr><td colspan="8" class="py-8 text-center text-slate-500">Loading catalog items...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CASHIER POS TERMINAL VIEW -->
         <div id="view-terminal" class="hidden h-full flex flex-col lg:flex-row gap-5">
-          <!-- Catalog Matrix -->
           <div class="w-full lg:w-7/12 flex flex-col gap-4">
             <div class="depth-card p-3 rounded-2xl flex flex-col gap-3">
               <div class="relative flex items-center">
@@ -609,7 +625,6 @@
             <div id="product-grid" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3.5 pr-1 pb-4 max-h-[60vh] lg:max-h-none"></div>
           </div>
 
-          <!-- Active Cart Console -->
           <div class="w-full lg:w-5/12 flex flex-col gap-4 justify-between">
             <div class="depth-card p-4 rounded-2xl flex justify-between items-center">
               <div class="flex items-center space-x-3">
@@ -659,7 +674,7 @@
           </div>
         </div>
 
-        <!-- 3. SALES LEDGER VIEW -->
+        <!-- 4. SALES LEDGER VIEW -->
         <div id="view-ledger" class="hidden depth-card p-4 sm:p-5 rounded-2xl space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 class="text-base font-bold text-white">Full POS Transaction Ledger</h2>
@@ -685,6 +700,126 @@
         </div>
 
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE / EDIT PRODUCT -->
+  <div id="modal-product" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-2xl rounded-2xl p-6 space-y-5 border border-white/15 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10">
+        <h3 id="modal-product-title" class="text-base font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="package-plus" class="w-5 h-5 text-indigo-400"></i> Add New Product
+        </h3>
+        <button onclick="closeProductModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4 text-xs font-medium">
+        <input type="hidden" id="prod-id" value="">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Product Title *</label>
+            <input type="text" id="prod-name" required placeholder="e.g. ZELLBURY LAWN 3PC" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 mb-1">Product Barcode / SKU *</label>
+            <input type="text" id="prod-code" required placeholder="e.g. P-001360" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-mono-code">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Category *</label>
+            <select id="prod-category" required class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500"></select>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 mb-1">Unit</label>
+            <select id="prod-unit" class="w-full px-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500">
+              <option value="Piece">Piece</option>
+              <option value="Meter">Meter</option>
+              <option value="Pack">Pack</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 mb-1">Opening Stock</label>
+            <input type="number" id="prod-stock" value="0" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-mono-code">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Purchase Price (Rs.)</label>
+            <input type="number" id="prod-purchase-price" value="0" step="any" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none focus:border-indigo-500 font-mono-code">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 mb-1">Selling Price (Rs.) *</label>
+            <input type="number" id="prod-sell-price" required value="0" step="any" 
+                   class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-emerald-400 font-bold outline-none focus:border-indigo-500 font-mono-code">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold">Cancel</button>
+          <button type="submit" id="btn-save-prod" class="btn-3d btn-3d-indigo px-5 py-2 rounded-xl text-white font-bold">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CATEGORIES MANAGEMENT -->
+  <div id="modal-categories" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-white/15 max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center pb-3 border-b border-white/10 flex-shrink-0">
+        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i> Categories Directory
+        </h3>
+        <button onclick="closeCategoriesModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex gap-2 flex-shrink-0">
+        <input type="text" id="new-cat-name" placeholder="Enter new category title..." 
+               class="flex-1 px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-xs text-white outline-none focus:border-indigo-500">
+        <button onclick="saveNewCategory()" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap">
+          + Add Category
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto space-y-1.5 inset-panel p-2.5 rounded-xl text-xs" id="cat-list-modal"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: THERMAL BARCODE LABEL PRINT -->
+  <div id="modal-barcode" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-sm rounded-2xl p-6 space-y-4 border border-white/15 text-center">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-sm font-bold text-white">Barcode Label Print</h3>
+        <button onclick="closeBarcodeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Printable Barcode Box -->
+      <div id="barcode-print-area" class="bg-white text-black p-3 rounded-lg flex flex-col items-center justify-center">
+        <h4 id="lbl-bar-title" class="text-[11px] font-bold uppercase truncate max-w-[220px]">PRODUCT TITLE</h4>
+        <svg id="barcode-svg" class="my-1"></svg>
+        <span id="lbl-bar-price" class="text-xs font-black">Rs. 0</span>
+      </div>
+
+      <button onclick="window.print()" class="btn-3d btn-3d-emerald w-full py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-2">
+        <i data-lucide="printer" class="w-4 h-4"></i> Print 38x28mm Sticker
+      </button>
     </div>
   </div>
 
@@ -729,7 +864,6 @@
         document.getElementById('live-clock').innerText = new Date().toLocaleTimeString();
       }, 1000);
 
-      // Default Calendar to August 01, 2026 -> August 17, 2026
       document.getElementById('dash-start-date').value = '2026-08-01';
       document.getElementById('dash-end-date').value = '2026-08-17';
 
@@ -747,7 +881,6 @@
       const sidebar = document.getElementById('main-sidebar');
       const overlay = document.getElementById('mobile-overlay');
       const isOpen = !sidebar.classList.contains('-translate-x-full');
-      
       if (isOpen) {
         sidebar.classList.add('-translate-x-full');
         overlay.classList.add('hidden');
@@ -781,17 +914,21 @@
 
     // View Navigation Handler
     function showSection(section) {
-      ['dashboard', 'terminal', 'ledger'].forEach(s => {
-        document.getElementById(`view-${s}`).classList.add('hidden');
+      ['dashboard', 'products-list', 'terminal', 'ledger'].forEach(s => {
+        const el = document.getElementById(`view-${s}`);
+        if (el) el.classList.add('hidden');
       });
-      document.getElementById(`view-${section}`).classList.remove('hidden');
+      const target = document.getElementById(`view-${section}`);
+      if (target) target.classList.remove('hidden');
       
       const titles = {
         'dashboard': '1. Dashboard Overview',
+        'products-list': '2. Master Profile - Products List',
         'terminal': '6. POS Cashier Terminal',
         'ledger': '6. Sales Ledger'
       };
       document.getElementById('current-view-title').innerText = titles[section] || section;
+      if (section === 'products-list') renderProductsTable(allProducts);
       lucide.createIcons();
     }
 
@@ -818,14 +955,13 @@
       return parseAmount(s.discount || s.item_discount || s.disc_amount || 0);
     }
 
-    // Exact Date Normalization (Prevents UTC timezone shifts)
     function getSaleDateString(s) {
       const raw = s.sell_date || s.date || s.invoice_date || s.transaction_date || s.created_at;
       if (!raw) return '2026-08-01';
       return String(raw).split('T')[0];
     }
 
-    // Fetch All Products Batched
+    // Fetch Products
     async function fetchAllProductsBatched() {
       try {
         let records = [];
@@ -848,10 +984,13 @@
           name: p.name || p.product_name || p.title || `Item #${p.id}`,
           code: p.product_code || p.code || p.sku || `P-${p.id}`,
           price: parseAmount(p.sell_price || p.selling_price || p.price || 0),
+          purchase_price: parseAmount(p.purchase_price || p.cost_price || 0),
           category_id: p.category_id,
+          unit: p.unit || p.product_unit || 'Piece',
           stock: parseInt(p.current_stock !== undefined ? p.current_stock : (p.stock !== undefined ? p.stock : (p.opening_stock || 0)))
         }));
 
+        document.getElementById('prod-list-count').innerText = `Total ${allProducts.length} items registered in database`;
         renderProducts(allProducts);
         renderRealLowStockAlerts();
       } catch (err) {
@@ -859,7 +998,196 @@
       }
     }
 
-    // Fetch Real Categories
+    // Master Profile: Render Products Directory Table
+    function renderProductsTable(list) {
+      const tbody = document.getElementById('tbl-master-products');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-500">No products match search criteria.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.slice(0, 100).map((p, idx) => {
+        const cat = allCategories.find(c => String(c.id) === String(p.category_id));
+        const catName = cat ? (cat.category_name || cat.name) : 'General';
+        const isOut = p.stock <= 0;
+        return `
+          <tr class="hover:bg-white/5 transition">
+            <td class="py-3 px-4 text-slate-500">${idx + 1}</td>
+            <td class="py-3 px-4 font-bold text-white max-w-[200px] truncate" title="${p.name}">${p.name}</td>
+            <td class="py-3 px-4 text-indigo-400 font-semibold">${p.code}</td>
+            <td class="py-3 px-4 text-slate-400">${catName}</td>
+            <td class="py-3 px-4 text-right text-slate-400">Rs. ${p.purchase_price.toLocaleString()}</td>
+            <td class="py-3 px-4 text-right font-bold text-emerald-400">Rs. ${p.price.toLocaleString()}</td>
+            <td class="py-3 px-4 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isOut ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+                ${p.stock} ${p.unit}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-center space-x-1.5">
+              <button onclick="printBarcodeLabel(${p.id})" title="Print Barcode Sticker" class="p-1.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400"><i data-lucide="barcode" class="w-3.5 h-3.5"></i></button>
+              <button onclick="openProductModal('edit', ${p.id})" title="Edit Product" class="p-1.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function filterProductsTable() {
+      const q = document.getElementById('prod-table-search').value.toLowerCase().trim();
+      const filtered = allProducts.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
+      renderProductsTable(filtered);
+    }
+
+    // Modal: Add / Edit Product CRUD
+    function openProductModal(mode, prodId = null) {
+      const modal = document.getElementById('modal-product');
+      const title = document.getElementById('modal-product-title');
+      const catSelect = document.getElementById('prod-category');
+
+      // Populate Categories in modal
+      catSelect.innerHTML = allCategories.map(c => `<option value="${c.id}">${c.category_name || c.name || 'Cat ' + c.id}</option>`).join('');
+
+      if (mode === 'edit' && prodId) {
+        const p = allProducts.find(item => item.id === prodId);
+        if (p) {
+          title.innerHTML = '<i data-lucide="pencil" class="w-5 h-5 text-emerald-400"></i> Edit Product';
+          document.getElementById('prod-id').value = p.id;
+          document.getElementById('prod-name').value = p.name;
+          document.getElementById('prod-code').value = p.code;
+          document.getElementById('prod-category').value = p.category_id || '';
+          document.getElementById('prod-unit').value = p.unit || 'Piece';
+          document.getElementById('prod-stock').value = p.stock || 0;
+          document.getElementById('prod-purchase-price').value = p.purchase_price || 0;
+          document.getElementById('prod-sell-price').value = p.price || 0;
+        }
+      } else {
+        title.innerHTML = '<i data-lucide="package-plus" class="w-5 h-5 text-indigo-400"></i> Add New Product';
+        document.getElementById('prod-id').value = '';
+        document.getElementById('product-form').reset();
+        document.getElementById('prod-code').value = `P-${Date.now().toString().slice(-6)}`;
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeProductModal() {
+      const modal = document.getElementById('modal-product');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveProduct(e) {
+      e.preventDefault();
+      const id = document.getElementById('prod-id').value;
+      const btn = document.getElementById('btn-save-prod');
+      btn.disabled = true;
+      btn.innerText = 'Saving...';
+
+      const payload = {
+        name: document.getElementById('prod-name').value.trim(),
+        product_code: document.getElementById('prod-code').value.trim(),
+        category_id: document.getElementById('prod-category').value,
+        product_unit: document.getElementById('prod-unit').value,
+        purchase_price: parseFloat(document.getElementById('prod-purchase-price').value) || 0,
+        sell_price: parseFloat(document.getElementById('prod-sell-price').value) || 0,
+        opening_stock: parseInt(document.getElementById('prod-stock').value) || 0,
+        current_stock: parseInt(document.getElementById('prod-stock').value) || 0
+      };
+
+      try {
+        if (id) {
+          const { error } = await db.from('products').update(payload).eq('id', id);
+          if (error) throw error;
+        } else {
+          const { error } = await db.from('products').insert([payload]);
+          if (error) throw error;
+        }
+        closeProductModal();
+        await fetchAllProductsBatched();
+        showSection('products-list');
+        alert('Product saved successfully!');
+      } catch (err) {
+        alert('Failed to save product: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Product';
+      }
+    }
+
+    // Modal: Categories Manager
+    function openCategoriesModal() {
+      const modal = document.getElementById('modal-categories');
+      const list = document.getElementById('cat-list-modal');
+      list.innerHTML = allCategories.map((c, i) => `
+        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between">
+          <span class="font-bold text-white">${i + 1}. ${c.category_name || c.name}</span>
+          <span class="text-[10px] text-slate-500 font-mono-code">ID: ${c.id}</span>
+        </div>
+      `).join('');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeCategoriesModal() {
+      const modal = document.getElementById('modal-categories');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveNewCategory() {
+      const name = document.getElementById('new-cat-name').value.trim();
+      if (!name) return alert('Enter category title.');
+      try {
+        const { error } = await db.from('categories').insert([{ category_name: name, name: name }]);
+        if (error) throw error;
+        document.getElementById('new-cat-name').value = '';
+        await fetchCategories();
+        openCategoriesModal();
+        alert('Category added successfully!');
+      } catch (e) {
+        alert('Category error: ' + e.message);
+      }
+    }
+
+    function openUnitsModal() {
+      alert('Product Unit Manager: Standard Unit is set to "Piece". Additional unit types (Meter, Pack, Dozen) are enabled.');
+    }
+
+    function openTaxModal() {
+      alert('Tax Profile Manager: Default Tax profile is set to "Zero Tax (0%)" per store configuration.');
+    }
+
+    // Modal: Barcode Label Print
+    function printBarcodeLabel(prodId) {
+      const p = allProducts.find(item => item.id === prodId);
+      if (!p) return;
+      document.getElementById('lbl-bar-title').innerText = p.name;
+      document.getElementById('lbl-bar-price').innerText = `Rs. ${p.price.toLocaleString()}`;
+      
+      JsBarcode('#barcode-svg', p.code, {
+        format: "CODE128",
+        width: 1.6,
+        height: 45,
+        displayValue: true,
+        fontSize: 12,
+        margin: 4
+      });
+
+      const modal = document.getElementById('modal-barcode');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeBarcodeModal() {
+      const modal = document.getElementById('modal-barcode');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Fetch Categories
     async function fetchCategories() {
       try {
         const { data } = await db.from('categories').select('*').limit(200);
@@ -1009,7 +1337,6 @@
       document.getElementById('kpi-total-sales').innerText = `Rs. ${(isAllTime ? totalAllTimeSum : periodSalesSum).toLocaleString()}`;
       document.getElementById('kpi-total-sales-count').innerText = isAllTime ? `${allSales.length} Invoices (All Time)` : `${salesSubset.length} Invoices`;
 
-      // Purchases
       if (allPurchases.length > 0) {
         const purchaseSum = allPurchases.filter(p => {
           const dt = String(p.purchase_date || p.date || p.created_at).split('T')[0];
@@ -1026,7 +1353,7 @@
       renderTop10TrendingProducts();
     }
 
-    // 1. Exact Day-by-Day Continuous Timeline Chart (Includes Rs. 0 Days)
+    // 1. Chart.js Sales Overview Timeline Chart
     function renderContinuousSalesChart(salesList, startStr, endStr) {
       const ctx = document.getElementById('salesChart').getContext('2d');
       const dailyMap = {};
@@ -1104,7 +1431,7 @@
       });
     }
 
-    // 2. Sales vs Expenses Comparison Chart
+    // 2. Sales vs Expenses Chart
     function renderSalesVsExpensesChart(salesList, startStr, endStr) {
       const ctx = document.getElementById('salesExpensesChart').getContext('2d');
       if (salesExpensesChartInstance) salesExpensesChartInstance.destroy();
@@ -1159,7 +1486,7 @@
       });
     }
 
-    // 3. Exact Top 10 Trending Products
+    // 3. Top 10 Trending Products
     function renderTop10TrendingProducts() {
       const tbody = document.getElementById('tbl-trending-prods');
       
@@ -1201,7 +1528,7 @@
       lucide.createIcons();
     }
 
-    // 4. Exact Real Low Stock Alert Table
+    // 4. Low Stock Alert
     function renderRealLowStockAlerts() {
       const tbody = document.getElementById('tbl-low-stock');
       

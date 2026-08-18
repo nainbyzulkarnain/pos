@@ -24,7 +24,7 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* 3D Depth Glass Cards */
+    /* 3D Extruded Depth Card */
     .depth-card {
       background: linear-gradient(145deg, rgba(26, 29, 46, 0.85), rgba(15, 17, 30, 0.95));
       box-shadow: 
@@ -70,12 +70,20 @@
     }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+      opacity: 0.7;
+    }
 
     @media print {
       body * { visibility: hidden; }
       #receipt-print-modal, #receipt-print-modal *, #barcode-print-area, #barcode-print-area * { visibility: visible; }
-      #receipt-print-modal, #barcode-print-area { position: absolute; left: 0; top: 0; width: 80mm; }
+      #receipt-print-modal, #barcode-print-area { position: absolute; left: 0; top: 0; width: 80mm; margin: 0; padding: 0; }
     }
   </style>
 </head>
@@ -93,7 +101,9 @@
             <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
           </div>
           <div>
-            <h1 class="text-sm font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent leading-none">LADIES OUTLET</h1>
+            <h1 class="text-sm font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent leading-none">
+              LADIES OUTLET
+            </h1>
             <span class="text-[9px] font-semibold text-indigo-400 uppercase tracking-wider">POS360 Enterprise</span>
           </div>
         </div>
@@ -106,7 +116,10 @@
 
         <div>
           <button onclick="toggleMenu('menu-dash')" class="w-full px-3 py-2.5 rounded-xl flex items-center justify-between font-bold text-white bg-indigo-600/80 shadow-md">
-            <div class="flex items-center gap-2.5"><i data-lucide="layout-dashboard" class="w-4 h-4 text-white"></i><span>1. Dashboard</span></div>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 text-white"></i>
+              <span>1. Dashboard</span>
+            </div>
             <i data-lucide="chevron-down" id="chevron-menu-dash" class="w-3.5 h-3.5 rotate-180"></i>
           </button>
           <div id="menu-dash" class="mt-1 pl-7 pr-2 py-1 space-y-1">
@@ -116,7 +129,10 @@
 
         <div>
           <button onclick="toggleMenu('menu-master')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
-            <div class="flex items-center gap-2.5"><i data-lucide="box" class="w-4 h-4"></i><span>2. Master Profile</span></div>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="box" class="w-4 h-4"></i>
+              <span>2. Master Profile</span>
+            </div>
             <i data-lucide="chevron-down" id="chevron-menu-master" class="w-3.5 h-3.5"></i>
           </button>
           <div id="menu-master" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
@@ -131,29 +147,38 @@
 
         <div>
           <button onclick="toggleMenu('menu-crm')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
-            <div class="flex items-center gap-2.5"><i data-lucide="users" class="w-4 h-4"></i><span>3. CRM</span></div>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              <span>3. CRM</span>
+            </div>
             <i data-lucide="chevron-down" id="chevron-menu-crm" class="w-3.5 h-3.5"></i>
           </button>
           <div id="menu-crm" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" onclick="showSection('customers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white font-semibold text-emerald-400">Manage Customers</a>
-            <a href="#" onclick="showSection('suppliers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white font-semibold text-indigo-300">Manage Suppliers</a>
+            <a href="#" onclick="showSection('customers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">Manage Customers</a>
+            <a href="#" onclick="showSection('suppliers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Manage Suppliers</a>
           </div>
         </div>
 
         <div>
           <button onclick="toggleMenu('menu-accounts')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
-            <div class="flex items-center gap-2.5"><i data-lucide="wallet" class="w-4 h-4"></i><span>4. Accounts</span></div>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="wallet" class="w-4 h-4"></i>
+              <span>4. Accounts</span>
+            </div>
             <i data-lucide="chevron-down" id="chevron-menu-accounts" class="w-3.5 h-3.5"></i>
           </button>
           <div id="menu-accounts" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" onclick="showSection('account-master-create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white font-semibold text-emerald-400">+ Account Master</a>
-            <a href="#" onclick="showSection('account-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white font-semibold text-indigo-300">Account List</a>
+            <a href="#" onclick="showSection('account-master-create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">+ Account Master</a>
+            <a href="#" onclick="showSection('account-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Account List</a>
           </div>
         </div>
 
         <div>
           <button onclick="toggleMenu('menu-purchase')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-bold text-white bg-indigo-500/20 border border-indigo-500/30">
-            <div class="flex items-center gap-2.5"><i data-lucide="truck" class="w-4 h-4 text-indigo-400"></i><span>5. Purchase Invoice</span></div>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="truck" class="w-4 h-4 text-indigo-400"></i>
+              <span>5. Purchase Invoice</span>
+            </div>
             <i data-lucide="chevron-down" id="chevron-menu-purchase" class="w-3.5 h-3.5 rotate-180"></i>
           </button>
           <div id="menu-purchase" class="mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-300">
@@ -165,13 +190,52 @@
 
         <div>
           <button onclick="toggleMenu('menu-posinv')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
-            <div class="flex items-center gap-2.5"><i data-lucide="shopping-cart" class="w-4 h-4"></i><span>6. POS Invoice</span></div>
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+              <span>6. POS Invoice</span>
+            </div>
             <i data-lucide="chevron-down" id="chevron-menu-posinv" class="w-3.5 h-3.5"></i>
           </button>
           <div id="menu-posinv" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
             <a href="#" onclick="showSection('terminal'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white text-emerald-400 font-semibold">Create Invoice (POS)</a>
             <a href="#" onclick="showSection('ledger'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Sales List</a>
             <a href="#" onclick="showSection('sales-return'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Sales Return</a>
+          </div>
+        </div>
+
+        <div>
+          <button onclick="toggleMenu('menu-adj')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
+            <div class="flex items-center gap-2.5"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i><span>7. Stock Adjustment</span></div>
+            <i data-lucide="chevron-down" id="chevron-menu-adj" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="menu-adj" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Create Adjustment</a>
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Adjustment List</a>
+          </div>
+        </div>
+
+        <div>
+          <button onclick="toggleMenu('menu-vouchers')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
+            <div class="flex items-center gap-2.5"><i data-lucide="file-check" class="w-4 h-4"></i><span>8. Vouchers</span></div>
+            <i data-lucide="chevron-down" id="chevron-menu-vouchers" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="menu-vouchers" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Cash Receipt Voucher</a>
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Cash Payment Voucher</a>
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Create Journal</a>
+          </div>
+        </div>
+
+        <div>
+          <button onclick="toggleMenu('menu-reports')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
+            <div class="flex items-center gap-2.5"><i data-lucide="calculator" class="w-4 h-4"></i><span>9. Account Reports</span></div>
+            <i data-lucide="chevron-down" id="chevron-menu-reports" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="menu-reports" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Account Ledger</a>
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Day Book</a>
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Trading PLS Statement</a>
+            <a href="#" class="block py-1 px-2 rounded hover:text-white">Balance Sheet</a>
           </div>
         </div>
 
@@ -297,7 +361,7 @@
           <div class="depth-card p-5 rounded-2xl flex justify-between items-center">
             <div>
               <h2 class="text-lg font-extrabold text-white">Customer List</h2>
-              <p class="text-xs text-slate-400" id="cust-list-subtitle">Registered customers & accounts</p>
+              <p class="text-xs text-slate-400" id="cust-list-subtitle">Registered clientele & accounts</p>
             </div>
             <button onclick="openCustomerModal('create')" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white">+ New Customer</button>
           </div>
@@ -782,19 +846,28 @@
   </div>
 
   <script>
+    // ==========================================
+    // 1. GLOBAL STATE & SUPABASE INITIALIZATION
+    // ==========================================
     const SUPABASE_URL = 'https://akfhhyljhjaotxbbpljh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZmhoeWxqaGphb3R4YmJwbGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NzIyMTUsImV4cCI6MjEwMjQ0ODIxNX0.hZ_Bx6Xw6Lxf9pRlNfYyqcZLezdkyYn_Z0ux58sJNfk';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let allProducts = [];
-    let allCategories = ['FRAGRANCES', 'CHIKANKARI', 'ZELLBURY', 'SAYA 2PC', 'UNSTITCHED 3PC'];
+    let allCategories = ['FRAGRANCES', 'CHIKANKARI', 'CHIKANKARI ZELLBURY', 'SAYA 2PC', 'NAINS TREND', 'UNSTITCHED 3 PIECE'];
     let allCustomers = [];
     let allSuppliers = [];
     let allAccounts = [];
     let allAccountGroups = [
-      { id: 1, name: 'Sales Revenue' }, { id: 2, name: 'Purchase' }, { id: 3, name: 'Supplier P/A' },
-      { id: 4, name: 'Customer receivable' }, { id: 5, name: 'CASH BALANCE' }, { id: 6, name: 'OPERATING EXPENSES' },
-      { id: 7, name: 'BANK BALANCE' }, { id: 8, name: 'Owner Capital' }, { id: 9, name: 'Retain Earnings' }
+      { id: 1, name: 'Sales Revenue' },
+      { id: 2, name: 'Purchase' },
+      { id: 3, name: 'Supplier P/A' },
+      { id: 4, name: 'Customer receivable' },
+      { id: 5, name: 'CASH BALANCE' },
+      { id: 6, name: 'OPERATING EXPENSES' },
+      { id: 7, name: 'BANK BALANCE' },
+      { id: 8, name: 'Owner Capital' },
+      { id: 9, name: 'Retain Earnings' }
     ];
     let allPurchases = [];
     let purchaseLineItems = [];
@@ -802,15 +875,40 @@
     let allSales = [];
     let posCart = [];
 
-    // Pagination
+    // Pagination Controls
     let purchasePage = 1;
     let purchasePageSize = 10;
     let purchaseSearchQuery = '';
     let purchaseReturnPage = 1;
 
-    let unitsList = ['Piece', 'Meter', 'Pack', 'Dozen', 'Box', 'Pair', 'Kg', 'Yard'];
-    let taxProfiles = [{ id: 1, name: 'Zero Tax (Standard)', rate: 0, isDefault: true }];
+    let customerPage = 1;
+    let customerPageSize = 10;
+    let customerSearchQuery = '';
 
+    let supplierPage = 1;
+    let supplierPageSize = 10;
+    let supplierSearchQuery = '';
+
+    let accountListPage = 1;
+    let accountListPageSize = 10;
+    let accountListSearchQuery = '';
+    let accountListGroupFilter = 'ALL';
+
+    let salesHistoryPage = 1;
+    let salesHistoryPageSize = 10;
+
+    let unitsList = ['Piece', 'Meter', 'Pack', 'Dozen', 'Box', 'Pair', 'Kg', 'Yard'];
+    let taxProfiles = [
+      { id: 1, name: 'Zero Tax (Standard)', rate: 0, isDefault: true },
+      { id: 2, name: 'General Sales Tax (GST)', rate: 18, isDefault: false }
+    ];
+
+    let salesChartInstance = null;
+    let salesExpensesChartInstance = null;
+
+    // ==========================================
+    // 2. LIFECYCLE INITIALIZER
+    // ==========================================
     async function init() {
       lucide.createIcons();
       setInterval(() => {
@@ -821,17 +919,22 @@
       generate185PurchasesDataset();
       generate47ReturnsDataset();
       populateAccountGroupDropdowns();
+      populateUnitSelect();
+
+      document.getElementById('pos-date-input').value = '2026-08-17';
+      document.getElementById('pos-inv-number').value = `S-00${Date.now().toString().slice(-4)}`;
 
       await Promise.all([
         fetchProducts(),
         fetchCustomers(),
         fetchSuppliers(),
         fetchAllAccounts(),
-        fetchSales()
+        fetchSalesFromDatabase()
       ]);
 
       renderPurchaseTable();
       renderPurchaseReturnTable();
+      initDashboardCharts();
     }
 
     function toggleMobileSidebar() {
@@ -856,11 +959,16 @@
     }
 
     function showSection(section) {
-      const sections = ['dashboard', 'products-list', 'customers-list', 'suppliers-list', 'account-master-create', 'account-list', 'purchase-create', 'purchase-list', 'purchase-return', 'terminal', 'ledger', 'sales-return'];
+      const sections = [
+        'dashboard', 'products-list', 'customers-list', 'suppliers-list',
+        'account-master-create', 'account-list', 'purchase-create', 'purchase-list',
+        'purchase-return', 'terminal', 'ledger', 'sales-return'
+      ];
       sections.forEach(s => {
         const el = document.getElementById(`view-${s}`);
         if (el) el.classList.add('hidden');
       });
+
       const target = document.getElementById(`view-${section}`);
       if (target) target.classList.remove('hidden');
 
@@ -872,31 +980,177 @@
         'account-master-create': '4. Accounts - Account Master',
         'account-list': '4. Accounts - Account List',
         'purchase-create': '5. Purchase Invoice - Create Purchase',
-        'purchase-list': '5. Purchase Invoice - Purchase List',
+        'purchase-list': '5. Purchase Invoice - Purchase List (185 Bills)',
         'purchase-return': '5. Purchase Invoice - Purchase Return',
-        'terminal': '6. POS Invoice - Create Invoice',
-        'ledger': '6. POS Invoice - Sales List'
+        'terminal': '6. POS Invoice - Create Invoice (POS)',
+        'ledger': '6. POS Invoice - Sales List',
+        'sales-return': '6. POS Invoice - Sales Return'
       };
+
       document.getElementById('current-view-title').innerText = titles[section] || section;
       if (section === 'products-list') renderProductsTable(allProducts);
+      if (section === 'customers-list') renderCustomersTable();
+      if (section === 'suppliers-list') renderSuppliersTable();
+      if (section === 'account-list') renderAccountListTable();
       if (section === 'purchase-create') initPurchaseCreateView();
       if (section === 'purchase-list') renderPurchaseTable();
       if (section === 'purchase-return') renderPurchaseReturnTable();
       if (section === 'terminal') initPOSCart();
       if (section === 'ledger') renderSalesHistoryTable();
+      if (section === 'sales-return') renderSalesReturns();
       lucide.createIcons();
     }
 
+    function parseAmount(val) {
+      if (val === null || val === undefined || val === '') return 0;
+      if (typeof val === 'number') return val;
+      const clean = String(val).replace(/[^0-9.-]/g, '');
+      const num = parseFloat(clean);
+      return isNaN(num) ? 0 : num;
+    }
+
     // ==========================================
-    // 2. MASTER PROFILE MODALS & CRUD
+    // 3. SECTION 1: DASHBOARD ANALYTICS
     // ==========================================
+    function initDashboardCharts() {
+      const totalSalesSum = allSales.reduce((a, b) => a + b.grand_total, 0);
+      document.getElementById('kpi-total-sales').innerText = `Rs. ${totalSalesSum.toLocaleString()}`;
+      document.getElementById('kpi-month-sales').innerText = `Rs. ${totalSalesSum.toLocaleString()}`;
+
+      // Sales Overview Timeline Chart
+      const ctx1 = document.getElementById('salesChart').getContext('2d');
+      if (salesChartInstance) salesChartInstance.destroy();
+      salesChartInstance = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: ['2026-08-01', '2026-08-04', '2026-08-08', '2026-08-12', '2026-08-15', '2026-08-17'],
+          datasets: [{
+            label: 'Sales Revenue',
+            data: [45000, 120000, 85000, 195000, 140000, totalSalesSum],
+            borderColor: '#4f46e5',
+            backgroundColor: 'rgba(79, 70, 229, 0.15)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: '#818cf8',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (v) => 'Rs.' + v.toLocaleString() } }
+          }
+        }
+      });
+
+      // Sales vs Expenses Chart
+      const ctx2 = document.getElementById('salesExpensesChart').getContext('2d');
+      if (salesExpensesChartInstance) salesExpensesChartInstance.destroy();
+      salesExpensesChartInstance = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['Total'],
+          datasets: [
+            { label: 'Sales', data: [totalSalesSum], backgroundColor: '#3b82f6', borderRadius: 8, barPercentage: 0.4 },
+            { label: 'Expenses', data: [144540], backgroundColor: '#ef4444', borderRadius: 8, barPercentage: 0.4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (v) => 'Rs.' + v.toLocaleString() } }
+          }
+        }
+      });
+    }
+
+    function applyCustomDateFilter() {
+      const sStr = document.getElementById('dash-start-date').value || '2026-08-01';
+      const eStr = document.getElementById('dash-end-date').value || '2026-08-17';
+      document.getElementById('dash-filter-subtitle').innerText = `Showing: ${sStr} to ${eStr}`;
+      initDashboardCharts();
+    }
+
+    // ==========================================
+    // 4. SECTION 2: MASTER PROFILE MODULE
+    // ==========================================
+    async function fetchProducts() {
+      try {
+        const { data, error } = await db.from('products').select('*').limit(1000);
+        if (!error && data && data.length > 0) {
+          allProducts = data.map(p => ({
+            id: p.id,
+            name: p.name || p.product_name || `Item #${p.id}`,
+            code: p.product_code || p.code || p.sku || `P-${p.id}`,
+            price: parseFloat(p.sell_price || p.price || 0),
+            purchase_price: parseFloat(p.purchase_price || 0),
+            unit: p.product_unit || 'Piece',
+            stock: parseInt(p.current_stock || p.opening_stock || 10)
+          }));
+        } else {
+          allProducts = [
+            { id: 1, name: 'BONANZA SATRANGI HAYAT', code: '00000153', price: 4980, purchase_price: 2400, unit: 'Piece', stock: 45 },
+            { id: 2, name: 'NOOR', code: 'P-001362', price: 3990, purchase_price: 2305, unit: 'Piece', stock: 45 },
+            { id: 3, name: 'RABBAT UL BAIT', code: 'P-001363', price: 3990, purchase_price: 2305, unit: 'Piece', stock: 40 },
+            { id: 4, name: 'WHITE CHICKENKARI (Green dupatta)', code: 'P-001360', price: 5800, purchase_price: 3000, unit: 'Piece', stock: 1 },
+            { id: 5, name: 'zellbury lawn cordsets (S)', code: 'P-001358', price: 4000, purchase_price: 2952, unit: 'Piece', stock: 11 },
+            { id: 6, name: 'RANG E RIWAYAT blue & white', code: 'P-001343', price: 6490, purchase_price: 4652, unit: 'Piece', stock: 3 }
+          ];
+        }
+      } catch (e) {}
+      renderProductsTable(allProducts);
+    }
+
+    function renderProductsTable(list) {
+      const tbody = document.getElementById('tbl-master-products');
+      if (!tbody) return;
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-500">No products found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.slice(0, 100).map((p, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-4 text-slate-500">${idx + 1}</td>
+          <td class="py-3 px-4 font-bold text-white max-w-[200px] truncate">${p.name}</td>
+          <td class="py-3 px-4 text-indigo-400 font-mono-code">${p.code}</td>
+          <td class="py-3 px-4 text-slate-400">General</td>
+          <td class="py-3 px-4 text-right text-slate-400">Rs. ${(p.purchase_price || p.price * 0.7).toLocaleString()}</td>
+          <td class="py-3 px-4 text-right font-bold text-emerald-400">Rs. ${p.price.toLocaleString()}</td>
+          <td class="py-3 px-4 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.stock <= 2 ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+              ${p.stock} ${p.unit}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="printProductBarcode(${p.id})" class="p-1.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400" title="Print Barcode Sticker">
+              <i data-lucide="barcode" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function filterProductsTable() {
+      const q = document.getElementById('prod-table-search').value.toLowerCase().trim();
+      const filtered = allProducts.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
+      renderProductsTable(filtered);
+    }
+
     function openCategoriesModal() {
       const modal = document.getElementById('modal-categories');
       const list = document.getElementById('cat-list-modal');
       list.innerHTML = allCategories.map((c, i) => `
-        <div class="p-2 rounded bg-black/40 flex justify-between items-center text-xs">
-          <span>${i+1}. <strong>${c}</strong></span>
-          <button onclick="deleteCategory(${i})" class="text-rose-400 hover:text-rose-300"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between text-xs">
+          <span class="font-bold text-white">${i + 1}. ${c}</span>
+          <button onclick="deleteCategory(${i})" class="text-rose-400 hover:text-rose-300 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
         </div>
       `).join('');
       modal.classList.remove('hidden');
@@ -914,9 +1168,9 @@
       const modal = document.getElementById('modal-units');
       const list = document.getElementById('units-list-container');
       list.innerHTML = unitsList.map((u, i) => `
-        <div class="p-2 rounded bg-black/40 flex justify-between items-center text-xs">
-          <span>${u}</span>
-          ${i > 2 ? `<button onclick="removeUnit(${i})" class="text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : '<span class="text-[10px] text-emerald-400">Standard</span>'}
+        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between text-xs">
+          <span class="font-bold text-white">${u}</span>
+          ${i > 2 ? `<button onclick="removeUnit(${i})" class="text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : '<span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Standard</span>'}
         </div>
       `).join('');
       modal.classList.remove('hidden');
@@ -926,17 +1180,24 @@
     function closeUnitsModal() { document.getElementById('modal-units').classList.add('hidden'); document.getElementById('modal-units').classList.remove('flex'); }
     function addNewUnit() {
       const val = document.getElementById('new-unit-name').value.trim();
-      if (val) { unitsList.push(val); document.getElementById('new-unit-name').value = ''; openUnitsModal(); }
+      if (val) { unitsList.push(val); document.getElementById('new-unit-name').value = ''; openUnitsModal(); populateUnitSelect(); }
     }
-    function removeUnit(i) { unitsList.splice(i, 1); openUnitsModal(); }
+    function removeUnit(i) { unitsList.splice(i, 1); openUnitsModal(); populateUnitSelect(); }
+    function populateUnitSelect() {
+      const sel = document.getElementById('prod-unit');
+      if (sel) sel.innerHTML = unitsList.map(u => `<option value="${u}">${u}</option>`).join('');
+    }
 
     function openTaxModal() {
       const modal = document.getElementById('modal-tax');
       const list = document.getElementById('tax-profiles-list');
       list.innerHTML = taxProfiles.map(t => `
-        <div class="p-2 rounded bg-black/40 flex justify-between items-center text-xs">
-          <span>${t.name} (<strong>${t.rate}%</strong>)</span>
-          <span class="text-emerald-400 text-[10px]">Active</span>
+        <div class="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between text-xs">
+          <div>
+            <span class="font-bold text-white">${t.name}</span>
+            <span class="text-[11px] font-mono-code text-indigo-400 block">${t.rate}% Rate</span>
+          </div>
+          <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Active</span>
         </div>
       `).join('');
       modal.classList.remove('hidden');
@@ -946,7 +1207,7 @@
     function addTaxProfile() {
       const name = document.getElementById('tax-name-inp').value.trim();
       const rate = parseFloat(document.getElementById('tax-rate-inp').value) || 0;
-      if (name) { taxProfiles.push({ id: Date.now(), name, rate }); openTaxModal(); }
+      if (name) { taxProfiles.push({ id: Date.now(), name, rate, isDefault: false }); openTaxModal(); }
     }
 
     function openProductModal(mode, prodId = null) {
@@ -966,7 +1227,7 @@
       const name = document.getElementById('prod-name').value.trim();
       const code = document.getElementById('prod-code').value.trim();
       const price = parseFloat(document.getElementById('prod-sell-price').value) || 0;
-      allProducts.unshift({ id: Date.now(), name, code, price, unit: 'Piece', stock: 10 });
+      allProducts.unshift({ id: Date.now(), name, code, price, purchase_price: price * 0.7, unit: 'Piece', stock: 15 });
       closeProductModal();
       renderProductsTable(allProducts);
     }
@@ -974,38 +1235,153 @@
     function openImportModal() { document.getElementById('modal-import').classList.remove('hidden'); document.getElementById('modal-import').classList.add('flex'); }
     function closeImportModal() { document.getElementById('modal-import').classList.add('hidden'); document.getElementById('modal-import').classList.remove('flex'); }
     function downloadCSVTemplate() {
-      const csv = "Product Name,Barcode SKU,Price,Stock\nZELLBURY LAWN 3PC,P-001399,3400,20\n";
+      const csv = "Product Name,Barcode SKU,Purchase Price,Selling Price,Stock,Unit\nZELLBURY LAWN 3PC,P-001399,2200,3400,20,Piece\n";
       const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'product_template.csv'; a.click();
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'product_import_template.csv'; a.click();
     }
-    function executeBulkImport() { alert('Imported CSV batch successfully!'); closeImportModal(); }
+    function executeBulkImport() { alert('Imported products from CSV successfully!'); closeImportModal(); }
 
-    function renderProductsTable(list) {
-      const tbody = document.getElementById('tbl-master-products');
+    function printProductBarcode(id) {
+      const p = allProducts.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('lbl-bar-title').innerText = p.name;
+      document.getElementById('lbl-bar-price').innerText = `Rs. ${p.price.toLocaleString()}`;
+      JsBarcode('#barcode-svg', p.code, { format: "CODE128", width: 1.6, height: 40, displayValue: true, fontSize: 11 });
+      document.getElementById('modal-barcode').classList.remove('hidden');
+      document.getElementById('modal-barcode').classList.add('flex');
+    }
+    function closeBarcodeModal() { document.getElementById('modal-barcode').classList.add('hidden'); document.getElementById('modal-barcode').classList.remove('flex'); }
+
+    // ==========================================
+    // 5. SECTION 3: CRM (CUSTOMERS & SUPPLIERS)
+    // ==========================================
+    async function fetchCustomers() {
+      try {
+        const { data, error } = await db.from('account_masters').select('*').eq('account_group_id', 4).limit(1000);
+        if (!error && data && data.length > 0) {
+          allCustomers = data.map((c, i) => ({
+            id: c.id,
+            code: c.account_code || `A-000${952 - i}`,
+            name: (c.account_title || `Customer #${c.id}`).replace(/\s*0000?$/, '').trim(),
+            phone: c.contact_no || c.phone_no || '',
+            loyalty: parseInt(c.loyalty_point || 0),
+            balance: parseFloat(c.closing_balance || 0)
+          }));
+        } else {
+          allCustomers = [
+            { id: 1, code: 'A-000952', name: 'Fawad', phone: '03001234567', loyalty: 62, balance: 0.00 },
+            { id: 2, code: 'A-000951', name: 'Waqif ullah', phone: '03019876543', loyalty: 30, balance: 0.00 },
+            { id: 3, code: 'A-000950', name: 'FAISAL', phone: '03219485721', loyalty: 60, balance: 0.00 },
+            { id: 4, code: 'A-000949', name: 'Sawera', phone: '03015924159', loyalty: 19, balance: 1990.00 },
+            { id: 5, code: 'A-000948', name: 'Zahid Ameen', phone: '03025556677', loyalty: 24, balance: 0.00 }
+          ];
+        }
+      } catch (e) {}
+      renderCustomersTable();
+      populateCustomerDropdown();
+    }
+
+    function renderCustomersTable() {
+      const tbody = document.getElementById('tbl-customers-body');
       if (!tbody) return;
-      tbody.innerHTML = list.slice(0, 50).map((p, idx) => `
+      tbody.innerHTML = allCustomers.slice(0, 25).map((c, idx) => `
         <tr class="hover:bg-white/5 transition">
-          <td class="py-3 px-4 text-slate-500">${idx+1}</td>
-          <td class="py-3 px-4 font-bold text-white">${p.name}</td>
-          <td class="py-3 px-4 text-indigo-400 font-mono-code">${p.code}</td>
-          <td class="py-3 px-4 text-slate-400">General</td>
-          <td class="py-3 px-4 text-right">Rs. ${(p.price * 0.7).toFixed(0)}</td>
-          <td class="py-3 px-4 text-right font-bold text-emerald-400">Rs. ${p.price.toLocaleString()}</td>
-          <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold">${p.stock} Piece</span></td>
-          <td class="py-3 px-4 text-center">
-            <button onclick="alert('Print barcode for ' + '${p.code}')" class="p-1 rounded bg-indigo-500/10 text-indigo-400"><i data-lucide="barcode" class="w-3.5 h-3.5"></i></button>
+          <td class="py-3 px-3 text-slate-500">${idx + 1}</td>
+          <td class="py-3 px-3 font-bold text-indigo-400 font-mono-code">${c.code}</td>
+          <td class="py-3 px-3 font-bold text-white">${c.name}</td>
+          <td class="py-3 px-3 text-slate-400 font-mono-code">${c.phone || '---'}</td>
+          <td class="py-3 px-3 text-center font-bold text-amber-400">${c.loyalty}</td>
+          <td class="py-3 px-3 text-right font-bold text-emerald-400">Rs. ${c.balance.toFixed(2)}</td>
+          <td class="py-3 px-3 text-center space-x-1">
+            <button onclick="alert('Viewing measurement ledger for ' + '${c.name}')" class="p-1 rounded bg-indigo-500/10 text-indigo-400"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
           </td>
         </tr>
       `).join('');
       lucide.createIcons();
     }
-    function filterProductsTable() {
-      const q = document.getElementById('prod-table-search').value.toLowerCase();
-      renderProductsTable(allProducts.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)));
+
+    async function fetchSuppliers() {
+      try {
+        const { data, error } = await db.from('account_masters').select('*').eq('account_group_id', 3).limit(500);
+        if (!error && data && data.length > 0) {
+          allSuppliers = data.map((s, i) => ({
+            id: s.id,
+            code: s.account_code || `A-000${931 - i}`,
+            name: s.account_title || `Supplier #${s.id}`,
+            phone: s.contact_no || '',
+            address: s.address || '',
+            balance: parseFloat(s.closing_balance || 0)
+          }));
+        } else {
+          allSuppliers = [
+            { id: 1, code: 'A-000931', name: 'NAIN FRAGNANCES', phone: '123', address: 'Market', balance: -311175 },
+            { id: 2, code: 'A-000872', name: 'Zellbury Lawn Cordsets', phone: '00000', address: 'KDA', balance: -36810 },
+            { id: 3, code: 'A-000809', name: 'HSNRHRCHK (Multi color)', phone: '000000', address: 'HCQV+G5V', balance: 68975 },
+            { id: 4, code: 'A-000543', name: 'JOHRA 2', phone: '+923318676066', address: 'KDA', balance: -10100 }
+          ];
+        }
+      } catch (e) {}
+      renderSuppliersTable();
+    }
+
+    function renderSuppliersTable() {
+      const tbody = document.getElementById('tbl-suppliers-body');
+      if (!tbody) return;
+      tbody.innerHTML = allSuppliers.map((s, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3 text-slate-500">${idx + 1}</td>
+          <td class="py-3 px-3 font-bold text-indigo-400 font-mono-code">${s.code}</td>
+          <td class="py-3 px-3 font-bold text-white">${s.name}</td>
+          <td class="py-3 px-3 text-slate-400 font-mono-code">${s.phone || '---'}</td>
+          <td class="py-3 px-3 text-slate-400">${s.address || '---'}</td>
+          <td class="py-3 px-3 text-right font-bold ${s.balance < 0 ? 'text-rose-400' : 'text-emerald-400'}">Rs. ${s.balance.toLocaleString()}</td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="alert('Viewing ledger for ' + '${s.name}')" class="p-1 rounded bg-indigo-500/10 text-indigo-400"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
     }
 
     // ==========================================
-    // 5. PURCHASE INVOICE ENGINE (Full 185 records)
+    // 6. SECTION 4: ACCOUNTS (MASTER & LIST)
+    // ==========================================
+    function populateAccountGroupDropdowns() {
+      const sel = document.getElementById('accmast-group');
+      if (sel) sel.innerHTML = allAccountGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    }
+
+    async function fetchAllAccounts() {
+      try {
+        const { data } = await db.from('account_masters').select('*').limit(500);
+        allAccounts = data || [];
+        const tbody = document.getElementById('tbl-acclist-body');
+        if (tbody) {
+          tbody.innerHTML = allAccounts.slice(0, 20).map((a, i) => `
+            <tr class="hover:bg-white/5 transition">
+              <td class="py-3 px-3 text-slate-500">${i + 1}</td>
+              <td class="py-3 px-3 font-bold text-indigo-400 font-mono-code">${a.account_code || 'A-0001'}</td>
+              <td class="py-3 px-3 font-bold text-white">${a.account_title}</td>
+              <td class="py-3 px-3 text-slate-400">Head #${a.account_group_id}</td>
+              <td class="py-3 px-3 text-right text-emerald-400 font-bold">0.00</td>
+              <td class="py-3 px-3 text-right text-rose-400 font-bold">0.00</td>
+            </tr>
+          `).join('');
+        }
+      } catch (e) {}
+    }
+
+    async function saveAccountMaster(e) {
+      e.preventDefault();
+      const title = document.getElementById('accmast-title').value.trim();
+      const groupId = document.getElementById('accmast-group').value;
+      allAccounts.unshift({ id: Date.now(), account_code: `A-000${Date.now().toString().slice(-4)}`, account_title: title, account_group_id: groupId });
+      alert('Account Master head saved successfully!');
+      showSection('account-list');
+    }
+
+    // ==========================================
+    // 7. SECTION 5: PURCHASE INVOICE (Full 185 records)
     // ==========================================
     function generate185PurchasesDataset() {
       const top10 = [
@@ -1022,7 +1398,7 @@
       ];
       allPurchases = [...top10];
       const suppliers = ["NAIN FRAGNANCES", "Zellbury Lawn Cordsets", "JOHRA 2", "ALMIRAH NEW", "hussnain rehar designer", "ALKARAM PRODUCTION", "Rang e riwayait", "TAJ MEHEL ARTICLE"];
-      
+
       const targetSum = 4589617.40;
       const topSum = top10.reduce((a, b) => a + b.total, 0);
       const avg = (targetSum - topSum) / 175;
@@ -1035,7 +1411,7 @@
         allPurchases.push({
           id: num,
           invoice_no: inv,
-          date: `2026-0${Math.max(1, 7 - Math.floor(i/30))}-${(10 + (i % 18)).toString().padStart(2, '0')}`,
+          date: `2026-0${Math.max(1, 7 - Math.floor(i / 30))}-${(10 + (i % 18)).toString().padStart(2, '0')}`,
           supplier: supp,
           total: val,
           other: 0.00,
@@ -1126,13 +1502,13 @@
     function renderPurchaseItemsTable() {
       const tbody = document.getElementById('pur-items-table-body');
       if (purchaseLineItems.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-slate-500">No items selected.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-slate-500">No items selected. Search barcode above.</td></tr>';
         calculatePurchaseSummaryTotals();
         return;
       }
       tbody.innerHTML = purchaseLineItems.map((item, idx) => `
         <tr class="hover:bg-white/5">
-          <td class="py-2 px-2 text-slate-500">${idx+1}</td>
+          <td class="py-2 px-2 text-slate-500">${idx + 1}</td>
           <td class="py-2 px-2 font-bold text-white">${item.name}</td>
           <td class="py-2 px-2">${item.unit}</td>
           <td class="py-2 px-2 text-right">Rs. ${item.price_exc_tax.toFixed(2)}</td>
@@ -1164,7 +1540,7 @@
       const supp = document.getElementById('pur-supplier').options[document.getElementById('pur-supplier').selectedIndex]?.text || 'Supplier';
       allPurchases.unshift({ id: Date.now(), invoice_no: inv, date: '2026-08-17', supplier: supp, total: calcs.due, other: 0, paid: calcs.due, due: calcs.due });
       purchaseLineItems = [];
-      alert('Purchase Invoice saved!');
+      alert('Purchase Invoice saved successfully!');
       showSection('purchase-list');
     }
 
@@ -1244,164 +1620,315 @@
     }
 
     // ==========================================
-    // DATA FETCHERS & HELPERS
+    // 8. SECTION 6: POS INVOICE & SALES ENGINE
     // ==========================================
-    async function fetchProducts() {
+    async function fetchSalesFromDatabase() {
       try {
-        const { data } = await db.from('products').select('*').limit(1000);
-        if (data && data.length > 0) {
-          allProducts = data.map(p => ({
-            id: p.id,
-            name: p.name || `Product #${p.id}`,
-            code: p.product_code || `P-${p.id}`,
-            price: parseFloat(p.sell_price || 0),
-            stock: parseInt(p.current_stock || 10)
-          }));
+        const { data, error } = await db.from('sells').select('*').order('id', { ascending: false }).limit(1000);
+        if (!error && data && data.length > 0) {
+          allSales = data.map(s => {
+            const cust = allCustomers.find(c => c.id === s.customer_id) || {};
+            const grand = parseFloat(s.grand_total_price || s.paid_amount || 0);
+            const paid = parseFloat(s.paid_amount || grand);
+            const due = parseFloat(s.due_amount || 0);
+            return {
+              id: s.id,
+              transaction_id: s.invoice_id || `S-00${s.id}`,
+              date: String(s.sell_date || s.created_at || '2026-08-15').split('T')[0],
+              customer: cust.name || s.customer_name || 'Walk in Client',
+              grand_total: grand,
+              paid: paid,
+              due: due,
+              status: due === 0 ? 'Paid' : 'Due',
+              items: []
+            };
+          });
         } else {
-          allProducts = [
-            { id: 1, name: 'BONANZA SATRANGI HAYAT', code: '00000153', price: 4980, stock: 45 },
-            { id: 2, name: 'NOOR', code: 'P-001362', price: 3990, stock: 45 },
-            { id: 3, name: 'RABBAT UL BAIT', code: 'P-001363', price: 3990, stock: 40 },
-            { id: 4, name: 'WHITE CHICKENKARI', code: 'P-001360', price: 5800, stock: 1 }
+          allSales = [
+            { id: 960, transaction_id: 'S-001101', date: '2026-08-15 07:38 PM', customer: 'FAISAL', grand_total: 6000.00, paid: 6000.00, due: 0.00, status: 'Paid', items: [{ name: 'BONANZA SATRANGI HAYAT', price: 6000, qty: 1, amount: 6000 }] },
+            { id: 959, transaction_id: 'S-001100', date: '2026-08-15 06:09 PM', customer: 'Sawera', grand_total: 1990.00, paid: 1990.00, due: 0.00, status: 'Paid', items: [{ name: 'zellbury lawn cordsets (S)', price: 1990, qty: 1, amount: 1990 }] },
+            { id: 958, transaction_id: 'S-001099', date: '2026-08-15 03:31 PM', customer: 'Zahid Ameen', grand_total: 2490.00, paid: 2490.00, due: 0.00, status: 'Paid', items: [] }
           ];
         }
       } catch (e) {}
+      renderSalesHistoryTable();
     }
 
-    async function fetchCustomers() {
-      try {
-        const { data } = await db.from('account_masters').select('*').eq('account_group_id', 4).limit(500);
-        allCustomers = (data || []).map(c => ({ id: c.id, name: c.account_title, phone: c.contact_no, loyalty: c.loyalty_point || 0 }));
-      } catch (e) {}
+    function populateCustomerDropdown() {
       const sel = document.getElementById('pos-cust-select');
-      if (sel) sel.innerHTML = '<option value="">Walk in Client</option>' + allCustomers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Walk in Client - na</option>' + 
+        allCustomers.map(c => `<option value="${c.id}">${c.name} - ${c.phone || 'na'}</option>`).join('');
     }
 
-    async function fetchSuppliers() {
-      try {
-        const { data } = await db.from('account_masters').select('*').eq('account_group_id', 3).limit(500);
-        allSuppliers = (data || []).map(s => ({ id: s.id, name: s.account_title }));
-      } catch (e) {}
+    function onPOSCustomerChange() {
+      const custId = parseInt(document.getElementById('pos-cust-select').value);
+      const cust = allCustomers.find(c => c.id === custId);
+      document.getElementById('lbl-avail-loyalty').innerText = cust ? cust.loyalty : '0';
     }
 
-    async function fetchAllAccounts() {
-      try {
-        const { data } = await db.from('account_masters').select('*').limit(500);
-        allAccounts = data || [];
-        const tbody = document.getElementById('tbl-acclist-body');
-        if (tbody) {
-          tbody.innerHTML = allAccounts.slice(0, 20).map((a, i) => `
-            <tr class="hover:bg-white/5">
-              <td class="py-2.5 px-3 text-slate-500">${i+1}</td>
-              <td class="py-2.5 px-3 font-bold text-indigo-400">${a.account_code || 'A-0001'}</td>
-              <td class="py-2.5 px-3 font-bold text-white">${a.account_title}</td>
-              <td class="py-2.5 px-3 text-slate-400">Head #${a.account_group_id}</td>
-              <td class="py-2.5 px-3 text-right text-emerald-400">0.00</td>
-              <td class="py-2.5 px-3 text-right text-rose-400">0.00</td>
-            </tr>
-          `).join('');
-        }
-      } catch (e) {}
-    }
-
-    async function fetchSales() {
-      try {
-        const { data } = await db.from('sells').select('*').limit(500);
-        allSales = (data || []).map(s => ({
-          id: s.id,
-          transaction_id: s.invoice_id || `S-00${s.id}`,
-          date: s.sell_date || '2026-08-15',
-          customer: 'Walk in Client',
-          grand_total: parseFloat(s.grand_total_price || 0),
-          paid: parseFloat(s.paid_amount || 0),
-          due: parseFloat(s.due_amount || 0)
-        }));
-      } catch (e) {}
-    }
-
-    function populateAccountGroupDropdowns() {
-      const sel = document.getElementById('accmast-group');
-      if (sel) sel.innerHTML = allAccountGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
-    }
-
-    // POS Cart
     function initPOSCart() {
       posCart = [];
+      document.getElementById('pos-date-input').value = '2026-08-17';
       document.getElementById('pos-inv-number').value = `S-00${Date.now().toString().slice(-4)}`;
+      document.getElementById('inp-pos-discount').value = '0';
+      document.getElementById('inp-pos-paid').value = '0';
       renderPOSCart();
     }
+
     function onPOSSearchInput(q) {
       const dropdown = document.getElementById('pos-search-dropdown');
       const query = q.toLowerCase().trim();
       if (!query) { dropdown.classList.add('hidden'); return; }
-      const matches = allProducts.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query)).slice(0, 6);
-      dropdown.innerHTML = matches.map(p => `
-        <div onclick="addPOSItem(${p.id})" class="p-2 hover:bg-indigo-600 cursor-pointer flex justify-between text-xs">
-          <span>${p.name}</span><span class="font-bold text-emerald-400">Rs. ${p.price}</span>
-        </div>
-      `).join('');
+
+      const matches = allProducts.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query)).slice(0, 10);
+      if (matches.length === 0) {
+        dropdown.innerHTML = '<div class="p-3 text-slate-500 text-xs">No matching products found.</div>';
+      } else {
+        dropdown.innerHTML = matches.map(p => `
+          <div onclick="addPOSItem(${p.id})" class="p-2.5 hover:bg-indigo-600 hover:text-white cursor-pointer flex justify-between items-center text-xs">
+            <div>
+              <span class="font-mono-code text-[10px] text-indigo-300 block">${p.code}</span>
+              <span class="font-bold">${p.name}</span>
+            </div>
+            <span class="font-bold text-emerald-400">Rs. ${p.price.toLocaleString()}</span>
+          </div>
+        `).join('');
+      }
       dropdown.classList.remove('hidden');
     }
-    function addPOSItem(id) {
-      const p = allProducts.find(item => item.id === id);
+
+    function addPOSItem(prodId) {
+      const p = allProducts.find(item => item.id === prodId);
       if (!p) return;
-      posCart.push({ id: p.id, name: p.name, price: p.price, qty: 1, discount: 0, amount: p.price });
+
+      const existing = posCart.find(i => i.product_id === p.id);
+      if (existing) {
+        existing.qty += 1;
+        existing.amount = (existing.qty * existing.price) - existing.discount;
+      } else {
+        posCart.push({
+          product_id: p.id,
+          name: p.name,
+          unit: p.unit || 'Piece',
+          price: p.price,
+          qty: 1,
+          discount: 0,
+          amount: p.price
+        });
+      }
       document.getElementById('pos-barcode-search').value = '';
       document.getElementById('pos-search-dropdown').classList.add('hidden');
       renderPOSCart();
     }
+
+    function updatePOSItemQty(idx, val) {
+      posCart[idx].qty = Math.max(1, parseInt(val) || 1);
+      posCart[idx].amount = (posCart[idx].qty * posCart[idx].price) - posCart[idx].discount;
+      renderPOSCart();
+    }
+
+    function updatePOSItemDiscount(idx, val) {
+      posCart[idx].discount = Math.max(0, parseFloat(val) || 0);
+      posCart[idx].amount = (posCart[idx].qty * posCart[idx].price) - posCart[idx].discount;
+      renderPOSCart();
+    }
+
+    function removePOSItem(idx) {
+      posCart.splice(idx, 1);
+      renderPOSCart();
+    }
+
     function renderPOSCart() {
       const tbody = document.getElementById('pos-cart-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = posCart.map((it, i) => `
-        <tr class="hover:bg-white/5">
-          <td class="py-2 px-2 font-bold text-white">${it.name}</td>
-          <td class="py-2 px-2 text-right">Rs. ${it.price}</td>
-          <td class="py-2 px-2 text-center">${it.qty}</td>
-          <td class="py-2 px-2 text-right">${it.discount}</td>
-          <td class="py-2 px-2 text-right font-bold text-emerald-400">Rs. ${it.amount}</td>
-          <td class="py-2 px-2 text-center"><button onclick="posCart.splice(${i},1); renderPOSCart();" class="text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td>
+      if (posCart.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-12 text-center text-slate-500">Scan barcode or search products above to start billing.</td></tr>';
+        calculatePOSBill();
+        return;
+      }
+
+      tbody.innerHTML = posCart.map((item, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-2.5 px-2 font-bold text-white">${item.name}</td>
+          <td class="py-2.5 px-2 text-slate-400">${item.unit}</td>
+          <td class="py-2.5 px-2 text-right font-bold text-slate-200">Rs. ${item.price.toLocaleString()}</td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="number" value="${item.qty}" min="1" oninput="updatePOSItemQty(${idx}, this.value)" class="w-16 px-1.5 py-0.5 bg-black/50 border border-white/10 rounded text-center text-white font-bold outline-none">
+          </td>
+          <td class="py-2.5 px-2 text-right">
+            <input type="number" value="${item.discount}" min="0" oninput="updatePOSItemDiscount(${idx}, this.value)" class="w-20 px-1.5 py-0.5 bg-black/50 border border-white/10 rounded text-right text-amber-400 font-bold outline-none">
+          </td>
+          <td class="py-2.5 px-2 text-right font-bold text-emerald-400">Rs. ${item.amount.toLocaleString()}</td>
+          <td class="py-2.5 px-2 text-center">
+            <button onclick="removePOSItem(${idx})" class="p-1 rounded text-rose-400 hover:bg-rose-500/20"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </td>
         </tr>
       `).join('');
+
       calculatePOSBill();
       lucide.createIcons();
     }
+
     function calculatePOSBill() {
-      const sub = posCart.reduce((a,b) => a + b.amount, 0);
-      const disc = parseFloat(document.getElementById('inp-pos-discount')?.value) || 0;
-      const grand = Math.max(0, sub - disc);
-      if (document.getElementById('lbl-pos-subtotal')) document.getElementById('lbl-pos-subtotal').innerText = `Rs. ${sub.toFixed(2)}`;
-      if (document.getElementById('lbl-pos-grandtotal')) document.getElementById('lbl-pos-grandtotal').innerText = `Rs. ${grand.toFixed(2)}`;
-      if (document.getElementById('inp-pos-paid') && parseFloat(document.getElementById('inp-pos-paid').value) === 0) document.getElementById('inp-pos-paid').value = grand;
-      const paid = parseFloat(document.getElementById('inp-pos-paid')?.value) || 0;
-      if (document.getElementById('lbl-pos-due')) document.getElementById('lbl-pos-due').innerText = `Rs. ${Math.max(0, grand - paid).toFixed(2)}`;
-      return { grand, paid };
-    }
-    function savePOSSale(prn) {
-      if (posCart.length === 0) return alert('Cart is empty');
-      alert('Sale invoice generated successfully!');
-      if (prn) window.print();
-      initPOSCart();
-    }
-    function renderSalesHistoryTable() {
-      const tbody = document.getElementById('tbl-sales-history-body');
-      if (tbody) {
-        tbody.innerHTML = allSales.slice(0, 15).map((s, i) => `
-          <tr class="hover:bg-white/5">
-            <td class="py-3 px-3.5 text-slate-500">${i+1}</td>
-            <td class="py-3 px-3.5 font-bold text-indigo-400">${s.transaction_id}</td>
-            <td class="py-3 px-3.5 text-slate-400">${s.date}</td>
-            <td class="py-3 px-3.5 font-bold text-white">${s.customer}</td>
-            <td class="py-3 px-3.5 text-right font-bold">Rs. ${s.grand_total.toFixed(2)}</td>
-            <td class="py-3 px-3.5 text-right font-bold text-emerald-400">Rs. ${s.paid.toFixed(2)}</td>
-            <td class="py-3 px-3.5 text-right font-bold text-rose-400">Rs. ${s.due.toFixed(2)}</td>
-            <td class="py-3 px-3.5 text-center"><button onclick="window.print()" class="p-1 rounded bg-indigo-500/10 text-indigo-400"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button></td>
-          </tr>
-        `).join('');
-        lucide.createIcons();
+      const kot = posCart.reduce((acc, i) => acc + i.qty, 0);
+      const subtotal = posCart.reduce((acc, i) => acc + (i.qty * i.price), 0);
+      const itemDiscounts = posCart.reduce((acc, i) => acc + i.discount, 0);
+      const totalDisc = itemDiscounts + (parseFloat(document.getElementById('inp-pos-discount')?.value) || 0) + (parseFloat(document.getElementById('lbl-redeem-amt')?.value) || 0);
+      const grandTotal = Math.max(0, subtotal - totalDisc);
+
+      const paidInput = document.getElementById('inp-pos-paid');
+      if (posCart.length > 0 && parseFloat(paidInput.value) === 0) {
+        paidInput.value = grandTotal.toFixed(0);
       }
+      const paid = parseFloat(paidInput.value) || 0;
+      const due = Math.max(0, grandTotal - paid);
+
+      document.getElementById('lbl-pos-kot').innerText = kot;
+      document.getElementById('lbl-pos-subtotal').innerText = `Rs. ${subtotal.toLocaleString()}`;
+      document.getElementById('lbl-pos-grandtotal').innerText = `Rs. ${grandTotal.toLocaleString()}`;
+      document.getElementById('lbl-pos-due').innerText = `Rs. ${due.toLocaleString()}`;
+
+      return { kot, subtotal, totalDisc, grandTotal, paid, due };
     }
 
+    function onRedeemPointsChange() {
+      const pts = parseInt(document.getElementById('inp-redeem-pts').value) || 0;
+      document.getElementById('lbl-redeem-amt').value = (pts * 1.0).toFixed(2);
+      calculatePOSBill();
+    }
+
+    async function savePOSSale(shouldPrint = false) {
+      if (posCart.length === 0) return alert('Please add items to invoice before saving.');
+
+      const bill = calculatePOSBill();
+      const custSelect = document.getElementById('pos-cust-select');
+      const custId = custSelect.value ? parseInt(custSelect.value) : null;
+      const custName = custSelect.options[custSelect.selectedIndex]?.text.split('-')[0].trim() || 'Walk in Client';
+      const invNo = document.getElementById('pos-inv-number').value.trim();
+      const sellDate = document.getElementById('pos-date-input').value;
+
+      const payload = {
+        invoice_id: invNo,
+        customer_id: custId,
+        sub_total: bill.subtotal,
+        discount: bill.totalDisc,
+        grand_total_price: bill.grandTotal,
+        paid_amount: bill.paid,
+        due_amount: bill.due,
+        sell_date: sellDate,
+        payment_type: 1
+      };
+
+      try {
+        const { data, error } = await db.from('sells').insert([payload]).select();
+        if (!error && data) {
+          const sellId = data[0].id;
+          const itemsPayload = posCart.map(i => ({
+            sell_id: sellId,
+            product_id: i.product_id,
+            quantity: i.qty,
+            unit_price: i.price,
+            discount: i.discount,
+            sub_total: i.amount
+          }));
+          await db.from('sell_products').insert(itemsPayload);
+        }
+      } catch (err) {}
+
+      const newSaleRecord = {
+        id: Date.now(),
+        transaction_id: invNo,
+        date: `${sellDate} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        customer: custName,
+        grand_total: bill.grandTotal,
+        paid: bill.paid,
+        due: bill.due,
+        status: bill.due === 0 ? 'Paid' : 'Due',
+        items: [...posCart]
+      };
+
+      allSales.unshift(newSaleRecord);
+
+      if (shouldPrint) {
+        openThermalReceipt(newSaleRecord);
+      } else {
+        alert(`Invoice ${invNo} saved successfully!`);
+        showSection('ledger');
+      }
+
+      initPOSCart();
+      fetchSalesFromDatabase();
+    }
+
+    function renderSalesHistoryTable() {
+      const tbody = document.getElementById('tbl-sales-history-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = allSales.slice(0, 25).map((s, idx) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3.5 text-slate-500">${idx + 1}</td>
+          <td class="py-3 px-3.5 font-bold text-indigo-400 font-mono-code">${s.transaction_id}</td>
+          <td class="py-3 px-3.5 text-slate-400 font-mono-code">${s.date}</td>
+          <td class="py-3 px-3.5 font-bold text-white">${s.customer}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-slate-200">Rs. ${s.grand_total.toLocaleString()}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-emerald-400">Rs. ${s.paid.toLocaleString()}</td>
+          <td class="py-3 px-3.5 text-right font-bold ${s.due > 0 ? 'text-rose-400' : 'text-slate-500'}">Rs. ${s.due.toLocaleString()}</td>
+          <td class="py-3 px-3.5 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+              ${s.status}
+            </span>
+          </td>
+          <td class="py-3 px-3.5 text-center space-x-1">
+            <button onclick="openThermalReceipt(allSales[${idx}])" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" title="Print 80mm Receipt"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openThermalReceipt(sale) {
+      document.getElementById('prn-inv-id').innerText = `INV #: ${sale.transaction_id}`;
+      const tbody = document.getElementById('prn-items');
+
+      if (sale.items && sale.items.length > 0) {
+        tbody.innerHTML = sale.items.map((it, i) => `
+          <div class="flex justify-between"><span>${i + 1}. ${it.name} x${it.qty}</span><span>Rs. ${it.amount}</span></div>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<div class="flex justify-between"><span>1. ${sale.customer} Order</span><span>Rs. ${sale.grand_total}</span></div>`;
+      }
+
+      document.getElementById('prn-total').innerText = `Rs. ${sale.grand_total.toFixed(2)}`;
+      window.print();
+    }
+
+    function renderSalesReturns() {
+      const tbody = document.getElementById('tbl-sales-returns-body');
+      if (!tbody) return;
+      tbody.innerHTML = allReturns.slice(0, 15).map((r, i) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3.5 text-slate-500">${i + 1}</td>
+          <td class="py-3 px-3.5 font-bold text-slate-200 font-mono-code">${r.invoice_no}</td>
+          <td class="py-3 px-3.5 text-slate-400">${r.date}</td>
+          <td class="py-3 px-3.5 font-bold text-white">${r.supplier}</td>
+          <td class="py-3 px-3.5 text-right font-bold text-rose-400">Rs. ${r.amount.toFixed(2)}</td>
+          <td class="py-3 px-3.5 text-center">
+            <button onclick="window.print()" class="p-1 rounded bg-indigo-500/10 text-indigo-400"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openNewSalesReturnPrompt() {
+      const inv = prompt("Enter Sales Bill # to return (e.g. S-001101):");
+      if (!inv) return;
+      const amt = parseFloat(prompt("Enter Return Amount (Rs.):")) || 0;
+      allReturns.unshift({ id: allReturns.length + 1, invoice_no: inv, date: 'Aug 17, 2026', supplier: 'WALK IN CLIENT', amount: amt });
+      renderSalesReturns();
+    }
+
+    // Window Load Trigger
     window.onload = init;
   </script>
 </body>

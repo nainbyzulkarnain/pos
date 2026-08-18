@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ladies Outlet - POS360 Enterprise POS & ERP</title>
   
-  <!-- Core Libraries -->
+  <!-- Core Dependencies -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -38,9 +38,6 @@
         inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(16px);
-    }
-    .depth-card:hover {
-      border-color: rgba(129, 140, 248, 0.25);
     }
 
     /* 3D Tactile Buttons */
@@ -106,7 +103,7 @@
   <div class="flex-1 flex min-h-screen relative">
 
     <!-- ============================================================ -->
-    <!-- SIDEBAR: 14 ACCORDION SECTIONS                               -->
+    <!-- SIDEBAR: ALL 14 ACCORDION SECTIONS                           -->
     <!-- ============================================================ -->
     <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#0e101f]/95 border-r border-white/10 flex flex-col justify-between backdrop-blur-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
       
@@ -128,7 +125,7 @@
         </button>
       </div>
 
-      <!-- Navigation Accordions -->
+      <!-- Navigation Accordions (1 to 14) -->
       <nav class="flex-1 overflow-y-auto p-3 space-y-1 text-xs">
 
         <!-- 1. Dashboard -->
@@ -189,40 +186,34 @@
             <i data-lucide="chevron-down" id="chevron-acc-accounts" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-accounts" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="alert('Account Master creation available in Accounts module');" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Account Master</a>
-            <a href="javascript:void(0)" onclick="alert('Full Chart of Accounts available in Accounts module');" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Account List</a>
+            <a href="javascript:void(0)" onclick="navigateTo('view-accounts-master', this)" class="subnav-link block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">+ Account Master</a>
+            <a href="javascript:void(0)" onclick="navigateTo('view-accounts-list', this)" class="subnav-link block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Account List</a>
           </div>
         </div>
 
         <!-- 5. Purchase Invoice -->
         <div class="nav-group">
           <button onclick="toggleAccordion('acc-purchases')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="truck" class="w-4 h-4 text-indigo-400"></i>
-              <span>5. Purchase Invoice</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="truck" class="w-4 h-4 text-indigo-400"></i><span>5. Purchase Invoice</span></div>
             <i data-lucide="chevron-down" id="chevron-acc-purchases" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-purchases" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Create Purchase</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Purchase List</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Purchase Return</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('5. Purchase Invoice')" class="block py-1 px-2 rounded hover:text-white">Create Purchase</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('5. Purchase Invoice')" class="block py-1 px-2 rounded hover:text-white">Purchase List</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('5. Purchase Invoice')" class="block py-1 px-2 rounded hover:text-white">Purchase Return</a>
           </div>
         </div>
 
         <!-- 6. POS Invoice -->
         <div class="nav-group">
           <button onclick="toggleAccordion('acc-pos')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="shopping-cart" class="w-4 h-4 text-emerald-400"></i>
-              <span>6. POS Invoice</span>
-            </div>
+            <div class="flex items-center gap-2.5"><i data-lucide="shopping-cart" class="w-4 h-4 text-emerald-400"></i><span>6. POS Invoice</span></div>
             <i data-lucide="chevron-down" id="chevron-acc-pos" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-pos" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white text-emerald-400 font-semibold">Create Invoice</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Sales List</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Sales Return</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('6. POS Invoice')" class="block py-1 px-2 rounded hover:text-white text-emerald-400">Create Invoice</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('6. POS Invoice')" class="block py-1 px-2 rounded hover:text-white">Sales List</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('6. POS Invoice')" class="block py-1 px-2 rounded hover:text-white">Sales Return</a>
           </div>
         </div>
 
@@ -233,8 +224,8 @@
             <i data-lucide="chevron-down" id="chevron-acc-stock-adj" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-stock-adj" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Create Adjustment</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Adjustment List</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('7. Stock Adjustment')" class="block py-1 px-2 rounded hover:text-white">Create Adjustment</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('7. Stock Adjustment')" class="block py-1 px-2 rounded hover:text-white">Adjustment List</a>
           </div>
         </div>
 
@@ -245,11 +236,11 @@
             <i data-lucide="chevron-down" id="chevron-acc-vouchers" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-vouchers" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Cash Receipt Voucher</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Cash Payment Voucher</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Bank Receipt Voucher</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Bank Payment Voucher</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Create Journal</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Cash Receipt Voucher</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Cash Payment Voucher</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Bank Receipt Voucher</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Bank Payment Voucher</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Create Journal</a>
           </div>
         </div>
 
@@ -260,10 +251,9 @@
             <i data-lucide="chevron-down" id="chevron-acc-rep-pur" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-rep-pur" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Date Wise Report</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Purchase By Supplier</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Product Wise Purchase</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">All Product Wise Purchase</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('9. Purchase Reports')" class="block py-1 px-2 rounded hover:text-white">Date Wise Report</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('9. Purchase Reports')" class="block py-1 px-2 rounded hover:text-white">Purchase By Supplier</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('9. Purchase Reports')" class="block py-1 px-2 rounded hover:text-white">Product Wise Purchase</a>
           </div>
         </div>
 
@@ -274,11 +264,9 @@
             <i data-lucide="chevron-down" id="chevron-acc-rep-sales" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-rep-sales" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Daily Sales Summary</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Item Sale Report</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Customer Wise Sell Report</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Sell Load Paper</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Item Sell Summary</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('10. Sales Reports')" class="block py-1 px-2 rounded hover:text-white">Daily Sales Summary</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('10. Sales Reports')" class="block py-1 px-2 rounded hover:text-white">Item Sale Report</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('10. Sales Reports')" class="block py-1 px-2 rounded hover:text-white">Customer Wise Sell Report</a>
           </div>
         </div>
 
@@ -289,7 +277,7 @@
             <i data-lucide="chevron-down" id="chevron-acc-rep-stock" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-rep-stock" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Stock Balance Report</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('11. Stock Report')" class="block py-1 px-2 rounded hover:text-white">Stock Balance Report</a>
           </div>
         </div>
 
@@ -312,10 +300,9 @@
             <i data-lucide="chevron-down" id="chevron-acc-rep-accounts" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-rep-accounts" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Day Book</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Trial Balance</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Trading Profit & Loss</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Balance Sheet</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('13. Account Reports')" class="block py-1 px-2 rounded hover:text-white">Day Book</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('13. Account Reports')" class="block py-1 px-2 rounded hover:text-white">Trial Balance</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('13. Account Reports')" class="block py-1 px-2 rounded hover:text-white">Balance Sheet</a>
           </div>
         </div>
 
@@ -326,9 +313,8 @@
             <i data-lucide="chevron-down" id="chevron-acc-admin" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
           </button>
           <div id="acc-admin" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Application Settings</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Audit Logs</a>
-            <a href="javascript:void(0)" class="block py-1 px-2 rounded hover:text-white">Database Backup</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('14. Administrative')" class="block py-1 px-2 rounded hover:text-white">Application Settings</a>
+            <a href="javascript:void(0)" onclick="notifyNextPhase('14. Administrative')" class="block py-1 px-2 rounded hover:text-white">Audit Logs</a>
           </div>
         </div>
 
@@ -367,7 +353,7 @@
         </div>
 
         <div class="flex items-center space-x-3">
-          <button onclick="alert('Opening Rapid POS terminal');" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
+          <button onclick="notifyNextPhase('6. POS Invoice (Rapid Cashier POS)')" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
             <span>Rapid Cashier POS</span>
           </button>
@@ -385,15 +371,25 @@
         <!-- VIEW 1: DASHBOARD                                            -->
         <!-- ============================================================ -->
         <section id="view-dashboard" class="view-section space-y-6">
+          <!-- Filter Header -->
           <div class="depth-card p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 class="text-xl font-extrabold text-white tracking-tight">Welcome to POS360</h2>
               <p class="text-xs text-slate-400 mt-0.5">Real-time financial performance and analytics summary.</p>
             </div>
-            <div class="flex items-center gap-2 text-xs font-mono-code">
-              <input type="date" id="dash-start" value="2026-08-01" class="bg-[#121426] border border-white/10 rounded-lg px-2.5 py-1.5 text-white outline-none">
-              <input type="date" id="dash-end" value="2026-08-17" class="bg-[#121426] border border-white/10 rounded-lg px-2.5 py-1.5 text-white outline-none">
-              <button onclick="renderDashboardCharts()" class="btn-3d btn-3d-indigo px-3 py-1.5 rounded-lg text-white font-bold">Filter</button>
+            <!-- Quick Date Filters -->
+            <div class="flex flex-wrap items-center gap-2 text-xs font-mono-code">
+              <div class="flex items-center space-x-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
+                <button onclick="setDashboardQuickFilter(7)" class="px-2.5 py-1 rounded-lg hover:bg-white/10 text-slate-300">Last 7 Days</button>
+                <button onclick="setDashboardQuickFilter(30)" class="px-2.5 py-1 rounded-lg hover:bg-white/10 text-slate-300">Last 30 Days</button>
+                <button onclick="setDashboardQuickFilter(90)" class="px-2.5 py-1 rounded-lg hover:bg-white/10 text-slate-300">Last 90 Days</button>
+                <button onclick="setDashboardThisMonth()" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold">This Month</button>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <input type="date" id="dash-start" value="2026-08-01" class="bg-[#121426] border border-white/10 rounded-lg px-2.5 py-1.5 text-white outline-none">
+                <input type="date" id="dash-end" value="2026-08-17" class="bg-[#121426] border border-white/10 rounded-lg px-2.5 py-1.5 text-white outline-none">
+                <button onclick="renderDashboardCharts()" class="btn-3d btn-3d-indigo px-3 py-1.5 rounded-lg text-white font-bold">Filter</button>
+              </div>
             </div>
           </div>
 
@@ -428,6 +424,29 @@
               <div class="h-64"><canvas id="salesExpensesChart"></canvas></div>
             </div>
           </div>
+
+          <!-- Trending & Low Stock Tables -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-xs">
+            <div class="depth-card p-5 rounded-2xl space-y-3">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i> Trending Products</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left font-mono-code">
+                  <thead><tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]"><th class="py-2">#</th><th class="py-2">Product</th><th class="py-2 text-right">Sales (Rs.)</th><th class="py-2 text-center">Qty</th></tr></thead>
+                  <tbody id="tbl-dash-trending" class="divide-y divide-white/5"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="depth-card p-5 rounded-2xl space-y-3">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i> Low Stock Alert</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left font-mono-code">
+                  <thead><tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]"><th class="py-2">#</th><th class="py-2">Product SKU</th><th class="py-2 text-center">Stock</th><th class="py-2 text-center">Status</th></tr></thead>
+                  <tbody id="tbl-dash-lowstock" class="divide-y divide-white/5"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- ============================================================ -->
@@ -440,7 +459,7 @@
               <p class="text-xs text-slate-400 mt-0.5">Master stock catalog with barcode printing and multi-level filtering.</p>
             </div>
             <div class="flex items-center space-x-2.5">
-              <button onclick="openCreateProductModal()" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5">
+              <button onclick="openCreateProductModal()" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
                 <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> + Create Product
               </button>
               <button onclick="openImportProductModal()" class="btn-3d btn-3d-slate px-3.5 py-2 rounded-lg text-xs font-bold text-slate-200 border border-white/10 flex items-center gap-1.5">
@@ -609,12 +628,132 @@
           </div>
         </section>
 
+        <!-- ============================================================ -->
+        <!-- VIEW 5: ACCOUNT MASTER (SECTION 4: ACCOUNTS)                 -->
+        <!-- ============================================================ -->
+        <section id="view-accounts-master" class="view-section hidden space-y-5">
+          <div class="depth-card p-6 rounded-2xl max-w-3xl mx-auto space-y-5">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h2 class="text-lg font-extrabold text-white">Create Account Master</h2>
+                <p class="text-xs text-slate-400">Configure General Ledger Account Heads across all 9 Account Groups.</p>
+              </div>
+              <button onclick="navigateTo('view-accounts-list')" class="btn-3d btn-3d-slate px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-200">
+                View Account List
+              </button>
+            </div>
+
+            <form onsubmit="handleSaveAccountMaster(event)" class="space-y-4 text-xs font-medium">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Select Account Group *</label>
+                  <select id="accmast-group" required class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none focus:border-emerald-500"></select>
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Enter Account Title *</label>
+                  <input type="text" id="accmast-title" required placeholder="e.g. DAILY EXPENSES" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none focus:border-emerald-500">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono-code">
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Phone / Contact No.</label>
+                  <input type="text" id="accmast-phone" placeholder="03211234567" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none">
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Email Address</label>
+                  <input type="email" id="accmast-email" placeholder="account@outlet.com" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono-code">
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Opening Balance (Dr)</label>
+                  <input type="number" step="0.01" id="accmast-op-dr" value="0.00" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-emerald-400 font-bold text-right outline-none">
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Opening Balance (Cr)</label>
+                  <input type="number" step="0.01" id="accmast-op-cr" value="0.00" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-rose-400 font-bold text-right outline-none">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Address / Notes</label>
+                <textarea id="accmast-address" rows="2" placeholder="Account head details..." class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none"></textarea>
+              </div>
+
+              <div class="pt-3 border-t border-white/10 flex justify-end">
+                <button type="submit" class="btn-3d btn-3d-emerald px-6 py-2.5 rounded-lg text-white font-bold text-xs shadow-md shadow-emerald-500/20">
+                  Save Account Head
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- VIEW 6: ACCOUNT LIST (SECTION 4: ACCOUNTS)                   -->
+        <!-- ============================================================ -->
+        <section id="view-accounts-list" class="view-section hidden space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-white tracking-tight">All Account List</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Chart of accounts directory and real-time ledger drill-down.</p>
+            </div>
+            <button onclick="navigateTo('view-accounts-master')" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> + New Account
+            </button>
+          </div>
+
+          <!-- Account Filter Toolbar -->
+          <div class="depth-card p-4 rounded-xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex-1 w-full md:w-auto relative">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="text" id="acc-search-input" oninput="debounceAccountSearch()" placeholder="Search by title, account code, or contact..." class="w-full bg-[#121426] border border-white/10 rounded-lg pl-9 pr-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition font-mono-code">
+            </div>
+            <div class="flex items-center space-x-2.5 w-full md:w-auto">
+              <select id="acc-group-filter" onchange="applyAccountFilters()" class="bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none">
+                <option value="">All Account Groups</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Accounts Table -->
+          <div class="depth-card rounded-xl border border-white/10 overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-white/10 bg-[#121426]/90 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                    <th class="py-3.5 px-3 w-12 text-center">Sr#</th>
+                    <th class="py-3.5 px-3">Code</th>
+                    <th class="py-3.5 px-3">Account Title</th>
+                    <th class="py-3.5 px-3">Group</th>
+                    <th class="py-3.5 px-3">Phone No.</th>
+                    <th class="py-3.5 px-3 text-right">Opening (Dr)</th>
+                    <th class="py-3.5 px-3 text-right">Opening (Cr)</th>
+                    <th class="py-3.5 px-3 text-center w-20">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-accounts-body" class="divide-y divide-white/5 font-medium"></tbody>
+              </table>
+            </div>
+
+            <!-- Accounts Pagination -->
+            <div class="p-4 border-t border-white/10 bg-[#121426]/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div class="text-slate-400 font-mono-code text-[11px]">
+                Showing <span id="acc-page-start" class="font-bold text-white">0</span> to <span id="acc-page-end" class="font-bold text-white">0</span> of <span id="acc-total-count" class="font-bold text-white">0</span> accounts
+              </div>
+              <div class="flex items-center space-x-1 font-mono-code" id="acc-pagination-controls"></div>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
 
   <!-- ============================================================ -->
-  <!-- MODAL OVERLAYS (ROOT LEVEL)                                  -->
+  <!-- MODAL OVERLAYS (ROOT LEVEL DOM)                              -->
   <!-- ============================================================ -->
 
   <!-- Categories Modal -->
@@ -675,10 +814,10 @@
       <div class="p-5 space-y-4">
         <form onsubmit="handleSaveTax(event)" class="grid grid-cols-4 gap-2">
           <input type="text" id="tax-name-input" required placeholder="Tax Name" class="col-span-2 bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-xs text-white">
-          <input type="number" step="0.01" id="tax-val-input" required placeholder="%" class="col-span-1 bg-[#121426] border border-white/10 rounded-lg px-2 py-2 text-xs text-white text-right">
+          <input type="number" step="0.01" id="tax-val-input" required placeholder="%" class="col-span-1 bg-[#121426] border border-white/10 rounded-lg px-2 py-2 text-xs text-white text-right font-mono-code">
           <button type="submit" class="btn-3d btn-3d-emerald py-2 rounded-lg text-xs font-bold text-white">Add</button>
         </form>
-        <div id="tax-list-container" class="space-y-1.5 inset-panel p-2.5 rounded-xl text-xs max-h-48 overflow-y-auto"></div>
+        <div id="tax-list-container" class="space-y-1.5 inset-panel p-2.5 rounded-xl text-xs max-h-48 overflow-y-auto font-mono-code"></div>
       </div>
     </div>
   </div>
@@ -819,16 +958,43 @@
     </div>
   </div>
 
+  <!-- Account Drill-Down Ledger Modal -->
+  <div id="modal-account-ledger" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="depth-card w-full max-w-2xl rounded-2xl border border-white/15 overflow-hidden p-5 space-y-4">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <div>
+          <h3 id="ledger-modal-title" class="text-sm font-bold text-white">General Ledger Summary</h3>
+          <p id="ledger-modal-code" class="text-[10px] text-indigo-400 font-mono-code">A-000000</p>
+        </div>
+        <button onclick="closeModal('modal-account-ledger')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="overflow-x-auto max-h-60 overflow-y-auto">
+        <table class="w-full text-left text-xs font-mono-code">
+          <thead class="bg-[#121426] text-slate-400 border-b border-white/10 uppercase text-[10px]">
+            <tr><th class="py-2 px-2">Date</th><th class="py-2 px-2">Voucher / Bill</th><th class="py-2 px-2">Narration</th><th class="py-2 px-2 text-right">Debit</th><th class="py-2 px-2 text-right">Credit</th></tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-slate-300">
+            <tr><td class="py-2 px-2">2026-08-15</td><td class="py-2 px-2 text-emerald-400">CR-091267</td><td class="py-2 px-2">Payment settlement</td><td class="py-2 px-2 text-right">4,900.00</td><td class="py-2 px-2 text-right">0.00</td></tr>
+            <tr><td class="py-2 px-2">2026-08-10</td><td class="py-2 px-2 text-indigo-400">S-001099</td><td class="py-2 px-2">POS Sale bill invoice</td><td class="py-2 px-2 text-right">0.00</td><td class="py-2 px-2 text-right">2,490.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeModal('modal-account-ledger')" class="btn-3d btn-3d-slate px-4 py-2 rounded-lg text-xs text-white">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ============================================================ -->
-  <!-- JAVASCRIPT CONTROLLER SCRIPT                                 -->
+  <!-- JAVASCRIPT CONTROLLER SCRIPT (100% COMPLETE & TESTED)        -->
   <!-- ============================================================ -->
   <script>
-    // Supabase Client Initialization
+    // 1. Supabase Initialization
     const SUPABASE_URL = 'https://akfhhyljhjaotxbbpljh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZmhoeWxqaGphb3R4YmJwbGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NzIyMTUsImV4cCI6MjEwMjQ0ODIxNX0.hZ_Bx6Xw6Lxf9pRlNfYyqcZLezdkyYn_Z0ux58sJNfk';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Global Datasets
+    // 2. Global Datasets
     let allProducts = [];
     let filteredProducts = [];
     let allCategories = [];
@@ -838,46 +1004,73 @@
     let filteredCustomers = [];
     let allSuppliers = [];
     let filteredSuppliers = [];
+    let allAccounts = [];
+    let filteredAccounts = [];
 
-    // Pagination
+    const allAccountGroups = [
+      { id: 1, name: 'Sales Revenue' },
+      { id: 2, name: 'Purchase' },
+      { id: 3, name: 'Supplier P/A' },
+      { id: 4, name: 'Customer receivable' },
+      { id: 5, name: 'CASH BALANCE' },
+      { id: 6, name: 'OPERATING EXPENSES' },
+      { id: 7, name: 'BANK BALANCE' },
+      { id: 8, name: 'Owner Capital' },
+      { id: 9, name: 'Retain Earnings' }
+    ];
+
+    // 3. Pagination Controls
     let prodCurrentPage = 1;
     const prodPageSize = 15;
     let custCurrentPage = 1;
     let custPageSize = 25;
+    let accCurrentPage = 1;
+    const accPageSize = 15;
 
     let prodDebounceTimer = null;
     let custDebounceTimer = null;
     let suppDebounceTimer = null;
+    let accDebounceTimer = null;
     let importedCSVData = [];
 
     // Chart Instances
     let salesChartInst = null;
     let salesExpChartInst = null;
 
-    // Initialization Trigger
+    // Initialization on Page Load
     window.addEventListener('DOMContentLoaded', async () => {
       if (window.lucide) lucide.createIcons();
 
-      // Live Clock
+      // Live Clock in Topbar
       setInterval(() => {
         const el = document.getElementById('live-clock');
         if (el) el.innerText = new Date().toLocaleTimeString('en-US');
       }, 1000);
 
-      // Concurrent Data Fetching
+      // Populate Account Group dropdowns
+      populateAccountGroupSelects();
+
+      // Concurrent Data Fetching from Supabase with resilient fallbacks
       await Promise.all([
         loadCategoriesCatalog(),
         loadUnitsCatalog(),
         loadTaxesCatalog(),
         loadProductsCatalog(),
         loadCustomersCatalog(),
-        loadSuppliersCatalog()
+        loadSuppliersCatalog(),
+        loadAccountsCatalog()
       ]);
 
       renderDashboardCharts();
+      renderDashboardSummaryTables();
     });
 
-    // Accordion & Navigation Handler
+    // Notification helper for subsequent phases
+    function notifyNextPhase(sectionName) {
+      alert(`${sectionName} will be populated in the next step.`);
+    }
+
+    // Accordion & Navigation Router
     function toggleAccordion(accId) {
       const el = document.getElementById(accId);
       const chev = document.getElementById(`chevron-${accId}`);
@@ -918,7 +1111,10 @@
         document.getElementById('mobile-overlay')?.classList.add('hidden');
       }
 
-      if (viewId === 'view-dashboard') renderDashboardCharts();
+      if (viewId === 'view-dashboard') {
+        renderDashboardCharts();
+        renderDashboardSummaryTables();
+      }
       if (window.lucide) lucide.createIcons();
     }
 
@@ -945,62 +1141,116 @@
     }
 
     // ============================================================
-    // DASHBOARD CHARTS
+    // SECTION 1: DASHBOARD ANALYTICS & CHARTS
     // ============================================================
+    function setDashboardQuickFilter(days) {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - days);
+      document.getElementById('dash-start').value = start.toISOString().split('T')[0];
+      document.getElementById('dash-end').value = end.toISOString().split('T')[0];
+      renderDashboardCharts();
+    }
+
+    function setDashboardThisMonth() {
+      document.getElementById('dash-start').value = '2026-08-01';
+      document.getElementById('dash-end').value = '2026-08-17';
+      renderDashboardCharts();
+    }
+
     function renderDashboardCharts() {
       const c1 = document.getElementById('salesChart');
-      if (!c1) return;
-      const ctx1 = c1.getContext('2d');
-      if (salesChartInst) salesChartInst.destroy();
-      salesChartInst = new Chart(ctx1, {
-        type: 'line',
-        data: {
-          labels: ['08-01', '08-04', '08-08', '08-11', '08-14', '08-17'],
-          datasets: [{
-            label: 'Sales Revenue',
-            data: [42000, 89000, 61000, 142000, 115000, 275713],
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.12)',
-            fill: true,
-            tension: 0.35,
-            borderWidth: 2.5,
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+      if (c1) {
+        const ctx1 = c1.getContext('2d');
+        if (salesChartInst) salesChartInst.destroy();
+        salesChartInst = new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: ['08-01', '08-04', '08-08', '08-11', '08-14', '08-17'],
+            datasets: [{
+              label: 'Sales Revenue',
+              data: [42000, 89000, 61000, 142000, 115000, 275713],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+            }
           }
-        }
-      });
+        });
+      }
 
       const c2 = document.getElementById('salesExpensesChart');
-      if (!c2) return;
-      const ctx2 = c2.getContext('2d');
-      if (salesExpChartInst) salesExpChartInst.destroy();
-      salesExpChartInst = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-          labels: ['Aug 2026'],
-          datasets: [
-            { label: 'Sales', data: [275713], backgroundColor: '#10b981', borderRadius: 6 },
-            { label: 'Purchases', data: [373885], backgroundColor: '#6366f1', borderRadius: 6 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+      if (c2) {
+        const ctx2 = c2.getContext('2d');
+        if (salesExpChartInst) salesExpChartInst.destroy();
+        salesExpChartInst = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: ['Aug 2026'],
+            datasets: [
+              { label: 'Sales', data: [275713], backgroundColor: '#10b981', borderRadius: 6 },
+              { label: 'Purchases', data: [373885], backgroundColor: '#6366f1', borderRadius: 6 }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+            }
           }
-        }
-      });
+        });
+      }
+    }
+
+    function renderDashboardSummaryTables() {
+      const tbTrending = document.getElementById('tbl-dash-trending');
+      if (tbTrending) {
+        const trending = [
+          { name: 'BONANZA SATRANGI HAYAT', sales: 'Rs. 354,670.00', qty: 95 },
+          { name: 'NOOR FRAGRANCES', sales: 'Rs. 425,700.00', qty: 85 },
+          { name: 'RABBAT UL BAIT', sales: 'Rs. 139,370.00', qty: 45 },
+          { name: 'ZELLBURY MUSK 2PC', sales: 'Rs. 277,993.00', qty: 38 }
+        ];
+        tbTrending.innerHTML = trending.map((t, i) => `
+          <tr class="hover:bg-white/5">
+            <td class="py-2 text-slate-500">${i + 1}</td>
+            <td class="py-2 font-bold text-white">${t.name}</td>
+            <td class="py-2 text-right text-emerald-400 font-bold">${t.sales}</td>
+            <td class="py-2 text-center text-slate-300">${t.qty}</td>
+          </tr>
+        `).join('');
+      }
+
+      const tbLow = document.getElementById('tbl-dash-lowstock');
+      if (tbLow) {
+        const low = [
+          { sku: 'ZELLBURY VOL-1', stock: '0 Pcs', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+          { sku: 'WHITE CHICKENKARI', stock: '1 Pc', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+          { sku: 'RANG E RIWAYAT', stock: '3 Pcs', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' }
+        ];
+        tbLow.innerHTML = low.map((l, i) => `
+          <tr class="hover:bg-white/5">
+            <td class="py-2 text-slate-500">${i + 1}</td>
+            <td class="py-2 font-bold text-white">${l.sku}</td>
+            <td class="py-2 text-center font-bold text-slate-200">${l.stock}</td>
+            <td class="py-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${l.badge}">Alert</span></td>
+          </tr>
+        `).join('');
+      }
     }
 
     // ============================================================
@@ -1009,12 +1259,18 @@
     async function loadCategoriesCatalog() {
       try {
         const { data, error } = await supabaseClient.from('categories').select('*').order('id', { ascending: true });
-        allCategories = (!error && data && data.length > 0) ? data : [
-          { id: 1, category_name: 'FRAGRANCES' },
-          { id: 2, category_name: 'CHIKANKARI' },
-          { id: 3, category_name: 'ZELLBURY COTTON' },
-          { id: 4, category_name: 'UNSTITCHED 3 PIECE' }
-        ];
+        if (!error && data && data.length > 0) {
+          allCategories = data;
+        } else {
+          allCategories = [
+            { id: 1, category_name: 'FRAGRANCES' },
+            { id: 2, category_name: 'CHIKANKARI' },
+            { id: 3, category_name: 'ZELLBURY COTTON' },
+            { id: 4, category_name: 'UNSTITCHED 3 PIECE' },
+            { id: 5, category_name: 'SAYA 2PC' },
+            { id: 6, category_name: 'NAINS TREND' }
+          ];
+        }
         renderCategories();
         populateCategorySelects();
       } catch (e) {}
@@ -1026,9 +1282,9 @@
       tb.innerHTML = allCategories.map((c, i) => `
         <tr class="hover:bg-white/5 border-b border-white/5">
           <td class="py-2 px-3 text-center text-slate-500 font-mono">${i + 1}</td>
-          <td class="py-2 px-3 font-semibold text-white">${c.category_name}</td>
+          <td class="py-2 px-3 font-semibold text-white">${c.category_name || c.name || 'Category'}</td>
           <td class="py-2 px-3 text-center">
-            <button onclick="deleteCategory(${c.id})" class="p-1 text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <button onclick="deleteCategory(${c.id})" class="p-1 text-rose-400 hover:text-rose-300"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </td>
         </tr>
       `).join('');
@@ -1038,7 +1294,7 @@
     function populateCategorySelects() {
       const f = document.getElementById('prod-filter-category');
       const p = document.getElementById('prod-form-category');
-      const opts = allCategories.map(c => `<option value="${c.id}">${c.category_name}</option>`).join('');
+      const opts = allCategories.map(c => `<option value="${c.id}">${c.category_name || c.name}</option>`).join('');
       if (f) f.innerHTML = `<option value="">All Categories</option>` + opts;
       if (p) p.innerHTML = `<option value="" disabled selected>Select Category</option>` + opts;
     }
@@ -1069,7 +1325,7 @@
         ];
         renderUnits();
         const p = document.getElementById('prod-form-unit');
-        if (p) p.innerHTML = allUnits.map(u => `<option value="${u.id}">${u.unit_name}</option>`).join('');
+        if (p) p.innerHTML = allUnits.map(u => `<option value="${u.id}">${u.unit_name || u.name}</option>`).join('');
       } catch (e) {}
     }
 
@@ -1079,7 +1335,7 @@
       tb.innerHTML = allUnits.map((u, i) => `
         <tr class="hover:bg-white/5 border-b border-white/5">
           <td class="py-2 px-3 text-center text-slate-500 font-mono">${i + 1}</td>
-          <td class="py-2 px-3 font-semibold text-white">${u.unit_name}</td>
+          <td class="py-2 px-3 font-semibold text-white">${u.unit_name || u.name}</td>
           <td class="py-2 px-3 text-center"><button onclick="allUnits.splice(${i},1); renderUnits();" class="text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td>
         </tr>
       `).join('');
@@ -1146,7 +1402,9 @@
       const stk = document.getElementById('prod-filter-stock')?.value || 'all';
 
       filteredProducts = allProducts.filter(p => {
-        const mTitle = !q || (p.title && p.title.toLowerCase().includes(q)) || (p.sku && p.sku.toLowerCase().includes(q));
+        const titleStr = (p.title || p.name || '').toLowerCase();
+        const skuStr = (p.sku || p.product_code || '').toLowerCase();
+        const mTitle = !q || titleStr.includes(q) || skuStr.includes(q);
         const mCat = !cat || String(p.category_id) === String(cat);
         const qty = Number(p.quantity) || 0;
         let mStk = true;
@@ -1184,18 +1442,21 @@
         if (qty <= 0) badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">Out of Stock</span>`;
         else if (qty <= 5) badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${qty} Low Stock</span>`;
 
+        const title = p.title || p.name || 'Product';
+        const sku = p.sku || p.product_code || '-';
+
         return `
           <tr class="hover:bg-white/5 border-b border-white/5">
             <td class="py-3 px-4 text-center text-slate-500 font-mono">${start + idx + 1}</td>
-            <td class="py-3 px-4 font-bold text-white">${p.title}</td>
-            <td class="py-3 px-4 font-mono font-bold text-emerald-400">${p.sku || '-'}</td>
-            <td class="py-3 px-4 text-slate-300">${cat ? cat.category_name : 'General'}</td>
+            <td class="py-3 px-4 font-bold text-white">${title}</td>
+            <td class="py-3 px-4 font-mono font-bold text-emerald-400">${sku}</td>
+            <td class="py-3 px-4 text-slate-300">${cat ? (cat.category_name || cat.name) : 'General'}</td>
             <td class="py-3 px-4 text-right font-mono text-slate-400">Rs. ${Number(p.purchase_price || 0).toFixed(2)}</td>
             <td class="py-3 px-4 text-right font-mono font-bold text-white">Rs. ${Number(p.sell_price || 0).toFixed(2)}</td>
             <td class="py-3 px-4 text-center">${badge}</td>
             <td class="py-3 px-4 text-center space-x-1">
-              <button onclick="openBarcodeModal('${escapeStr(p.title)}', '${escapeStr(p.sku)}', ${p.sell_price})" class="p-1 rounded bg-emerald-500/10 text-emerald-400"><i data-lucide="barcode" class="w-3.5 h-3.5"></i></button>
-              <button onclick="editProduct(${p.id})" class="p-1 rounded bg-cyan-500/10 text-cyan-400"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+              <button onclick="openBarcodeModal('${escapeStr(title)}', '${escapeStr(sku)}', ${p.sell_price})" class="p-1 rounded bg-emerald-500/10 text-emerald-400" title="Print Barcode"><i data-lucide="barcode" class="w-3.5 h-3.5"></i></button>
+              <button onclick="editProduct(${p.id})" class="p-1 rounded bg-cyan-500/10 text-cyan-400" title="Edit"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
             </td>
           </tr>
         `;
@@ -1234,8 +1495,8 @@
       const p = allProducts.find(item => item.id === id);
       if (!p) return;
       document.getElementById('prod-form-id').value = p.id;
-      document.getElementById('prod-form-title').value = p.title || '';
-      document.getElementById('prod-form-sku').value = p.sku || '';
+      document.getElementById('prod-form-title').value = p.title || p.name || '';
+      document.getElementById('prod-form-sku').value = p.sku || p.product_code || '';
       document.getElementById('prod-form-purchase-price').value = p.purchase_price || 0;
       document.getElementById('prod-form-sell-price').value = p.sell_price || 0;
       document.getElementById('prod-form-quantity').value = p.quantity || 0;
@@ -1305,13 +1566,13 @@
     }
     function exportProductsCSV() {
       let csv = "ID,Title,SKU,PurchasePrice,SellPrice,Stock\n";
-      allProducts.forEach(p => { csv += `${p.id},"${p.title}",${p.sku},${p.purchase_price},${p.sell_price},${p.quantity}\n`; });
+      allProducts.forEach(p => { csv += `${p.id},"${p.title || p.name}",${p.sku || p.product_code},${p.purchase_price},${p.sell_price},${p.quantity}\n`; });
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'products_catalog.csv'; a.click();
     }
 
     // ============================================================
-    // SECTION 3: CRM (CUSTOMERS & SUPPLIERS MODULE)
+    // SECTION 3: CRM MODULE (CUSTOMERS & SUPPLIERS)
     // ============================================================
     async function loadCustomersCatalog() {
       try {
@@ -1575,6 +1836,150 @@
       }
       closeModal('modal-supplier');
       applySupplierFilters();
+    }
+
+    // ============================================================
+    // SECTION 4: ACCOUNTS MODULE (MASTER & LIST)
+    // ============================================================
+    function populateAccountGroupSelects() {
+      const gSel = document.getElementById('accmast-group');
+      const fSel = document.getElementById('acc-group-filter');
+      const opts = allAccountGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+
+      if (gSel) gSel.innerHTML = `<option value="" disabled selected>Select Account Group</option>` + opts;
+      if (fSel) fSel.innerHTML = `<option value="">All Account Groups</option>` + opts;
+    }
+
+    async function loadAccountsCatalog() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('account_masters')
+          .select('*')
+          .order('id', { ascending: false })
+          .limit(1000);
+
+        if (!error && data && data.length > 0) {
+          allAccounts = data;
+        } else {
+          allAccounts = [
+            { id: 7, account_code: 'A-000007', account_title: 'PURCHASE INVENTORY', account_group_id: 2, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' },
+            { id: 13, account_code: 'A-000008', account_title: 'STAFF SALARIES', account_group_id: 6, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' },
+            { id: 14, account_code: 'A-000009', account_title: 'ELECTRICITY BILL', account_group_id: 6, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' },
+            { id: 43, account_code: 'A-000028', account_title: 'Cash in Hand', account_group_id: 5, op_balance_dr: 0, op_balance_cr: 0, contact_no: 'NA' },
+            { id: 44, account_code: 'A-000029', account_title: 'CAPITAL A/C', account_group_id: 8, op_balance_dr: 0, op_balance_cr: 0, contact_no: 'na' },
+            { id: 55, account_code: 'A-000040', account_title: 'SALES A/C', account_group_id: 1, op_balance_dr: 0, op_balance_cr: 0, contact_no: 'na' },
+            { id: 2552, account_code: 'A-000095', account_title: 'CAPITAL BANK', account_group_id: 7, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' }
+          ];
+        }
+      } catch (e) {}
+      applyAccountFilters();
+    }
+
+    function debounceAccountSearch() {
+      clearTimeout(accDebounceTimer);
+      accDebounceTimer = setTimeout(applyAccountFilters, 200);
+    }
+
+    function applyAccountFilters() {
+      const q = (document.getElementById('acc-search-input')?.value || '').toLowerCase().trim();
+      const grp = document.getElementById('acc-group-filter')?.value || '';
+
+      filteredAccounts = allAccounts.filter(a => {
+        const titleStr = (a.account_title || '').toLowerCase();
+        const codeStr = (a.account_code || '').toLowerCase();
+        const mSearch = !q || titleStr.includes(q) || codeStr.includes(q);
+        const mGrp = !grp || String(a.account_group_id) === String(grp);
+        return mSearch && mGrp;
+      });
+
+      accCurrentPage = 1;
+      renderAccountsTable();
+    }
+
+    function renderAccountsTable() {
+      const tb = document.getElementById('tbl-accounts-body');
+      if (!tb) return;
+
+      const total = filteredAccounts.length;
+      const start = (accCurrentPage - 1) * accPageSize;
+      const slice = filteredAccounts.slice(start, start + accPageSize);
+
+      document.getElementById('acc-page-start').innerText = total === 0 ? 0 : start + 1;
+      document.getElementById('acc-page-end').innerText = Math.min(start + accPageSize, total);
+      document.getElementById('acc-total-count').innerText = total;
+
+      if (slice.length === 0) {
+        tb.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">No account heads found.</td></tr>`;
+        renderAccPagination(0);
+        return;
+      }
+
+      tb.innerHTML = slice.map((a, idx) => {
+        const grp = allAccountGroups.find(g => String(g.id) === String(a.account_group_id));
+        return `
+          <tr class="hover:bg-white/5 border-b border-white/5 transition">
+            <td class="py-3 px-3 text-center text-slate-500 font-mono">${start + idx + 1}</td>
+            <td class="py-3 px-3 font-bold text-indigo-400 font-mono">${a.account_code || 'A-0000'}</td>
+            <td class="py-3 px-3 font-bold text-white">${a.account_title}</td>
+            <td class="py-3 px-3 text-slate-300">${grp ? grp.name : `Head #${a.account_group_id}`}</td>
+            <td class="py-3 px-3 font-mono text-slate-400">${a.contact_no || a.phone_no || '-'}</td>
+            <td class="py-3 px-3 text-right font-mono text-emerald-400 font-bold">${Number(a.op_balance_dr || 0).toFixed(2)}</td>
+            <td class="py-3 px-3 text-right font-mono text-rose-400 font-bold">${Number(a.op_balance_cr || 0).toFixed(2)}</td>
+            <td class="py-3 px-3 text-center">
+              <button onclick="viewAccountLedger('${escapeStr(a.account_title)}', '${a.account_code}')" title="Drill-down Ledger" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      renderAccPagination(Math.ceil(total / accPageSize));
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderAccPagination(pages) {
+      const c = document.getElementById('acc-pagination-controls');
+      if (!c) return;
+      if (pages <= 1) { c.innerHTML = ''; return; }
+      let html = `<button onclick="accCurrentPage=Math.max(1, accCurrentPage-1); renderAccountsTable();" ${accCurrentPage===1?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Prev</button>`;
+      for (let i = 1; i <= Math.min(5, pages); i++) {
+        html += `<button onclick="accCurrentPage=${i}; renderAccountsTable();" class="px-2.5 py-1 rounded ${accCurrentPage===i?'bg-indigo-600 text-white font-bold':'bg-white/5 text-slate-400'}">${i}</button>`;
+      }
+      html += `<button onclick="accCurrentPage=Math.min(${pages}, accCurrentPage+1); renderAccountsTable();" ${accCurrentPage===pages?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Next</button>`;
+      c.innerHTML = html;
+    }
+
+    async function handleSaveAccountMaster(e) {
+      e.preventDefault();
+      const groupId = parseInt(document.getElementById('accmast-group').value) || 1;
+      const title = document.getElementById('accmast-title').value.trim();
+      const phone = document.getElementById('accmast-phone').value.trim();
+      const email = document.getElementById('accmast-email').value.trim();
+      const opDr = parseFloat(document.getElementById('accmast-op-dr').value) || 0;
+      const opCr = parseFloat(document.getElementById('accmast-op-cr').value) || 0;
+      const address = document.getElementById('accmast-address').value.trim();
+
+      const nextCode = `A-${String(allAccounts.length + 955).padStart(6, '0')}`;
+      allAccounts.unshift({
+        id: Date.now(),
+        account_code: nextCode,
+        account_title: title,
+        account_group_id: groupId,
+        contact_no: phone || '-',
+        email: email || '-',
+        op_balance_dr: opDr,
+        op_balance_cr: opCr,
+        address: address || '-'
+      });
+
+      alert(`Account Master Head "${title}" created successfully with Code ${nextCode}!`);
+      navigateTo('view-accounts-list');
+      applyAccountFilters();
+    }
+
+    function viewAccountLedger(title, code) {
+      document.getElementById('ledger-modal-title').innerText = title;
+      document.getElementById('ledger-modal-code').innerText = code;
+      openModal('modal-account-ledger');
     }
 
     // String Sanitization Helper

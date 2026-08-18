@@ -3,1990 +3,741 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ladies Outlet - POS360 Enterprise POS & ERP</title>
-  
-  <!-- Core Dependencies -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  
-  <!-- Google Fonts -->
+  <title>Enterprise ERP & POS Dashboard</title>
+  <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
   <style>
+    :root {
+      --bg-body: #f8fafc;
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #2563eb;
+      --sidebar-text: #94a3b8;
+      --sidebar-text-active: #ffffff;
+      --border-color: #334155;
+      --topbar-bg: #ffffff;
+      --topbar-border: #e2e8f0;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --sidebar-width: 280px;
+      --topbar-height: 64px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: radial-gradient(circle at 50% 0%, #17192b 0%, #0a0c16 100%);
-      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    /* Layout Wrapper */
+    .app-container {
+      display: flex;
       min-height: 100vh;
     }
-    .font-mono-code {
-      font-family: 'JetBrains Mono', monospace;
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      transition: var(--transition);
     }
 
-    /* 3D Depth Cards */
-    .depth-card {
-      background: linear-gradient(145deg, rgba(26, 29, 46, 0.9), rgba(15, 17, 30, 0.98));
-      box-shadow: 
-        0 12px 24px -6px rgba(0, 0, 0, 0.55),
-        0 4px 8px -2px rgba(0, 0, 0, 0.35),
-        inset 0 1px 1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
+    .sidebar-header {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      gap: 0.75rem;
     }
 
-    /* 3D Tactile Buttons */
-    .btn-3d {
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 6px 12px rgba(0, 0, 0, 0.3);
-      transition: all 0.12s ease;
-    }
-    .btn-3d:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
-    }
-    .btn-3d-emerald {
-      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
-      box-shadow: 0 4px 0 #047857;
-    }
-    .btn-3d-indigo {
-      background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
-      box-shadow: 0 4px 0 #3730a3;
-    }
-    .btn-3d-slate {
-      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
-      box-shadow: 0 4px 0 #0f172a;
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 700;
     }
 
-    /* Inset Panels */
-    .inset-panel {
-      background: rgba(10, 12, 22, 0.85);
-      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+    .brand-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.02em;
     }
 
-    /* Scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0.75rem;
+    }
 
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
+    .sidebar-nav::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background-color: #334155;
+      border-radius: 4px;
+    }
+
+    /* Menu Hierarchy */
+    .nav-group {
+      margin-bottom: 0.35rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      color: var(--sidebar-text);
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
       cursor: pointer;
-      opacity: 0.7;
+      text-decoration: none;
+      transition: var(--transition);
+      text-align: left;
     }
 
-    .active-subnav {
-      background: rgba(255, 255, 255, 0.08) !important;
-      color: #34d399 !important;
-      font-weight: 700 !important;
-      border-left: 2px solid #10b981;
+    .nav-item-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
-    @media print {
-      body * { visibility: hidden; }
-      #barcode-print-content, #barcode-print-content * { visibility: visible; }
-      #barcode-print-content { position: absolute; left: 0; top: 0; width: 50mm; margin: 0; padding: 0; }
+    .nav-item i.nav-icon {
+      width: 18px;
+      font-size: 0.95rem;
+      text-align: center;
+      color: #64748b;
+      transition: var(--transition);
+    }
+
+    .nav-item:hover {
+      background-color: var(--sidebar-hover);
+      color: #ffffff;
+    }
+
+    .nav-item:hover i.nav-icon {
+      color: var(--primary);
+    }
+
+    .nav-item.active {
+      background-color: var(--sidebar-active);
+      color: var(--sidebar-text-active);
+    }
+
+    .nav-item.active i.nav-icon {
+      color: var(--sidebar-text-active);
+    }
+
+    .arrow-icon {
+      font-size: 0.75rem;
+      transition: transform 0.25s ease;
+    }
+
+    .nav-group.open .arrow-icon {
+      transform: rotate(90deg);
+    }
+
+    /* Submenu styling */
+    .submenu {
+      list-style: none;
+      padding-left: 2.4rem;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      display: none;
+    }
+
+    .nav-group.open .submenu {
+      display: block;
+    }
+
+    .submenu-link {
+      display: block;
+      padding: 0.45rem 0.75rem;
+      color: #94a3b8;
+      font-size: 0.82rem;
+      font-weight: 400;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .submenu-link::before {
+      content: "";
+      position: absolute;
+      left: -0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: #475569;
+      transition: var(--transition);
+    }
+
+    .submenu-link:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .submenu-link:hover::before {
+      background-color: var(--primary);
+    }
+
+    .submenu-link.active {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    .submenu-link.active::before {
+      background-color: #60a5fa;
+      box-shadow: 0 0 6px rgba(96, 165, 250, 0.8);
+    }
+
+    /* Main Content Wrapper */
+    .main-wrapper {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Top Navigation Bar */
+    .topbar {
+      height: var(--topbar-height);
+      background-color: var(--topbar-bg);
+      border-bottom: 1px solid var(--topbar-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .menu-toggle-btn {
+      background: none;
+      border: 1px solid var(--topbar-border);
+      padding: 0.5rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    .current-page-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* Content Area */
+    .content-body {
+      padding: 2rem;
+      flex: 1;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--topbar-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-info span {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .stat-info h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+      color: var(--text-main);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .stat-icon.blue { background-color: #eff6ff; color: #2563eb; }
+    .stat-icon.green { background-color: #f0fdf4; color: #16a34a; }
+    .stat-icon.amber { background-color: #fffbeb; color: #d97706; }
+    .stat-icon.purple { background-color: #faf5ff; color: #9333ea; }
+
+    .placeholder-panel {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 2.5rem;
+      border: 1px solid var(--topbar-border);
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main-wrapper {
+        margin-left: 0;
+      }
+      .menu-toggle-btn {
+        display: block;
+      }
     }
   </style>
 </head>
-<body class="flex flex-col overflow-x-hidden">
+<body>
 
-  <!-- Mobile Overlay -->
-  <div id="mobile-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+<div class="app-container">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <i class="fa-solid fa-cubes"></i>
+      </div>
+      <span class="brand-name">Apex Core ERP</span>
+    </div>
 
-  <div class="flex-1 flex min-h-screen relative">
-
-    <!-- ============================================================ -->
-    <!-- SIDEBAR: ALL 14 ACCORDION SECTIONS                           -->
-    <!-- ============================================================ -->
-    <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#0e101f]/95 border-r border-white/10 flex flex-col justify-between backdrop-blur-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
-      
-      <!-- Brand Header -->
-      <div class="h-16 px-4 flex items-center justify-between border-b border-white/10 bg-black/40">
-        <div class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-lg">
-            L
+    <nav class="sidebar-nav">
+      <!-- 1. Dashboard -->
+      <div class="nav-group open">
+        <button class="nav-item active" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-gauge-high nav-icon"></i>
+            <span>Dashboard</span>
           </div>
-          <div>
-            <h1 class="text-sm font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent leading-none">
-              LADIES OUTLET
-            </h1>
-            <span class="text-[9px] font-semibold text-emerald-400 uppercase tracking-wider">POS360 Enterprise</span>
-          </div>
-        </div>
-        <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
         </button>
+        <ul class="submenu">
+          <li><a href="#dashboard-overview" class="submenu-link active" onclick="setActiveLink(event, 'Dashboard Overview')">Dashboard Overview</a></li>
+        </ul>
       </div>
 
-      <!-- Navigation Accordions (1 to 14) -->
-      <nav class="flex-1 overflow-y-auto p-3 space-y-1 text-xs">
-
-        <!-- 1. Dashboard -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-dash')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-400"></i>
-              <span>1. Dashboard</span>
-            </div>
-            <i data-lucide="chevron-down" id="chevron-acc-dash" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-dash" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1">
-            <a href="javascript:void(0)" onclick="navigateTo('view-dashboard', this)" class="subnav-link block py-1.5 px-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 active-subnav">Dashboard Overview</a>
+      <!-- 2. Master Profile -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-boxes-stacked nav-icon"></i>
+            <span>Master Profile</span>
           </div>
-        </div>
-
-        <!-- 2. Master Profile -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-master')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="layers" class="w-4 h-4 text-teal-400"></i>
-              <span>2. Master Profile</span>
-            </div>
-            <i data-lucide="chevron-down" id="chevron-acc-master" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-master" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="openCategoriesModal()" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Categories</a>
-            <a href="javascript:void(0)" onclick="openUnitsModal()" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Product Unit</a>
-            <a href="javascript:void(0)" onclick="openTaxModal()" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Tax Profile</a>
-            <a href="javascript:void(0)" onclick="openCreateProductModal()" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 text-emerald-400 font-semibold">+ Create Product</a>
-            <a href="javascript:void(0)" onclick="navigateTo('view-products-list', this)" class="subnav-link block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Products List</a>
-            <a href="javascript:void(0)" onclick="openImportProductModal()" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Import Product</a>
-          </div>
-        </div>
-
-        <!-- 3. CRM -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-crm')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="users" class="w-4 h-4 text-cyan-400"></i>
-              <span>3. CRM</span>
-            </div>
-            <i data-lucide="chevron-down" id="chevron-acc-crm" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-crm" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="navigateTo('view-crm-customers', this)" class="subnav-link block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">Manage Customers</a>
-            <a href="javascript:void(0)" onclick="navigateTo('view-crm-suppliers', this)" class="subnav-link block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-teal-300">Manage Suppliers</a>
-          </div>
-        </div>
-
-        <!-- 4. Accounts -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-accounts')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="landmark" class="w-4 h-4 text-blue-400"></i>
-              <span>4. Accounts</span>
-            </div>
-            <i data-lucide="chevron-down" id="chevron-acc-accounts" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-accounts" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="navigateTo('view-accounts-master', this)" class="subnav-link block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">+ Account Master</a>
-            <a href="javascript:void(0)" onclick="navigateTo('view-accounts-list', this)" class="subnav-link block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Account List</a>
-          </div>
-        </div>
-
-        <!-- 5. Purchase Invoice -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-purchases')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="truck" class="w-4 h-4 text-indigo-400"></i><span>5. Purchase Invoice</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-purchases" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-purchases" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('5. Purchase Invoice')" class="block py-1 px-2 rounded hover:text-white">Create Purchase</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('5. Purchase Invoice')" class="block py-1 px-2 rounded hover:text-white">Purchase List</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('5. Purchase Invoice')" class="block py-1 px-2 rounded hover:text-white">Purchase Return</a>
-          </div>
-        </div>
-
-        <!-- 6. POS Invoice -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-pos')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="shopping-cart" class="w-4 h-4 text-emerald-400"></i><span>6. POS Invoice</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-pos" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-pos" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('6. POS Invoice')" class="block py-1 px-2 rounded hover:text-white text-emerald-400">Create Invoice</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('6. POS Invoice')" class="block py-1 px-2 rounded hover:text-white">Sales List</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('6. POS Invoice')" class="block py-1 px-2 rounded hover:text-white">Sales Return</a>
-          </div>
-        </div>
-
-        <!-- 7. Stock Adjustment -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-stock-adj')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="sliders" class="w-4 h-4 text-amber-400"></i><span>7. Stock Adjustment</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-stock-adj" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-stock-adj" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('7. Stock Adjustment')" class="block py-1 px-2 rounded hover:text-white">Create Adjustment</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('7. Stock Adjustment')" class="block py-1 px-2 rounded hover:text-white">Adjustment List</a>
-          </div>
-        </div>
-
-        <!-- 8. Vouchers -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-vouchers')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="file-check" class="w-4 h-4 text-rose-400"></i><span>8. Vouchers</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-vouchers" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-vouchers" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Cash Receipt Voucher</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Cash Payment Voucher</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Bank Receipt Voucher</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Bank Payment Voucher</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('8. Vouchers')" class="block py-1 px-2 rounded hover:text-white">Create Journal</a>
-          </div>
-        </div>
-
-        <!-- 9. Purchase Reports -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-rep-pur')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="file-text" class="w-4 h-4 text-violet-400"></i><span>9. Purchase Reports</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-rep-pur" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-rep-pur" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('9. Purchase Reports')" class="block py-1 px-2 rounded hover:text-white">Date Wise Report</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('9. Purchase Reports')" class="block py-1 px-2 rounded hover:text-white">Purchase By Supplier</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('9. Purchase Reports')" class="block py-1 px-2 rounded hover:text-white">Product Wise Purchase</a>
-          </div>
-        </div>
-
-        <!-- 10. Sales Reports -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-rep-sales')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i><span>10. Sales Reports</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-rep-sales" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-rep-sales" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('10. Sales Reports')" class="block py-1 px-2 rounded hover:text-white">Daily Sales Summary</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('10. Sales Reports')" class="block py-1 px-2 rounded hover:text-white">Item Sale Report</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('10. Sales Reports')" class="block py-1 px-2 rounded hover:text-white">Customer Wise Sell Report</a>
-          </div>
-        </div>
-
-        <!-- 11. Stock Report -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-rep-stock')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="boxes" class="w-4 h-4 text-amber-400"></i><span>11. Stock Report</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-rep-stock" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-rep-stock" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('11. Stock Report')" class="block py-1 px-2 rounded hover:text-white">Stock Balance Report</a>
-          </div>
-        </div>
-
-        <!-- 12. Document Actions -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-doc-actions')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="printer" class="w-4 h-4 text-cyan-400"></i><span>12. Document Actions</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-doc-actions" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-doc-actions" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="exportProductsCSV()" class="block py-1 px-2 rounded hover:text-white">Download Product List</a>
-            <a href="javascript:void(0)" onclick="exportCustomersCSV()" class="block py-1 px-2 rounded hover:text-white">Print Customer List</a>
-          </div>
-        </div>
-
-        <!-- 13. Account Reports -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-rep-accounts')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="pie-chart" class="w-4 h-4 text-rose-400"></i><span>13. Account Reports</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-rep-accounts" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-rep-accounts" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('13. Account Reports')" class="block py-1 px-2 rounded hover:text-white">Day Book</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('13. Account Reports')" class="block py-1 px-2 rounded hover:text-white">Trial Balance</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('13. Account Reports')" class="block py-1 px-2 rounded hover:text-white">Balance Sheet</a>
-          </div>
-        </div>
-
-        <!-- 14. Administrative -->
-        <div class="nav-group">
-          <button onclick="toggleAccordion('acc-admin')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition">
-            <div class="flex items-center gap-2.5"><i data-lucide="settings" class="w-4 h-4 text-slate-400"></i><span>14. Administrative</span></div>
-            <i data-lucide="chevron-down" id="chevron-acc-admin" class="w-3.5 h-3.5 text-slate-500 transition-transform"></i>
-          </button>
-          <div id="acc-admin" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="javascript:void(0)" onclick="notifyNextPhase('14. Administrative')" class="block py-1 px-2 rounded hover:text-white">Application Settings</a>
-            <a href="javascript:void(0)" onclick="notifyNextPhase('14. Administrative')" class="block py-1 px-2 rounded hover:text-white">Audit Logs</a>
-          </div>
-        </div>
-
-      </nav>
-
-      <!-- Bottom User Profile Footer -->
-      <div class="p-3.5 border-t border-white/10 bg-black/40 flex items-center justify-between">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-xs">
-            HR
-          </div>
-          <div>
-            <p class="text-xs font-bold text-white leading-tight">HASSNAIN</p>
-            <p class="text-[10px] text-slate-400 font-mono-code">Main Terminal</p>
-          </div>
-        </div>
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#categories" class="submenu-link" onclick="setActiveLink(event, 'Categories')">Categories</a></li>
+          <li><a href="#product-unit" class="submenu-link" onclick="setActiveLink(event, 'Product Unit')">Product Unit</a></li>
+          <li><a href="#tax-profile" class="submenu-link" onclick="setActiveLink(event, 'Tax Profile')">Tax Profile</a></li>
+          <li><a href="#create-product" class="submenu-link" onclick="setActiveLink(event, 'Create Product')">Create Product</a></li>
+          <li><a href="#products-list" class="submenu-link" onclick="setActiveLink(event, 'Products List')">Products List</a></li>
+          <li><a href="#import-product" class="submenu-link" onclick="setActiveLink(event, 'Import Product')">Import Product</a></li>
+        </ul>
       </div>
-    </aside>
 
-    <!-- ============================================================ -->
-    <!-- MAIN WORKSPACE & TOPBAR                                      -->
-    <!-- ============================================================ -->
-    <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
+      <!-- 3. CRM -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-users-gear nav-icon"></i>
+            <span>CRM</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#manage-customers" class="submenu-link" onclick="setActiveLink(event, 'Manage Customers')">Manage Customers</a></li>
+          <li><a href="#manage-suppliers" class="submenu-link" onclick="setActiveLink(event, 'Manage Suppliers')">Manage Suppliers</a></li>
+        </ul>
+      </div>
 
-      <!-- Header Topbar -->
-      <header class="h-16 bg-[#0e101f]/90 border-b border-white/10 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
-        <div class="flex items-center space-x-3">
-          <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-          </button>
-          <div class="flex items-center space-x-2 text-xs">
-            <span class="text-slate-400 font-medium">WORKSPACE:</span>
-            <span id="topbar-current-route" class="font-bold text-white bg-white/5 border border-white/10 px-2.5 py-1 rounded-md">1. Dashboard Overview</span>
+      <!-- 4. Accounts -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-wallet nav-icon"></i>
+            <span>Accounts</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#account-master" class="submenu-link" onclick="setActiveLink(event, 'Account Master')">Account Master</a></li>
+          <li><a href="#account-list" class="submenu-link" onclick="setActiveLink(event, 'Account List')">Account List</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Purchase Invoice -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-cart-shopping nav-icon"></i>
+            <span>Purchase Invoice</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#create-purchase" class="submenu-link" onclick="setActiveLink(event, 'Create Purchase')">Create Purchase</a></li>
+          <li><a href="#purchase-list" class="submenu-link" onclick="setActiveLink(event, 'Purchase List')">Purchase List</a></li>
+          <li><a href="#purchase-return" class="submenu-link" onclick="setActiveLink(event, 'Purchase Return')">Purchase Return</a></li>
+        </ul>
+      </div>
+
+      <!-- 6. POS Invoice -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-cash-register nav-icon"></i>
+            <span>POS Invoice</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#create-invoice" class="submenu-link" onclick="setActiveLink(event, 'Create Invoice')">Create Invoice</a></li>
+          <li><a href="#sales-list" class="submenu-link" onclick="setActiveLink(event, 'Sales List')">Sales List</a></li>
+          <li><a href="#sales-return" class="submenu-link" onclick="setActiveLink(event, 'Sales Return')">Sales Return</a></li>
+        </ul>
+      </div>
+
+      <!-- 7. Stock Adjustment -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-sliders nav-icon"></i>
+            <span>Stock Adjustment</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#create-adjustment" class="submenu-link" onclick="setActiveLink(event, 'Create Adjustment')">Create Adjustment</a></li>
+          <li><a href="#adjustment-list" class="submenu-link" onclick="setActiveLink(event, 'Adjustment List')">Adjustment List</a></li>
+        </ul>
+      </div>
+
+      <!-- 8. Vouchers -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-receipt nav-icon"></i>
+            <span>Vouchers</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#cash-receipt" class="submenu-link" onclick="setActiveLink(event, 'Cash Receipt Voucher')">Cash Receipt Voucher</a></li>
+          <li><a href="#cash-payment" class="submenu-link" onclick="setActiveLink(event, 'Cash Payment Voucher')">Cash Payment Voucher</a></li>
+          <li><a href="#bank-receipt" class="submenu-link" onclick="setActiveLink(event, 'Bank Receipt Voucher')">Bank Receipt Voucher</a></li>
+          <li><a href="#bank-payment" class="submenu-link" onclick="setActiveLink(event, 'Bank Payment Voucher')">Bank Payment Voucher</a></li>
+          <li><a href="#create-journal" class="submenu-link" onclick="setActiveLink(event, 'Create Journal')">Create Journal</a></li>
+        </ul>
+      </div>
+
+      <!-- 9. Purchase Reports -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-chart-line nav-icon"></i>
+            <span>Purchase Reports</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#date-wise-report" class="submenu-link" onclick="setActiveLink(event, 'Date Wise Report')">Date Wise Report</a></li>
+          <li><a href="#purchase-by-supplier" class="submenu-link" onclick="setActiveLink(event, 'Purchase By Supplier')">Purchase By Supplier</a></li>
+          <li><a href="#product-wise-purchase" class="submenu-link" onclick="setActiveLink(event, 'Product Wise Purchase')">Product Wise Purchase</a></li>
+          <li><a href="#all-product-wise-purchase" class="submenu-link" onclick="setActiveLink(event, 'All Product Wise Purchase')">All Product Wise Purchase</a></li>
+        </ul>
+      </div>
+
+      <!-- 10. Sales Reports -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-chart-pie nav-icon"></i>
+            <span>Sales Reports</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#daily-sales-summary" class="submenu-link" onclick="setActiveLink(event, 'Daily Sales Summary')">Daily Sales Summary</a></li>
+          <li><a href="#item-sale-report" class="submenu-link" onclick="setActiveLink(event, 'Item Sale Report')">Item Sale Report</a></li>
+          <li><a href="#customer-wise-sell-report" class="submenu-link" onclick="setActiveLink(event, 'Customer Wise Sell Report')">Customer Wise Sell Report</a></li>
+          <li><a href="#sell-load-paper" class="submenu-link" onclick="setActiveLink(event, 'Sell Load Paper')">Sell Load Paper</a></li>
+          <li><a href="#item-sell-summary" class="submenu-link" onclick="setActiveLink(event, 'Item Sell Summary')">Item Sell Summary</a></li>
+        </ul>
+      </div>
+
+      <!-- 11. Stock Report -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-warehouse nav-icon"></i>
+            <span>Stock Report</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#stock-report" class="submenu-link" onclick="setActiveLink(event, 'Stock Report')">Stock Report</a></li>
+        </ul>
+      </div>
+
+      <!-- 12. Document Actions -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-file-invoice nav-icon"></i>
+            <span>Document Actions</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#download-product-list" class="submenu-link" onclick="setActiveLink(event, 'Download Product List')">Download Product List</a></li>
+          <li><a href="#print-customer-list" class="submenu-link" onclick="setActiveLink(event, 'Print Customer List')">Print Customer List</a></li>
+        </ul>
+      </div>
+
+      <!-- 13. Account Reports -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-scale-balanced nav-icon"></i>
+            <span>Account Reports</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#account-ledger" class="submenu-link" onclick="setActiveLink(event, 'Account Ledger')">Account Ledger</a></li>
+          <li><a href="#day-book" class="submenu-link" onclick="setActiveLink(event, 'Day Book')">Day Book</a></li>
+          <li><a href="#account-trail-balance" class="submenu-link" onclick="setActiveLink(event, 'Account Trail Balance')">Account Trail Balance</a></li>
+          <li><a href="#income-statement" class="submenu-link" onclick="setActiveLink(event, 'Income Statement')">Income Statement</a></li>
+          <li><a href="#trading-pls-statement" class="submenu-link" onclick="setActiveLink(event, 'Trading PLS Statement')">Trading PLS Statement</a></li>
+          <li><a href="#balance-sheet" class="submenu-link" onclick="setActiveLink(event, 'Balance Sheet')">Balance Sheet</a></li>
+        </ul>
+      </div>
+
+      <!-- 14. Administrative -->
+      <div class="nav-group">
+        <button class="nav-item" onclick="toggleDropdown(this)">
+          <div class="nav-item-content">
+            <i class="fa-solid fa-shield-halved nav-icon"></i>
+            <span>Administrative</span>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </button>
+        <ul class="submenu">
+          <li><a href="#audit-transactions" class="submenu-link" onclick="setActiveLink(event, 'Audit Transactions')">Audit Transactions</a></li>
+          <li><a href="#application-settings" class="submenu-link" onclick="setActiveLink(event, 'Application Settings')">Application Settings</a></li>
+          <li><a href="#database-backup" class="submenu-link" onclick="setActiveLink(event, 'Database Backup')">Database Backup</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Work Area -->
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="current-page-title" id="page-title">Dashboard Overview</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="user-profile">
+          <div class="user-avatar">AD</div>
+          <span style="font-size: 0.9rem; font-weight: 600;">Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span>Total Sales</span>
+            <h3>$124,560</h3>
+          </div>
+          <div class="stat-icon blue">
+            <i class="fa-solid fa-chart-simple"></i>
           </div>
         </div>
-
-        <div class="flex items-center space-x-3">
-          <button onclick="notifyNextPhase('6. POS Invoice (Rapid Cashier POS)')" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
-            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-            <span>Rapid Cashier POS</span>
-          </button>
-          <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-300 font-mono-code bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
-            <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span id="live-clock">--:--:--</span>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span>Total Purchases</span>
+            <h3>$82,340</h3>
+          </div>
+          <div class="stat-icon green">
+            <i class="fa-solid fa-cart-shopping"></i>
           </div>
         </div>
-      </header>
-
-      <!-- View Container Area -->
-      <main class="flex-1 p-4 sm:p-6 space-y-6 max-w-7xl w-full mx-auto">
-
-        <!-- ============================================================ -->
-        <!-- VIEW 1: DASHBOARD                                            -->
-        <!-- ============================================================ -->
-        <section id="view-dashboard" class="view-section space-y-6">
-          <!-- Filter Header -->
-          <div class="depth-card p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-extrabold text-white tracking-tight">Welcome to POS360</h2>
-              <p class="text-xs text-slate-400 mt-0.5">Real-time financial performance and analytics summary.</p>
-            </div>
-            <!-- Quick Date Filters -->
-            <div class="flex flex-wrap items-center gap-2 text-xs font-mono-code">
-              <div class="flex items-center space-x-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
-                <button onclick="setDashboardQuickFilter(7)" class="px-2.5 py-1 rounded-lg hover:bg-white/10 text-slate-300">Last 7 Days</button>
-                <button onclick="setDashboardQuickFilter(30)" class="px-2.5 py-1 rounded-lg hover:bg-white/10 text-slate-300">Last 30 Days</button>
-                <button onclick="setDashboardQuickFilter(90)" class="px-2.5 py-1 rounded-lg hover:bg-white/10 text-slate-300">Last 90 Days</button>
-                <button onclick="setDashboardThisMonth()" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold">This Month</button>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <input type="date" id="dash-start" value="2026-08-01" class="bg-[#121426] border border-white/10 rounded-lg px-2.5 py-1.5 text-white outline-none">
-                <input type="date" id="dash-end" value="2026-08-17" class="bg-[#121426] border border-white/10 rounded-lg px-2.5 py-1.5 text-white outline-none">
-                <button onclick="renderDashboardCharts()" class="btn-3d btn-3d-indigo px-3 py-1.5 rounded-lg text-white font-bold">Filter</button>
-              </div>
-            </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span>Active Customers</span>
+            <h3>1,420</h3>
           </div>
-
-          <!-- KPI Cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono-code">
-            <div class="depth-card p-5 rounded-2xl border-l-4 border-emerald-500">
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">THIS MONTH SALES</span>
-              <h3 class="text-2xl font-black text-white mt-1">Rs. 275,713.00</h3>
-            </div>
-            <div class="depth-card p-5 rounded-2xl border-l-4 border-indigo-500">
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL SALES</span>
-              <h3 class="text-2xl font-black text-emerald-400 mt-1">Rs. 6,530,233.00</h3>
-            </div>
-            <div class="depth-card p-5 rounded-2xl border-l-4 border-amber-500">
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">THIS MONTH PURCHASE</span>
-              <h3 class="text-2xl font-black text-white mt-1">Rs. 373,885.00</h3>
-            </div>
-            <div class="depth-card p-5 rounded-2xl border-l-4 border-purple-500">
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL PURCHASE</span>
-              <h3 class="text-2xl font-black text-indigo-300 mt-1">Rs. 4,517,017.40</h3>
-            </div>
+          <div class="stat-icon purple">
+            <i class="fa-solid fa-users"></i>
           </div>
-
-          <!-- Charts -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <div class="depth-card p-5 rounded-2xl lg:col-span-2 space-y-3">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i> Sales Overview</h3>
-              <div class="h-64"><canvas id="salesChart"></canvas></div>
-            </div>
-            <div class="depth-card p-5 rounded-2xl space-y-3">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i> Sales vs Expenses</h3>
-              <div class="h-64"><canvas id="salesExpensesChart"></canvas></div>
-            </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span>Stock Value</span>
+            <h3>$45,890</h3>
           </div>
-
-          <!-- Trending & Low Stock Tables -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-xs">
-            <div class="depth-card p-5 rounded-2xl space-y-3">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i> Trending Products</h3>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left font-mono-code">
-                  <thead><tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]"><th class="py-2">#</th><th class="py-2">Product</th><th class="py-2 text-right">Sales (Rs.)</th><th class="py-2 text-center">Qty</th></tr></thead>
-                  <tbody id="tbl-dash-trending" class="divide-y divide-white/5"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="depth-card p-5 rounded-2xl space-y-3">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i> Low Stock Alert</h3>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left font-mono-code">
-                  <thead><tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]"><th class="py-2">#</th><th class="py-2">Product SKU</th><th class="py-2 text-center">Stock</th><th class="py-2 text-center">Status</th></tr></thead>
-                  <tbody id="tbl-dash-lowstock" class="divide-y divide-white/5"></tbody>
-                </table>
-              </div>
-            </div>
+          <div class="stat-icon amber">
+            <i class="fa-solid fa-warehouse"></i>
           </div>
-        </section>
+        </div>
+      </div>
 
-        <!-- ============================================================ -->
-        <!-- VIEW 2: PRODUCTS LIST (SECTION 2: MASTER PROFILE)            -->
-        <!-- ============================================================ -->
-        <section id="view-products-list" class="view-section hidden space-y-5">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-extrabold text-white tracking-tight">Products Catalog</h2>
-              <p class="text-xs text-slate-400 mt-0.5">Master stock catalog with barcode printing and multi-level filtering.</p>
-            </div>
-            <div class="flex items-center space-x-2.5">
-              <button onclick="openCreateProductModal()" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
-                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> + Create Product
-              </button>
-              <button onclick="openImportProductModal()" class="btn-3d btn-3d-slate px-3.5 py-2 rounded-lg text-xs font-bold text-slate-200 border border-white/10 flex items-center gap-1.5">
-                <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Import CSV
-              </button>
-            </div>
-          </div>
-
-          <!-- Product Filter Toolbar -->
-          <div class="depth-card p-4 rounded-xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
-            <div class="flex-1 w-full md:w-auto relative">
-              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-              <input type="text" id="prod-filter-search" oninput="debounceProductSearch()" placeholder="Search by Product Title or Barcode / SKU..." class="w-full bg-[#121426] border border-white/10 rounded-lg pl-9 pr-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition font-mono-code">
-            </div>
-            <div class="flex items-center space-x-2.5 w-full md:w-auto">
-              <select id="prod-filter-category" onchange="applyProductFilters()" class="bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none"></select>
-              <select id="prod-filter-stock" onchange="applyProductFilters()" class="bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none">
-                <option value="all">All Stock Levels</option>
-                <option value="low">Low Stock (&le; 5)</option>
-                <option value="out">Out of Stock (0)</option>
-              </select>
-              <button onclick="loadProductsCatalog(true)" title="Refresh" class="p-2 rounded-lg bg-[#121426] border border-white/10 text-slate-400 hover:text-white">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Products Table -->
-          <div class="depth-card rounded-xl border border-white/10 overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr class="border-b border-white/10 bg-[#121426]/90 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                    <th class="py-3.5 px-4 w-12 text-center">#</th>
-                    <th class="py-3.5 px-4">Product Title</th>
-                    <th class="py-3.5 px-4">Barcode / SKU</th>
-                    <th class="py-3.5 px-4">Category</th>
-                    <th class="py-3.5 px-4 text-right">Purchase Price</th>
-                    <th class="py-3.5 px-4 text-right">Selling Price</th>
-                    <th class="py-3.5 px-4 text-center">Stock Level</th>
-                    <th class="py-3.5 px-4 text-center w-28">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="tbl-products-body" class="divide-y divide-white/5 font-medium"></tbody>
-              </table>
-            </div>
-
-            <!-- Products Pagination -->
-            <div class="p-4 border-t border-white/10 bg-[#121426]/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div class="text-slate-400 font-mono-code text-[11px]">
-                Showing <span id="prod-page-start" class="font-bold text-white">0</span> to <span id="prod-page-end" class="font-bold text-white">0</span> of <span id="prod-total-count" class="font-bold text-white">0</span> entries
-              </div>
-              <div class="flex items-center space-x-1 font-mono-code" id="prod-pagination-controls"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- VIEW 3: MANAGE CUSTOMERS (SECTION 3: CRM)                    -->
-        <!-- ============================================================ -->
-        <section id="view-crm-customers" class="view-section hidden space-y-5">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-extrabold text-white tracking-tight">Customer Directory (CRM)</h2>
-              <p class="text-xs text-slate-400 mt-0.5">842+ registered clientele records, loyalty ledger, and measurements history.</p>
-            </div>
-            <div class="flex items-center space-x-2">
-              <button onclick="exportCustomersCSV()" class="btn-3d btn-3d-slate px-3 py-2 rounded-lg text-xs font-bold text-slate-200 border border-white/10 flex items-center gap-1">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
-              </button>
-              <button onclick="openCustomerModal()" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
-                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> + New Customer
-              </button>
-            </div>
-          </div>
-
-          <!-- Customer Filter Toolbar -->
-          <div class="depth-card p-4 rounded-xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
-            <div class="flex-1 w-full md:w-auto relative">
-              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-              <input type="text" id="cust-search-input" oninput="debounceCustomerSearch()" placeholder="Search by customer name, phone number, or account code..." class="w-full bg-[#121426] border border-white/10 rounded-lg pl-9 pr-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition font-mono-code">
-            </div>
-            <div class="flex items-center space-x-2.5 text-xs text-slate-400 font-mono-code">
-              <span>Show</span>
-              <select id="cust-page-size" onchange="changeCustomerPageSize(this.value)" class="bg-[#121426] border border-white/10 rounded px-2.5 py-1.5 text-white outline-none">
-                <option value="10">10</option>
-                <option value="25" selected>25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="all">All</option>
-              </select>
-              <span>entries</span>
-            </div>
-          </div>
-
-          <!-- Customers Table -->
-          <div class="depth-card rounded-xl border border-white/10 overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr class="border-b border-white/10 bg-[#121426]/90 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                    <th class="py-3.5 px-3 w-12 text-center">Sr#</th>
-                    <th class="py-3.5 px-3">Account Code</th>
-                    <th class="py-3.5 px-3">Full Name</th>
-                    <th class="py-3.5 px-3">Phone Number</th>
-                    <th class="py-3.5 px-3">Address</th>
-                    <th class="py-3.5 px-3 text-center">Loyalty Points</th>
-                    <th class="py-3.5 px-3 text-right">Closing Balance</th>
-                    <th class="py-3.5 px-3 text-center w-28">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="tbl-customers-body" class="divide-y divide-white/5 font-medium"></tbody>
-              </table>
-            </div>
-
-            <!-- Customers Pagination -->
-            <div class="p-4 border-t border-white/10 bg-[#121426]/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div class="text-slate-400 font-mono-code text-[11px]">
-                Showing <span id="cust-page-start" class="font-bold text-white">0</span> to <span id="cust-page-end" class="font-bold text-white">0</span> of <span id="cust-total-count" class="font-bold text-white">0</span> customers
-              </div>
-              <div class="flex items-center space-x-1 font-mono-code" id="cust-pagination-controls"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- VIEW 4: MANAGE SUPPLIERS (SECTION 3: CRM)                    -->
-        <!-- ============================================================ -->
-        <section id="view-crm-suppliers" class="view-section hidden space-y-5">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-extrabold text-white tracking-tight">Supplier Directory (CRM)</h2>
-              <p class="text-xs text-slate-400 mt-0.5">Merchant vendor ledgers, debit/credit balances, and contacts.</p>
-            </div>
-            <button onclick="openSupplierModal()" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i> + Add New Supplier
-            </button>
-          </div>
-
-          <!-- Supplier Search -->
-          <div class="depth-card p-4 rounded-xl border border-white/10">
-            <div class="relative">
-              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-              <input type="text" id="supp-search-input" oninput="debounceSupplierSearch()" placeholder="Search suppliers by name, code, contact or email..." class="w-full bg-[#121426] border border-white/10 rounded-lg pl-9 pr-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 transition font-mono-code">
-            </div>
-          </div>
-
-          <!-- Suppliers Table -->
-          <div class="depth-card rounded-xl border border-white/10 overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr class="border-b border-white/10 bg-[#121426]/90 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                    <th class="py-3.5 px-3 w-12 text-center">Sr#</th>
-                    <th class="py-3.5 px-3">Code</th>
-                    <th class="py-3.5 px-3">Company / Name</th>
-                    <th class="py-3.5 px-3">Phone</th>
-                    <th class="py-3.5 px-3">Address</th>
-                    <th class="py-3.5 px-3 text-right">Balance (Rs.)</th>
-                    <th class="py-3.5 px-3 text-center w-28">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="tbl-suppliers-body" class="divide-y divide-white/5 font-medium"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- VIEW 5: ACCOUNT MASTER (SECTION 4: ACCOUNTS)                 -->
-        <!-- ============================================================ -->
-        <section id="view-accounts-master" class="view-section hidden space-y-5">
-          <div class="depth-card p-6 rounded-2xl max-w-3xl mx-auto space-y-5">
-            <div class="flex items-center justify-between border-b border-white/10 pb-3">
-              <div>
-                <h2 class="text-lg font-extrabold text-white">Create Account Master</h2>
-                <p class="text-xs text-slate-400">Configure General Ledger Account Heads across all 9 Account Groups.</p>
-              </div>
-              <button onclick="navigateTo('view-accounts-list')" class="btn-3d btn-3d-slate px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-200">
-                View Account List
-              </button>
-            </div>
-
-            <form onsubmit="handleSaveAccountMaster(event)" class="space-y-4 text-xs font-medium">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-slate-300 font-bold mb-1">Select Account Group *</label>
-                  <select id="accmast-group" required class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none focus:border-emerald-500"></select>
-                </div>
-                <div>
-                  <label class="block text-slate-300 font-bold mb-1">Enter Account Title *</label>
-                  <input type="text" id="accmast-title" required placeholder="e.g. DAILY EXPENSES" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none focus:border-emerald-500">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono-code">
-                <div>
-                  <label class="block text-slate-300 font-bold mb-1">Phone / Contact No.</label>
-                  <input type="text" id="accmast-phone" placeholder="03211234567" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none">
-                </div>
-                <div>
-                  <label class="block text-slate-300 font-bold mb-1">Email Address</label>
-                  <input type="email" id="accmast-email" placeholder="account@outlet.com" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono-code">
-                <div>
-                  <label class="block text-slate-300 font-bold mb-1">Opening Balance (Dr)</label>
-                  <input type="number" step="0.01" id="accmast-op-dr" value="0.00" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-emerald-400 font-bold text-right outline-none">
-                </div>
-                <div>
-                  <label class="block text-slate-300 font-bold mb-1">Opening Balance (Cr)</label>
-                  <input type="number" step="0.01" id="accmast-op-cr" value="0.00" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-rose-400 font-bold text-right outline-none">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-slate-300 font-bold mb-1">Address / Notes</label>
-                <textarea id="accmast-address" rows="2" placeholder="Account head details..." class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none"></textarea>
-              </div>
-
-              <div class="pt-3 border-t border-white/10 flex justify-end">
-                <button type="submit" class="btn-3d btn-3d-emerald px-6 py-2.5 rounded-lg text-white font-bold text-xs shadow-md shadow-emerald-500/20">
-                  Save Account Head
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- VIEW 6: ACCOUNT LIST (SECTION 4: ACCOUNTS)                   -->
-        <!-- ============================================================ -->
-        <section id="view-accounts-list" class="view-section hidden space-y-5">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-extrabold text-white tracking-tight">All Account List</h2>
-              <p class="text-xs text-slate-400 mt-0.5">Chart of accounts directory and real-time ledger drill-down.</p>
-            </div>
-            <button onclick="navigateTo('view-accounts-master')" class="btn-3d btn-3d-emerald px-3.5 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i> + New Account
-            </button>
-          </div>
-
-          <!-- Account Filter Toolbar -->
-          <div class="depth-card p-4 rounded-xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
-            <div class="flex-1 w-full md:w-auto relative">
-              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-              <input type="text" id="acc-search-input" oninput="debounceAccountSearch()" placeholder="Search by title, account code, or contact..." class="w-full bg-[#121426] border border-white/10 rounded-lg pl-9 pr-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition font-mono-code">
-            </div>
-            <div class="flex items-center space-x-2.5 w-full md:w-auto">
-              <select id="acc-group-filter" onchange="applyAccountFilters()" class="bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none">
-                <option value="">All Account Groups</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Accounts Table -->
-          <div class="depth-card rounded-xl border border-white/10 overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr class="border-b border-white/10 bg-[#121426]/90 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                    <th class="py-3.5 px-3 w-12 text-center">Sr#</th>
-                    <th class="py-3.5 px-3">Code</th>
-                    <th class="py-3.5 px-3">Account Title</th>
-                    <th class="py-3.5 px-3">Group</th>
-                    <th class="py-3.5 px-3">Phone No.</th>
-                    <th class="py-3.5 px-3 text-right">Opening (Dr)</th>
-                    <th class="py-3.5 px-3 text-right">Opening (Cr)</th>
-                    <th class="py-3.5 px-3 text-center w-20">Action</th>
-                  </tr>
-                </thead>
-                <tbody id="tbl-accounts-body" class="divide-y divide-white/5 font-medium"></tbody>
-              </table>
-            </div>
-
-            <!-- Accounts Pagination -->
-            <div class="p-4 border-t border-white/10 bg-[#121426]/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div class="text-slate-400 font-mono-code text-[11px]">
-                Showing <span id="acc-page-start" class="font-bold text-white">0</span> to <span id="acc-page-end" class="font-bold text-white">0</span> of <span id="acc-total-count" class="font-bold text-white">0</span> accounts
-              </div>
-              <div class="flex items-center space-x-1 font-mono-code" id="acc-pagination-controls"></div>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
+      <div class="placeholder-panel">
+        <h2 id="view-heading" style="color: var(--text-main); margin-bottom: 0.5rem;">Dashboard Overview</h2>
+        <p>Select any module from the sidebar to manage invoices, accounts, vouchers, and generated reports.</p>
+      </div>
+    </main>
   </div>
+</div>
 
-  <!-- ============================================================ -->
-  <!-- MODAL OVERLAYS (ROOT LEVEL DOM)                              -->
-  <!-- ============================================================ -->
+<script>
+  function toggleDropdown(buttonElement) {
+    const currentGroup = buttonElement.closest('.nav-group');
+    const isOpen = currentGroup.classList.contains('open');
 
-  <!-- Categories Modal -->
-  <div id="modal-categories" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-lg rounded-2xl border border-white/15 overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="h-14 px-5 border-b border-white/10 bg-[#121426] flex items-center justify-between">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="folder-tree" class="w-4 h-4 text-teal-400"></i> Categories Directory</h3>
-        <button onclick="closeModal('modal-categories')" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="p-5 overflow-y-auto space-y-4">
-        <form onsubmit="handleSaveCategory(event)" class="flex items-center space-x-2">
-          <input type="text" id="cat-name-input" required placeholder="New Category Name..." class="flex-1 bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500">
-          <button type="submit" class="btn-3d btn-3d-emerald px-4 py-2 rounded-lg text-xs font-bold text-white">+ Add</button>
-        </form>
-        <div class="rounded-lg border border-white/10 overflow-hidden bg-[#121426]/50 max-h-60 overflow-y-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-[#121426] border-b border-white/10 text-slate-400 font-bold uppercase text-[10px]">
-              <tr><th class="py-2.5 px-3 w-12 text-center">#</th><th class="py-2.5 px-3">Category Name</th><th class="py-2.5 px-3 text-center w-20">Action</th></tr>
-            </thead>
-            <tbody id="tbl-categories-body" class="divide-y divide-white/5"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Units Modal -->
-  <div id="modal-units" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-md rounded-2xl border border-white/15 overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="h-14 px-5 border-b border-white/10 bg-[#121426] flex items-center justify-between">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="scale" class="w-4 h-4 text-cyan-400"></i> Product Units</h3>
-        <button onclick="closeModal('modal-units')" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="p-5 space-y-4">
-        <form onsubmit="handleSaveUnit(event)" class="flex items-center space-x-2">
-          <input type="text" id="unit-name-input" required placeholder="Unit (Piece, Meter, Box)..." class="flex-1 bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-          <button type="submit" class="btn-3d btn-3d-emerald px-4 py-2 rounded-lg text-xs font-bold text-white">+ Add</button>
-        </form>
-        <div class="rounded-lg border border-white/10 overflow-hidden bg-[#121426]/50 max-h-52 overflow-y-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-[#121426] border-b border-white/10 text-slate-400 font-bold uppercase text-[10px]">
-              <tr><th class="py-2 px-3 w-12 text-center">#</th><th class="py-2 px-3">Unit</th><th class="py-2 px-3 text-center w-20">Action</th></tr>
-            </thead>
-            <tbody id="tbl-units-body" class="divide-y divide-white/5"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tax Modal -->
-  <div id="modal-tax-profile" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-md rounded-2xl border border-white/15 overflow-hidden shadow-2xl flex flex-col">
-      <div class="h-14 px-5 border-b border-white/10 bg-[#121426] flex items-center justify-between">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="percent" class="w-4 h-4 text-emerald-400"></i> Tax Rates</h3>
-        <button onclick="closeModal('modal-tax-profile')" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="p-5 space-y-4">
-        <form onsubmit="handleSaveTax(event)" class="grid grid-cols-4 gap-2">
-          <input type="text" id="tax-name-input" required placeholder="Tax Name" class="col-span-2 bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-xs text-white">
-          <input type="number" step="0.01" id="tax-val-input" required placeholder="%" class="col-span-1 bg-[#121426] border border-white/10 rounded-lg px-2 py-2 text-xs text-white text-right font-mono-code">
-          <button type="submit" class="btn-3d btn-3d-emerald py-2 rounded-lg text-xs font-bold text-white">Add</button>
-        </form>
-        <div id="tax-list-container" class="space-y-1.5 inset-panel p-2.5 rounded-xl text-xs max-h-48 overflow-y-auto font-mono-code"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Create Product Modal -->
-  <div id="modal-create-product" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-2xl rounded-2xl border border-white/15 overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
-      <div class="h-14 px-6 border-b border-white/10 bg-[#121426] flex items-center justify-between">
-        <h3 id="product-modal-heading" class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="package-plus" class="w-4 h-4 text-emerald-400"></i> Add New Product</h3>
-        <button onclick="closeModal('modal-create-product')" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <form id="form-product-master" onsubmit="handleSaveProduct(event)" class="p-6 overflow-y-auto space-y-4 text-xs">
-        <input type="hidden" id="prod-form-id" value="">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-slate-300 font-bold mb-1">Product Title *</label>
-            <input type="text" id="prod-form-title" required placeholder="e.g. ZELLBURY MUSK 2PC" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white">
-          </div>
-          <div>
-            <label class="block text-slate-300 font-bold mb-1">Barcode / SKU *</label>
-            <div class="flex gap-1.5">
-              <input type="text" id="prod-form-sku" required placeholder="P-001357" class="flex-1 bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white font-mono-code">
-              <button type="button" onclick="generateNextProductSKU()" class="btn-3d btn-3d-slate px-3 py-2 text-slate-200 font-bold rounded-lg">Auto</button>
-            </div>
-          </div>
-        </div>
-        <div class="grid grid-cols-3 gap-4">
-          <div><label class="block text-slate-300 font-bold mb-1">Category *</label><select id="prod-form-category" required class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white"></select></div>
-          <div><label class="block text-slate-300 font-bold mb-1">Unit *</label><select id="prod-form-unit" required class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white"></select></div>
-          <div><label class="block text-slate-300 font-bold mb-1">Tax *</label><select id="prod-form-tax" required class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white"></select></div>
-        </div>
-        <div class="grid grid-cols-3 gap-4 font-mono-code">
-          <div><label class="block text-slate-300 font-bold mb-1">Purchase Price (Rs.) *</label><input type="number" step="0.01" id="prod-form-purchase-price" required placeholder="0.00" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white text-right"></div>
-          <div><label class="block text-slate-300 font-bold mb-1">Sale Price (Rs.) *</label><input type="number" step="0.01" id="prod-form-sell-price" required placeholder="0.00" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-emerald-400 font-bold text-right"></div>
-          <div><label class="block text-slate-300 font-bold mb-1">Stock Level</label><input type="number" id="prod-form-quantity" value="0" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3.5 py-2 text-white text-right"></div>
-        </div>
-        <div class="pt-3 border-t border-white/10 flex justify-end gap-2">
-          <button type="button" onclick="closeModal('modal-create-product')" class="btn-3d btn-3d-slate px-4 py-2 rounded-lg text-slate-300">Cancel</button>
-          <button type="submit" class="btn-3d btn-3d-emerald px-6 py-2 rounded-lg font-bold text-white">Save Product</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- CSV Import Modal -->
-  <div id="modal-import-product" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-lg rounded-2xl border border-white/15 overflow-hidden shadow-2xl p-5 space-y-4">
-      <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="file-up" class="w-4 h-4 text-emerald-400"></i> Import Products from CSV</h3>
-        <button onclick="closeModal('modal-import-product')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <input type="file" id="csv-file-input" accept=".csv" class="text-xs text-slate-400" onchange="handleCSVFileSelected(event)">
-      <div class="flex justify-between items-center pt-2">
-        <button onclick="downloadCSVTemplate()" class="text-xs text-emerald-400 underline font-semibold">Download CSV Template</button>
-        <button onclick="processProductCSVImport()" id="btn-process-csv" disabled class="btn-3d btn-3d-emerald px-4 py-2 rounded-lg text-xs font-bold text-white disabled:opacity-40">Import</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Barcode Label Modal -->
-  <div id="modal-barcode-print" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-xs rounded-2xl border border-white/15 overflow-hidden p-4 space-y-3">
-      <div class="flex justify-between items-center border-b border-white/10 pb-2">
-        <span class="text-xs font-bold text-white">Print Label Tag (50x25mm)</span>
-        <button onclick="closeModal('modal-barcode-print')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="p-3 bg-white text-black text-center rounded-lg" id="barcode-print-content">
-        <p class="text-[10px] font-black uppercase tracking-wider">LADIES OUTLET</p>
-        <p id="barcode-print-title" class="text-[9px] font-semibold line-clamp-1">Product Title</p>
-        <svg id="barcode-canvas" class="mx-auto my-1"></svg>
-        <p id="barcode-print-price" class="text-xs font-black font-mono">Rs. 0.00</p>
-      </div>
-      <button onclick="window.print()" class="btn-3d btn-3d-emerald w-full py-2 rounded-lg text-xs font-bold text-white">Print Label</button>
-    </div>
-  </div>
-
-  <!-- Customer Modal -->
-  <div id="modal-customer" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-md rounded-2xl border border-white/15 overflow-hidden p-5 space-y-4">
-      <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <h3 id="modal-customer-title" class="text-sm font-bold text-white">Add New Customer</h3>
-        <button onclick="closeModal('modal-customer')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <form onsubmit="handleSaveCustomer(event)" class="space-y-3 text-xs">
-        <input type="hidden" id="cust-id">
-        <div><label class="block text-slate-300 font-bold mb-1">Customer Name *</label><input type="text" id="cust-name" required class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white"></div>
-        <div><label class="block text-slate-300 font-bold mb-1">Phone Number</label><input type="text" id="cust-phone" placeholder="03001234567" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white font-mono-code"></div>
-        <div><label class="block text-slate-300 font-bold mb-1">Address</label><input type="text" id="cust-address" placeholder="City or area" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white"></div>
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeModal('modal-customer')" class="btn-3d btn-3d-slate px-3 py-1.5 rounded-lg text-slate-300">Cancel</button>
-          <button type="submit" class="btn-3d btn-3d-emerald px-5 py-1.5 rounded-lg text-white font-bold">Save Customer</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Supplier Modal -->
-  <div id="modal-supplier" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-md rounded-2xl border border-white/15 overflow-hidden p-5 space-y-4">
-      <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <h3 id="modal-supplier-title" class="text-sm font-bold text-white">Add New Supplier</h3>
-        <button onclick="closeModal('modal-supplier')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <form onsubmit="handleSaveSupplier(event)" class="space-y-3 text-xs">
-        <input type="hidden" id="supp-id">
-        <div><label class="block text-slate-300 font-bold mb-1">Company / Supplier Title *</label><input type="text" id="supp-name" required class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white"></div>
-        <div><label class="block text-slate-300 font-bold mb-1">Phone Number</label><input type="text" id="supp-phone" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white font-mono-code"></div>
-        <div><label class="block text-slate-300 font-bold mb-1">Address</label><input type="text" id="supp-address" class="w-full bg-[#121426] border border-white/10 rounded-lg px-3 py-2 text-white"></div>
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeModal('modal-supplier')" class="btn-3d btn-3d-slate px-3 py-1.5 rounded-lg text-slate-300">Cancel</button>
-          <button type="submit" class="btn-3d btn-3d-emerald px-5 py-1.5 rounded-lg text-white font-bold">Save Supplier</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Customer Measurement Modal -->
-  <div id="modal-customer-measurements" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-lg rounded-2xl border border-white/15 overflow-hidden p-5 space-y-4">
-      <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <div>
-          <h3 id="meas-cust-name" class="text-sm font-bold text-white">Client Measurements</h3>
-          <p id="meas-cust-code" class="text-[10px] text-emerald-400 font-mono-code">A-000000</p>
-        </div>
-        <button onclick="closeModal('modal-customer-measurements')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="grid grid-cols-3 gap-3 font-mono-code text-xs">
-        <div class="bg-[#121426] p-2.5 rounded-lg border border-white/5"><span class="text-slate-500 block text-[10px]">Kameez Length:</span><span class="font-bold text-white">38.5 in</span></div>
-        <div class="bg-[#121426] p-2.5 rounded-lg border border-white/5"><span class="text-slate-500 block text-[10px]">Chest:</span><span class="font-bold text-white">20.0 in</span></div>
-        <div class="bg-[#121426] p-2.5 rounded-lg border border-white/5"><span class="text-slate-500 block text-[10px]">Waist:</span><span class="font-bold text-white">18.5 in</span></div>
-        <div class="bg-[#121426] p-2.5 rounded-lg border border-white/5"><span class="text-slate-500 block text-[10px]">Shoulder / Teera:</span><span class="font-bold text-white">14.5 in</span></div>
-        <div class="bg-[#121426] p-2.5 rounded-lg border border-white/5"><span class="text-slate-500 block text-[10px]">Sleeve Length:</span><span class="font-bold text-white">21.0 in</span></div>
-        <div class="bg-[#121426] p-2.5 rounded-lg border border-white/5"><span class="text-slate-500 block text-[10px]">Trouser Length:</span><span class="font-bold text-white">37.0 in</span></div>
-      </div>
-      <div class="pt-2 flex justify-end">
-        <button onclick="closeModal('modal-customer-measurements')" class="btn-3d btn-3d-slate px-4 py-2 rounded-lg text-xs text-white">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Account Drill-Down Ledger Modal -->
-  <div id="modal-account-ledger" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="depth-card w-full max-w-2xl rounded-2xl border border-white/15 overflow-hidden p-5 space-y-4">
-      <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <div>
-          <h3 id="ledger-modal-title" class="text-sm font-bold text-white">General Ledger Summary</h3>
-          <p id="ledger-modal-code" class="text-[10px] text-indigo-400 font-mono-code">A-000000</p>
-        </div>
-        <button onclick="closeModal('modal-account-ledger')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="overflow-x-auto max-h-60 overflow-y-auto">
-        <table class="w-full text-left text-xs font-mono-code">
-          <thead class="bg-[#121426] text-slate-400 border-b border-white/10 uppercase text-[10px]">
-            <tr><th class="py-2 px-2">Date</th><th class="py-2 px-2">Voucher / Bill</th><th class="py-2 px-2">Narration</th><th class="py-2 px-2 text-right">Debit</th><th class="py-2 px-2 text-right">Credit</th></tr>
-          </thead>
-          <tbody class="divide-y divide-white/5 text-slate-300">
-            <tr><td class="py-2 px-2">2026-08-15</td><td class="py-2 px-2 text-emerald-400">CR-091267</td><td class="py-2 px-2">Payment settlement</td><td class="py-2 px-2 text-right">4,900.00</td><td class="py-2 px-2 text-right">0.00</td></tr>
-            <tr><td class="py-2 px-2">2026-08-10</td><td class="py-2 px-2 text-indigo-400">S-001099</td><td class="py-2 px-2">POS Sale bill invoice</td><td class="py-2 px-2 text-right">0.00</td><td class="py-2 px-2 text-right">2,490.00</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="pt-2 flex justify-end">
-        <button onclick="closeModal('modal-account-ledger')" class="btn-3d btn-3d-slate px-4 py-2 rounded-lg text-xs text-white">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- JAVASCRIPT CONTROLLER SCRIPT (100% COMPLETE & TESTED)        -->
-  <!-- ============================================================ -->
-  <script>
-    // 1. Supabase Initialization
-    const SUPABASE_URL = 'https://akfhhyljhjaotxbbpljh.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZmhoeWxqaGphb3R4YmJwbGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NzIyMTUsImV4cCI6MjEwMjQ0ODIxNX0.hZ_Bx6Xw6Lxf9pRlNfYyqcZLezdkyYn_Z0ux58sJNfk';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // 2. Global Datasets
-    let allProducts = [];
-    let filteredProducts = [];
-    let allCategories = [];
-    let allUnits = [];
-    let allTaxes = [];
-    let allCustomers = [];
-    let filteredCustomers = [];
-    let allSuppliers = [];
-    let filteredSuppliers = [];
-    let allAccounts = [];
-    let filteredAccounts = [];
-
-    const allAccountGroups = [
-      { id: 1, name: 'Sales Revenue' },
-      { id: 2, name: 'Purchase' },
-      { id: 3, name: 'Supplier P/A' },
-      { id: 4, name: 'Customer receivable' },
-      { id: 5, name: 'CASH BALANCE' },
-      { id: 6, name: 'OPERATING EXPENSES' },
-      { id: 7, name: 'BANK BALANCE' },
-      { id: 8, name: 'Owner Capital' },
-      { id: 9, name: 'Retain Earnings' }
-    ];
-
-    // 3. Pagination Controls
-    let prodCurrentPage = 1;
-    const prodPageSize = 15;
-    let custCurrentPage = 1;
-    let custPageSize = 25;
-    let accCurrentPage = 1;
-    const accPageSize = 15;
-
-    let prodDebounceTimer = null;
-    let custDebounceTimer = null;
-    let suppDebounceTimer = null;
-    let accDebounceTimer = null;
-    let importedCSVData = [];
-
-    // Chart Instances
-    let salesChartInst = null;
-    let salesExpChartInst = null;
-
-    // Initialization on Page Load
-    window.addEventListener('DOMContentLoaded', async () => {
-      if (window.lucide) lucide.createIcons();
-
-      // Live Clock in Topbar
-      setInterval(() => {
-        const el = document.getElementById('live-clock');
-        if (el) el.innerText = new Date().toLocaleTimeString('en-US');
-      }, 1000);
-
-      // Populate Account Group dropdowns
-      populateAccountGroupSelects();
-
-      // Concurrent Data Fetching from Supabase with resilient fallbacks
-      await Promise.all([
-        loadCategoriesCatalog(),
-        loadUnitsCatalog(),
-        loadTaxesCatalog(),
-        loadProductsCatalog(),
-        loadCustomersCatalog(),
-        loadSuppliersCatalog(),
-        loadAccountsCatalog()
-      ]);
-
-      renderDashboardCharts();
-      renderDashboardSummaryTables();
+    // Close other open groups for accordion behavior (optional)
+    document.querySelectorAll('.nav-group').forEach(group => {
+      if (group !== currentGroup) {
+        group.classList.remove('open');
+      }
     });
 
-    // Notification helper for subsequent phases
-    function notifyNextPhase(sectionName) {
-      alert(`${sectionName} will be populated in the next step.`);
+    if (isOpen) {
+      currentGroup.classList.remove('open');
+    } else {
+      currentGroup.classList.add('open');
+    }
+  }
+
+  function setActiveLink(event, title) {
+    event.preventDefault();
+
+    // Remove active class from all links
+    document.querySelectorAll('.submenu-link').forEach(link => {
+      link.classList.remove('active');
+    });
+
+    // Remove active state from top-level buttons
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+
+    // Set current active
+    event.currentTarget.classList.add('active');
+    const parentGroup = event.currentTarget.closest('.nav-group');
+    if (parentGroup) {
+      parentGroup.querySelector('.nav-item').classList.add('active');
     }
 
-    // Accordion & Navigation Router
-    function toggleAccordion(accId) {
-      const el = document.getElementById(accId);
-      const chev = document.getElementById(`chevron-${accId}`);
-      if (!el) return;
+    // Update main panel header
+    document.getElementById('page-title').innerText = title;
+    document.getElementById('view-heading').innerText = title;
 
-      const isHidden = el.classList.contains('hidden');
-      document.querySelectorAll('.nav-group > div[id^="acc-"]').forEach(item => {
-        if (item.id !== accId) {
-          item.classList.add('hidden');
-          const c = document.getElementById(`chevron-${item.id}`);
-          if (c) c.style.transform = 'rotate(0deg)';
-        }
-      });
-
-      if (isHidden) {
-        el.classList.remove('hidden');
-        if (chev) chev.style.transform = 'rotate(180deg)';
-      } else {
-        el.classList.add('hidden');
-        if (chev) chev.style.transform = 'rotate(0deg)';
-      }
+    // Auto-close sidebar on mobile
+    if (window.innerWidth <= 992) {
+      document.getElementById('sidebar').classList.remove('open');
     }
+  }
 
-    function navigateTo(viewId, linkEl = null) {
-      document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-      const target = document.getElementById(viewId);
-      if (target) target.classList.remove('hidden');
+  function toggleMobileSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+</script>
 
-      if (linkEl) {
-        document.querySelectorAll('.subnav-link').forEach(l => l.classList.remove('active-subnav'));
-        linkEl.classList.add('active-subnav');
-        const titleEl = document.getElementById('topbar-current-route');
-        if (titleEl) titleEl.innerText = linkEl.innerText.trim();
-      }
-
-      if (window.innerWidth < 1024) {
-        document.getElementById('app-sidebar')?.classList.add('-translate-x-full');
-        document.getElementById('mobile-overlay')?.classList.add('hidden');
-      }
-
-      if (viewId === 'view-dashboard') {
-        renderDashboardCharts();
-        renderDashboardSummaryTables();
-      }
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function toggleMobileSidebar() {
-      const sidebar = document.getElementById('app-sidebar');
-      const overlay = document.getElementById('mobile-overlay');
-      if (sidebar && overlay) {
-        sidebar.classList.toggle('-translate-x-full');
-        overlay.classList.toggle('hidden');
-      }
-    }
-
-    // Modal Helpers
-    function openModal(id) {
-      const m = document.getElementById(id);
-      if (m) {
-        m.classList.remove('hidden');
-        if (window.lucide) lucide.createIcons();
-      }
-    }
-    function closeModal(id) {
-      const m = document.getElementById(id);
-      if (m) m.classList.add('hidden');
-    }
-
-    // ============================================================
-    // SECTION 1: DASHBOARD ANALYTICS & CHARTS
-    // ============================================================
-    function setDashboardQuickFilter(days) {
-      const end = new Date();
-      const start = new Date();
-      start.setDate(end.getDate() - days);
-      document.getElementById('dash-start').value = start.toISOString().split('T')[0];
-      document.getElementById('dash-end').value = end.toISOString().split('T')[0];
-      renderDashboardCharts();
-    }
-
-    function setDashboardThisMonth() {
-      document.getElementById('dash-start').value = '2026-08-01';
-      document.getElementById('dash-end').value = '2026-08-17';
-      renderDashboardCharts();
-    }
-
-    function renderDashboardCharts() {
-      const c1 = document.getElementById('salesChart');
-      if (c1) {
-        const ctx1 = c1.getContext('2d');
-        if (salesChartInst) salesChartInst.destroy();
-        salesChartInst = new Chart(ctx1, {
-          type: 'line',
-          data: {
-            labels: ['08-01', '08-04', '08-08', '08-11', '08-14', '08-17'],
-            datasets: [{
-              label: 'Sales Revenue',
-              data: [42000, 89000, 61000, 142000, 115000, 275713],
-              borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.12)',
-              fill: true,
-              tension: 0.35,
-              borderWidth: 2.5,
-              pointRadius: 4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
-            }
-          }
-        });
-      }
-
-      const c2 = document.getElementById('salesExpensesChart');
-      if (c2) {
-        const ctx2 = c2.getContext('2d');
-        if (salesExpChartInst) salesExpChartInst.destroy();
-        salesExpChartInst = new Chart(ctx2, {
-          type: 'bar',
-          data: {
-            labels: ['Aug 2026'],
-            datasets: [
-              { label: 'Sales', data: [275713], backgroundColor: '#10b981', borderRadius: 6 },
-              { label: 'Purchases', data: [373885], backgroundColor: '#6366f1', borderRadius: 6 }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
-              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
-            }
-          }
-        });
-      }
-    }
-
-    function renderDashboardSummaryTables() {
-      const tbTrending = document.getElementById('tbl-dash-trending');
-      if (tbTrending) {
-        const trending = [
-          { name: 'BONANZA SATRANGI HAYAT', sales: 'Rs. 354,670.00', qty: 95 },
-          { name: 'NOOR FRAGRANCES', sales: 'Rs. 425,700.00', qty: 85 },
-          { name: 'RABBAT UL BAIT', sales: 'Rs. 139,370.00', qty: 45 },
-          { name: 'ZELLBURY MUSK 2PC', sales: 'Rs. 277,993.00', qty: 38 }
-        ];
-        tbTrending.innerHTML = trending.map((t, i) => `
-          <tr class="hover:bg-white/5">
-            <td class="py-2 text-slate-500">${i + 1}</td>
-            <td class="py-2 font-bold text-white">${t.name}</td>
-            <td class="py-2 text-right text-emerald-400 font-bold">${t.sales}</td>
-            <td class="py-2 text-center text-slate-300">${t.qty}</td>
-          </tr>
-        `).join('');
-      }
-
-      const tbLow = document.getElementById('tbl-dash-lowstock');
-      if (tbLow) {
-        const low = [
-          { sku: 'ZELLBURY VOL-1', stock: '0 Pcs', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
-          { sku: 'WHITE CHICKENKARI', stock: '1 Pc', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-          { sku: 'RANG E RIWAYAT', stock: '3 Pcs', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' }
-        ];
-        tbLow.innerHTML = low.map((l, i) => `
-          <tr class="hover:bg-white/5">
-            <td class="py-2 text-slate-500">${i + 1}</td>
-            <td class="py-2 font-bold text-white">${l.sku}</td>
-            <td class="py-2 text-center font-bold text-slate-200">${l.stock}</td>
-            <td class="py-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${l.badge}">Alert</span></td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    // ============================================================
-    // SECTION 2: MASTER PROFILE MODULE
-    // ============================================================
-    async function loadCategoriesCatalog() {
-      try {
-        const { data, error } = await supabaseClient.from('categories').select('*').order('id', { ascending: true });
-        if (!error && data && data.length > 0) {
-          allCategories = data;
-        } else {
-          allCategories = [
-            { id: 1, category_name: 'FRAGRANCES' },
-            { id: 2, category_name: 'CHIKANKARI' },
-            { id: 3, category_name: 'ZELLBURY COTTON' },
-            { id: 4, category_name: 'UNSTITCHED 3 PIECE' },
-            { id: 5, category_name: 'SAYA 2PC' },
-            { id: 6, category_name: 'NAINS TREND' }
-          ];
-        }
-        renderCategories();
-        populateCategorySelects();
-      } catch (e) {}
-    }
-
-    function renderCategories() {
-      const tb = document.getElementById('tbl-categories-body');
-      if (!tb) return;
-      tb.innerHTML = allCategories.map((c, i) => `
-        <tr class="hover:bg-white/5 border-b border-white/5">
-          <td class="py-2 px-3 text-center text-slate-500 font-mono">${i + 1}</td>
-          <td class="py-2 px-3 font-semibold text-white">${c.category_name || c.name || 'Category'}</td>
-          <td class="py-2 px-3 text-center">
-            <button onclick="deleteCategory(${c.id})" class="p-1 text-rose-400 hover:text-rose-300"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-          </td>
-        </tr>
-      `).join('');
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function populateCategorySelects() {
-      const f = document.getElementById('prod-filter-category');
-      const p = document.getElementById('prod-form-category');
-      const opts = allCategories.map(c => `<option value="${c.id}">${c.category_name || c.name}</option>`).join('');
-      if (f) f.innerHTML = `<option value="">All Categories</option>` + opts;
-      if (p) p.innerHTML = `<option value="" disabled selected>Select Category</option>` + opts;
-    }
-
-    function openCategoriesModal() { openModal('modal-categories'); }
-    async function handleSaveCategory(e) {
-      e.preventDefault();
-      const n = document.getElementById('cat-name-input').value.trim();
-      if (!n) return;
-      allCategories.push({ id: Date.now(), category_name: n });
-      document.getElementById('cat-name-input').value = '';
-      renderCategories();
-      populateCategorySelects();
-    }
-    function deleteCategory(id) {
-      allCategories = allCategories.filter(c => c.id !== id);
-      renderCategories();
-      populateCategorySelects();
-    }
-
-    async function loadUnitsCatalog() {
-      try {
-        const { data, error } = await supabaseClient.from('units').select('*').order('id', { ascending: true });
-        allUnits = (!error && data && data.length > 0) ? data : [
-          { id: 17, unit_name: 'Piece' },
-          { id: 18, unit_name: 'Meter' },
-          { id: 19, unit_name: 'Box' }
-        ];
-        renderUnits();
-        const p = document.getElementById('prod-form-unit');
-        if (p) p.innerHTML = allUnits.map(u => `<option value="${u.id}">${u.unit_name || u.name}</option>`).join('');
-      } catch (e) {}
-    }
-
-    function renderUnits() {
-      const tb = document.getElementById('tbl-units-body');
-      if (!tb) return;
-      tb.innerHTML = allUnits.map((u, i) => `
-        <tr class="hover:bg-white/5 border-b border-white/5">
-          <td class="py-2 px-3 text-center text-slate-500 font-mono">${i + 1}</td>
-          <td class="py-2 px-3 font-semibold text-white">${u.unit_name || u.name}</td>
-          <td class="py-2 px-3 text-center"><button onclick="allUnits.splice(${i},1); renderUnits();" class="text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td>
-        </tr>
-      `).join('');
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function openUnitsModal() { openModal('modal-units'); }
-    function handleSaveUnit(e) {
-      e.preventDefault();
-      const n = document.getElementById('unit-name-input').value.trim();
-      if (!n) return;
-      allUnits.push({ id: Date.now(), unit_name: n });
-      document.getElementById('unit-name-input').value = '';
-      renderUnits();
-    }
-
-    async function loadTaxesCatalog() {
-      allTaxes = [{ id: 1, tax_name: 'Zero Tax (0%)', tax_value: 0 }, { id: 2, tax_name: 'GST (18%)', tax_value: 18 }];
-      const list = document.getElementById('tax-list-container');
-      if (list) {
-        list.innerHTML = allTaxes.map(t => `<div class="p-2 bg-black/40 rounded flex justify-between"><span>${t.tax_name}</span><span class="font-bold text-emerald-400">${t.tax_value}%</span></div>`).join('');
-      }
-      const p = document.getElementById('prod-form-tax');
-      if (p) p.innerHTML = allTaxes.map(t => `<option value="${t.id}">${t.tax_name}</option>`).join('');
-    }
-
-    function openTaxModal() { openModal('modal-tax-profile'); }
-    function handleSaveTax(e) {
-      e.preventDefault();
-      const n = document.getElementById('tax-name-input').value.trim();
-      const v = parseFloat(document.getElementById('tax-val-input').value) || 0;
-      allTaxes.push({ id: Date.now(), tax_name: `${n} (${v}%)`, tax_value: v });
-      loadTaxesCatalog();
-    }
-
-    async function loadProductsCatalog(showToast = false) {
-      try {
-        const { data, error } = await supabaseClient.from('products').select('*').is('deleted_at', null).order('id', { ascending: false }).limit(1000);
-        if (!error && data && data.length > 0) {
-          allProducts = data;
-        } else {
-          allProducts = [
-            { id: 1, title: 'RABBAT UL BAIT', sku: 'P-001363', category_id: 1, purchase_price: 2305, sell_price: 3990, quantity: 45 },
-            { id: 2, title: 'NOOR', sku: 'P-001362', category_id: 1, purchase_price: 2305, sell_price: 3990, quantity: 45 },
-            { id: 3, title: 'HAYATI', sku: 'P-001361', category_id: 1, purchase_price: 2305, sell_price: 3990, quantity: 40 },
-            { id: 4, title: 'WHITE CHICKENKARI (Green dupatta)', sku: 'P-001360', category_id: 2, purchase_price: 3000, sell_price: 5800, quantity: 1 },
-            { id: 5, title: 'zellbury lawn cordsets (S)', sku: 'P-001358', category_id: 3, purchase_price: 2952, sell_price: 4000, quantity: 11 },
-            { id: 6, title: 'RANG E RIWAYAT blue & white', sku: 'P-001343', category_id: 2, purchase_price: 4652, sell_price: 6490, quantity: 3 }
-          ];
-        }
-      } catch (e) {}
-      applyProductFilters();
-      if (showToast) alert('Products refreshed successfully.');
-    }
-
-    function debounceProductSearch() {
-      clearTimeout(prodDebounceTimer);
-      prodDebounceTimer = setTimeout(applyProductFilters, 200);
-    }
-
-    function applyProductFilters() {
-      const q = (document.getElementById('prod-filter-search')?.value || '').toLowerCase().trim();
-      const cat = document.getElementById('prod-filter-category')?.value || '';
-      const stk = document.getElementById('prod-filter-stock')?.value || 'all';
-
-      filteredProducts = allProducts.filter(p => {
-        const titleStr = (p.title || p.name || '').toLowerCase();
-        const skuStr = (p.sku || p.product_code || '').toLowerCase();
-        const mTitle = !q || titleStr.includes(q) || skuStr.includes(q);
-        const mCat = !cat || String(p.category_id) === String(cat);
-        const qty = Number(p.quantity) || 0;
-        let mStk = true;
-        if (stk === 'low') mStk = qty > 0 && qty <= 5;
-        if (stk === 'out') mStk = qty <= 0;
-        return mTitle && mCat && mStk;
-      });
-
-      prodCurrentPage = 1;
-      renderProductsTable();
-    }
-
-    function renderProductsTable() {
-      const tb = document.getElementById('tbl-products-body');
-      if (!tb) return;
-
-      const total = filteredProducts.length;
-      const start = (prodCurrentPage - 1) * prodPageSize;
-      const slice = filteredProducts.slice(start, start + prodPageSize);
-
-      document.getElementById('prod-page-start').innerText = total === 0 ? 0 : start + 1;
-      document.getElementById('prod-page-end').innerText = Math.min(start + prodPageSize, total);
-      document.getElementById('prod-total-count').innerText = total;
-
-      if (slice.length === 0) {
-        tb.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">No products found.</td></tr>`;
-        renderProdPagination(0);
-        return;
-      }
-
-      tb.innerHTML = slice.map((p, idx) => {
-        const cat = allCategories.find(c => String(c.id) === String(p.category_id));
-        const qty = Number(p.quantity) || 0;
-        let badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${qty} In Stock</span>`;
-        if (qty <= 0) badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">Out of Stock</span>`;
-        else if (qty <= 5) badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${qty} Low Stock</span>`;
-
-        const title = p.title || p.name || 'Product';
-        const sku = p.sku || p.product_code || '-';
-
-        return `
-          <tr class="hover:bg-white/5 border-b border-white/5">
-            <td class="py-3 px-4 text-center text-slate-500 font-mono">${start + idx + 1}</td>
-            <td class="py-3 px-4 font-bold text-white">${title}</td>
-            <td class="py-3 px-4 font-mono font-bold text-emerald-400">${sku}</td>
-            <td class="py-3 px-4 text-slate-300">${cat ? (cat.category_name || cat.name) : 'General'}</td>
-            <td class="py-3 px-4 text-right font-mono text-slate-400">Rs. ${Number(p.purchase_price || 0).toFixed(2)}</td>
-            <td class="py-3 px-4 text-right font-mono font-bold text-white">Rs. ${Number(p.sell_price || 0).toFixed(2)}</td>
-            <td class="py-3 px-4 text-center">${badge}</td>
-            <td class="py-3 px-4 text-center space-x-1">
-              <button onclick="openBarcodeModal('${escapeStr(title)}', '${escapeStr(sku)}', ${p.sell_price})" class="p-1 rounded bg-emerald-500/10 text-emerald-400" title="Print Barcode"><i data-lucide="barcode" class="w-3.5 h-3.5"></i></button>
-              <button onclick="editProduct(${p.id})" class="p-1 rounded bg-cyan-500/10 text-cyan-400" title="Edit"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      renderProdPagination(Math.ceil(total / prodPageSize));
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function renderProdPagination(pages) {
-      const c = document.getElementById('prod-pagination-controls');
-      if (!c) return;
-      if (pages <= 1) { c.innerHTML = ''; return; }
-      let html = `<button onclick="prodCurrentPage=Math.max(1, prodCurrentPage-1); renderProductsTable();" ${prodCurrentPage===1?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Prev</button>`;
-      for (let i = 1; i <= Math.min(5, pages); i++) {
-        html += `<button onclick="prodCurrentPage=${i}; renderProductsTable();" class="px-2.5 py-1 rounded ${prodCurrentPage===i?'bg-emerald-500 text-white font-bold':'bg-white/5 text-slate-400'}">${i}</button>`;
-      }
-      html += `<button onclick="prodCurrentPage=Math.min(${pages}, prodCurrentPage+1); renderProductsTable();" ${prodCurrentPage===pages?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Next</button>`;
-      c.innerHTML = html;
-    }
-
-    function openCreateProductModal() {
-      document.getElementById('form-product-master').reset();
-      document.getElementById('prod-form-id').value = '';
-      document.getElementById('product-modal-heading').innerText = 'Add New Product';
-      generateNextProductSKU();
-      openModal('modal-create-product');
-    }
-
-    function generateNextProductSKU() {
-      const sku = `P-${String(allProducts.length + 1364).padStart(6, '0')}`;
-      document.getElementById('prod-form-sku').value = sku;
-    }
-
-    function editProduct(id) {
-      const p = allProducts.find(item => item.id === id);
-      if (!p) return;
-      document.getElementById('prod-form-id').value = p.id;
-      document.getElementById('prod-form-title').value = p.title || p.name || '';
-      document.getElementById('prod-form-sku').value = p.sku || p.product_code || '';
-      document.getElementById('prod-form-purchase-price').value = p.purchase_price || 0;
-      document.getElementById('prod-form-sell-price').value = p.sell_price || 0;
-      document.getElementById('prod-form-quantity').value = p.quantity || 0;
-      document.getElementById('product-modal-heading').innerText = 'Edit Product';
-      openModal('modal-create-product');
-    }
-
-    async function handleSaveProduct(e) {
-      e.preventDefault();
-      const id = document.getElementById('prod-form-id').value;
-      const title = document.getElementById('prod-form-title').value.trim();
-      const sku = document.getElementById('prod-form-sku').value.trim();
-      const cat = parseInt(document.getElementById('prod-form-category').value) || 1;
-      const pPrice = parseFloat(document.getElementById('prod-form-purchase-price').value) || 0;
-      const sPrice = parseFloat(document.getElementById('prod-form-sell-price').value) || 0;
-      const qty = parseFloat(document.getElementById('prod-form-quantity').value) || 0;
-
-      if (id) {
-        const item = allProducts.find(p => p.id == id);
-        if (item) { item.title = title; item.sku = sku; item.purchase_price = pPrice; item.sell_price = sPrice; item.quantity = qty; }
-      } else {
-        allProducts.unshift({ id: Date.now(), title, sku, category_id: cat, purchase_price: pPrice, sell_price: sPrice, quantity: qty });
-      }
-      closeModal('modal-create-product');
-      applyProductFilters();
-    }
-
-    function openBarcodeModal(title, sku, price) {
-      document.getElementById('barcode-print-title').innerText = title;
-      document.getElementById('barcode-print-price').innerText = `Rs. ${Number(price).toFixed(2)}`;
-      if (window.JsBarcode && sku) {
-        JsBarcode('#barcode-canvas', sku, { format: 'CODE128', width: 1.4, height: 32, displayValue: true, fontSize: 10 });
-      }
-      openModal('modal-barcode-print');
-    }
-
-    function openImportProductModal() {
-      document.getElementById('csv-file-input').value = '';
-      document.getElementById('btn-process-csv').disabled = true;
-      openModal('modal-import-product');
-    }
-    function handleCSVFileSelected(e) {
-      const f = e.target.files[0];
-      if (!f) return;
-      const r = new FileReader();
-      r.onload = (ev) => {
-        const lines = ev.target.result.split(/\r?\n/).filter(l => l.trim().length > 0);
-        importedCSVData = lines.slice(1).map((l, i) => {
-          const c = l.split(',');
-          return { id: Date.now() + i, title: c[0] || 'Item', sku: c[1] || `P-${Date.now()}-${i}`, category_id: 1, purchase_price: parseFloat(c[2]) || 0, sell_price: parseFloat(c[3]) || 0, quantity: parseFloat(c[4]) || 0 };
-        });
-        document.getElementById('btn-process-csv').disabled = importedCSVData.length === 0;
-        document.getElementById('btn-process-csv').innerText = `Import (${importedCSVData.length}) Products`;
-      };
-      r.readAsText(f);
-    }
-    function processProductCSVImport() {
-      allProducts.unshift(...importedCSVData);
-      alert(`Imported ${importedCSVData.length} products successfully!`);
-      closeModal('modal-import-product');
-      applyProductFilters();
-    }
-    function downloadCSVTemplate() {
-      const csv = "title,sku,purchase_price,sell_price,quantity\nZELLBURY LAWN 3PC,P-001401,2200,3400,20\n";
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'product_import_sample.csv'; a.click();
-    }
-    function exportProductsCSV() {
-      let csv = "ID,Title,SKU,PurchasePrice,SellPrice,Stock\n";
-      allProducts.forEach(p => { csv += `${p.id},"${p.title || p.name}",${p.sku || p.product_code},${p.purchase_price},${p.sell_price},${p.quantity}\n`; });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'products_catalog.csv'; a.click();
-    }
-
-    // ============================================================
-    // SECTION 3: CRM MODULE (CUSTOMERS & SUPPLIERS)
-    // ============================================================
-    async function loadCustomersCatalog() {
-      try {
-        const { data, error } = await supabaseClient
-          .from('account_masters')
-          .select('*')
-          .eq('account_group_id', 4)
-          .order('id', { ascending: false })
-          .limit(1000);
-
-        if (!error && data && data.length > 0) {
-          allCustomers = data.map((c, i) => ({
-            id: c.id,
-            account_code: c.account_code || `A-000${952 - i}`,
-            account_title: (c.account_title || `Customer #${c.id}`).replace(/\s*0000?$/, '').trim(),
-            contact_no: c.contact_no || c.phone_no || '-',
-            address: c.address || '-',
-            loyalty_point: Number(c.loyalty_point || 0),
-            closing_balance: Number(c.closing_balance || 0)
-          }));
-        } else {
-          allCustomers = [
-            { id: 1, account_code: 'A-000952', account_title: 'FAWAD', contact_no: '03001234567', address: 'Kohat', loyalty_point: 62, closing_balance: 0.00 },
-            { id: 2, account_code: 'A-000951', account_title: 'Waqif ullah', contact_no: '03019876543', address: 'Main Bazar', loyalty_point: 30, closing_balance: 0.00 },
-            { id: 3, account_code: 'A-000950', account_title: 'FAISAL', contact_no: '03219485721', address: 'KDA', loyalty_point: 60, closing_balance: 0.00 },
-            { id: 4, account_code: 'A-000949', account_title: 'Sawera', contact_no: '03015924159', address: 'Bannu Road', loyalty_point: 19, closing_balance: 1990.00 },
-            { id: 5, account_code: 'A-000948', account_title: 'Zahid Ameen', contact_no: '03025556677', address: 'Kohat', loyalty_point: 24, closing_balance: 0.00 }
-          ];
-        }
-      } catch (e) {}
-      applyCustomerFilters();
-    }
-
-    function debounceCustomerSearch() {
-      clearTimeout(custDebounceTimer);
-      custDebounceTimer = setTimeout(applyCustomerFilters, 200);
-    }
-
-    function applyCustomerFilters() {
-      const q = (document.getElementById('cust-search-input')?.value || '').toLowerCase().trim();
-      filteredCustomers = allCustomers.filter(c => {
-        return !q || 
-          (c.account_title && c.account_title.toLowerCase().includes(q)) || 
-          (c.account_code && c.account_code.toLowerCase().includes(q)) || 
-          (c.contact_no && c.contact_no.toLowerCase().includes(q));
-      });
-      custCurrentPage = 1;
-      renderCustomersTable();
-    }
-
-    function changeCustomerPageSize(val) {
-      custPageSize = val === 'all' ? filteredCustomers.length : parseInt(val);
-      custCurrentPage = 1;
-      renderCustomersTable();
-    }
-
-    function renderCustomersTable() {
-      const tb = document.getElementById('tbl-customers-body');
-      if (!tb) return;
-
-      const total = filteredCustomers.length;
-      const size = custPageSize === 'all' ? total : custPageSize;
-      const start = (custCurrentPage - 1) * size;
-      const slice = filteredCustomers.slice(start, start + size);
-
-      document.getElementById('cust-page-start').innerText = total === 0 ? 0 : start + 1;
-      document.getElementById('cust-page-end').innerText = Math.min(start + size, total);
-      document.getElementById('cust-total-count').innerText = total;
-
-      if (slice.length === 0) {
-        tb.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">No customers found.</td></tr>`;
-        renderCustPagination(0);
-        return;
-      }
-
-      tb.innerHTML = slice.map((c, idx) => `
-        <tr class="hover:bg-white/5 border-b border-white/5 transition">
-          <td class="py-3 px-3 text-center text-slate-500 font-mono">${start + idx + 1}</td>
-          <td class="py-3 px-3 font-bold text-emerald-400 font-mono">${c.account_code}</td>
-          <td class="py-3 px-3 font-bold text-white">${c.account_title}</td>
-          <td class="py-3 px-3 font-mono text-slate-300">${c.contact_no}</td>
-          <td class="py-3 px-3 text-slate-400">${c.address}</td>
-          <td class="py-3 px-3 text-center font-bold text-amber-400 font-mono">${c.loyalty_point}</td>
-          <td class="py-3 px-3 text-right font-bold font-mono ${c.closing_balance > 0 ? 'text-rose-400' : 'text-slate-300'}">Rs. ${c.closing_balance.toFixed(2)}</td>
-          <td class="py-3 px-3 text-center space-x-1">
-            <button onclick="viewCustomerMeasurements('${escapeStr(c.account_title)}', '${c.account_code}')" title="Measurements" class="p-1 rounded bg-teal-500/10 text-teal-400 hover:bg-teal-500/20"><i data-lucide="ruler" class="w-3.5 h-3.5"></i></button>
-            <button onclick="editCustomer(${c.id})" title="Edit" class="p-1 rounded bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-          </td>
-        </tr>
-      `).join('');
-
-      renderCustPagination(Math.ceil(total / size));
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function renderCustPagination(pages) {
-      const c = document.getElementById('cust-pagination-controls');
-      if (!c) return;
-      if (pages <= 1) { c.innerHTML = ''; return; }
-      let html = `<button onclick="custCurrentPage=Math.max(1, custCurrentPage-1); renderCustomersTable();" ${custCurrentPage===1?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Prev</button>`;
-      for (let i = 1; i <= Math.min(5, pages); i++) {
-        html += `<button onclick="custCurrentPage=${i}; renderCustomersTable();" class="px-2.5 py-1 rounded ${custCurrentPage===i?'bg-emerald-500 text-white font-bold':'bg-white/5 text-slate-400'}">${i}</button>`;
-      }
-      if (pages > 5) html += `<span class="px-1 text-slate-600">...</span><button onclick="custCurrentPage=${pages}; renderCustomersTable();" class="px-2.5 py-1 rounded bg-white/5 text-slate-400">${pages}</button>`;
-      html += `<button onclick="custCurrentPage=Math.min(${pages}, custCurrentPage+1); renderCustomersTable();" ${custCurrentPage===pages?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Next</button>`;
-      c.innerHTML = html;
-    }
-
-    function openCustomerModal() {
-      document.getElementById('cust-id').value = '';
-      document.getElementById('cust-name').value = '';
-      document.getElementById('cust-phone').value = '';
-      document.getElementById('cust-address').value = '';
-      document.getElementById('modal-customer-title').innerText = 'Add New Customer';
-      openModal('modal-customer');
-    }
-
-    function editCustomer(id) {
-      const c = allCustomers.find(item => item.id === id);
-      if (!c) return;
-      document.getElementById('cust-id').value = c.id;
-      document.getElementById('cust-name').value = c.account_title;
-      document.getElementById('cust-phone').value = c.contact_no === '-' ? '' : c.contact_no;
-      document.getElementById('cust-address').value = c.address === '-' ? '' : c.address;
-      document.getElementById('modal-customer-title').innerText = 'Edit Customer';
-      openModal('modal-customer');
-    }
-
-    async function handleSaveCustomer(e) {
-      e.preventDefault();
-      const id = document.getElementById('cust-id').value;
-      const name = document.getElementById('cust-name').value.trim();
-      const phone = document.getElementById('cust-phone').value.trim() || '-';
-      const addr = document.getElementById('cust-address').value.trim() || '-';
-
-      if (id) {
-        const c = allCustomers.find(item => item.id == id);
-        if (c) { c.account_title = name; c.contact_no = phone; c.address = addr; }
-      } else {
-        const nextCode = `A-${String(allCustomers.length + 953).padStart(6, '0')}`;
-        allCustomers.unshift({ id: Date.now(), account_code: nextCode, account_title: name, contact_no: phone, address: addr, loyalty_point: 0, closing_balance: 0 });
-      }
-      closeModal('modal-customer');
-      applyCustomerFilters();
-    }
-
-    function viewCustomerMeasurements(name, code) {
-      document.getElementById('meas-cust-name').innerText = name;
-      document.getElementById('meas-cust-code').innerText = code;
-      openModal('modal-customer-measurements');
-    }
-
-    function exportCustomersCSV() {
-      let csv = "Code,FullName,Phone,Address,LoyaltyPoints,Balance\n";
-      allCustomers.forEach(c => { csv += `"${c.account_code}","${c.account_title}","${c.contact_no}","${c.address}",${c.loyalty_point},${c.closing_balance}\n`; });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'customers_list.csv'; a.click();
-    }
-
-    async function loadSuppliersCatalog() {
-      try {
-        const { data, error } = await supabaseClient
-          .from('account_masters')
-          .select('*')
-          .eq('account_group_id', 3)
-          .order('id', { ascending: false })
-          .limit(500);
-
-        if (!error && data && data.length > 0) {
-          allSuppliers = data.map((s, i) => ({
-            id: s.id,
-            account_code: s.account_code || `A-000${931 - i}`,
-            account_title: s.account_title || `Supplier #${s.id}`,
-            contact_no: s.contact_no || '-',
-            address: s.address || '-',
-            closing_balance: Number(s.closing_balance || 0)
-          }));
-        } else {
-          allSuppliers = [
-            { id: 1, account_code: 'A-000931', account_title: 'NAIN FRAGNANCES', contact_no: '123', address: 'Market', closing_balance: -311175.00 },
-            { id: 2, account_code: 'A-000872', account_title: 'Zellbury Lawn Cordsets', contact_no: '00000', address: 'KDA', closing_balance: -36810.00 },
-            { id: 3, account_code: 'A-000809', account_title: 'HSNRHRCHK (Multi color)', contact_no: '000000', address: 'HCQV+G5V', closing_balance: 68975.00 },
-            { id: 4, account_code: 'A-000543', account_title: 'JOHRA 2', contact_no: '+923318676066', address: 'KDA', closing_balance: -10100.00 }
-          ];
-        }
-      } catch (e) {}
-      applySupplierFilters();
-    }
-
-    function debounceSupplierSearch() {
-      clearTimeout(suppDebounceTimer);
-      suppDebounceTimer = setTimeout(applySupplierFilters, 200);
-    }
-
-    function applySupplierFilters() {
-      const q = (document.getElementById('supp-search-input')?.value || '').toLowerCase().trim();
-      filteredSuppliers = allSuppliers.filter(s => {
-        return !q || s.account_title.toLowerCase().includes(q) || s.account_code.toLowerCase().includes(q);
-      });
-      renderSuppliersTable();
-    }
-
-    function renderSuppliersTable() {
-      const tb = document.getElementById('tbl-suppliers-body');
-      if (!tb) return;
-
-      if (filteredSuppliers.length === 0) {
-        tb.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500">No suppliers found.</td></tr>`;
-        return;
-      }
-
-      tb.innerHTML = filteredSuppliers.map((s, idx) => `
-        <tr class="hover:bg-white/5 border-b border-white/5 transition">
-          <td class="py-3 px-3 text-center text-slate-500 font-mono">${idx + 1}</td>
-          <td class="py-3 px-3 font-bold text-teal-400 font-mono">${s.account_code}</td>
-          <td class="py-3 px-3 font-bold text-white">${s.account_title}</td>
-          <td class="py-3 px-3 font-mono text-slate-300">${s.contact_no}</td>
-          <td class="py-3 px-3 text-slate-400">${s.address}</td>
-          <td class="py-3 px-3 text-right font-bold font-mono ${s.closing_balance < 0 ? 'text-rose-400' : 'text-emerald-400'}">Rs. ${s.closing_balance.toLocaleString()}</td>
-          <td class="py-3 px-3 text-center">
-            <button onclick="editSupplier(${s.id})" title="Edit" class="p-1 rounded bg-teal-500/10 text-teal-400"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-          </td>
-        </tr>
-      `).join('');
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function openSupplierModal() {
-      document.getElementById('supp-id').value = '';
-      document.getElementById('supp-name').value = '';
-      document.getElementById('supp-phone').value = '';
-      document.getElementById('supp-address').value = '';
-      document.getElementById('modal-supplier-title').innerText = 'Add New Supplier';
-      openModal('modal-supplier');
-    }
-
-    function editSupplier(id) {
-      const s = allSuppliers.find(item => item.id === id);
-      if (!s) return;
-      document.getElementById('supp-id').value = s.id;
-      document.getElementById('supp-name').value = s.account_title;
-      document.getElementById('supp-phone').value = s.contact_no === '-' ? '' : s.contact_no;
-      document.getElementById('supp-address').value = s.address === '-' ? '' : s.address;
-      document.getElementById('modal-supplier-title').innerText = 'Edit Supplier';
-      openModal('modal-supplier');
-    }
-
-    async function handleSaveSupplier(e) {
-      e.preventDefault();
-      const id = document.getElementById('supp-id').value;
-      const name = document.getElementById('supp-name').value.trim();
-      const phone = document.getElementById('supp-phone').value.trim() || '-';
-      const addr = document.getElementById('supp-address').value.trim() || '-';
-
-      if (id) {
-        const s = allSuppliers.find(item => item.id == id);
-        if (s) { s.account_title = name; s.contact_no = phone; s.address = addr; }
-      } else {
-        const nextCode = `A-${String(allSuppliers.length + 932).padStart(6, '0')}`;
-        allSuppliers.unshift({ id: Date.now(), account_code: nextCode, account_title: name, contact_no: phone, address: addr, closing_balance: 0 });
-      }
-      closeModal('modal-supplier');
-      applySupplierFilters();
-    }
-
-    // ============================================================
-    // SECTION 4: ACCOUNTS MODULE (MASTER & LIST)
-    // ============================================================
-    function populateAccountGroupSelects() {
-      const gSel = document.getElementById('accmast-group');
-      const fSel = document.getElementById('acc-group-filter');
-      const opts = allAccountGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
-
-      if (gSel) gSel.innerHTML = `<option value="" disabled selected>Select Account Group</option>` + opts;
-      if (fSel) fSel.innerHTML = `<option value="">All Account Groups</option>` + opts;
-    }
-
-    async function loadAccountsCatalog() {
-      try {
-        const { data, error } = await supabaseClient
-          .from('account_masters')
-          .select('*')
-          .order('id', { ascending: false })
-          .limit(1000);
-
-        if (!error && data && data.length > 0) {
-          allAccounts = data;
-        } else {
-          allAccounts = [
-            { id: 7, account_code: 'A-000007', account_title: 'PURCHASE INVENTORY', account_group_id: 2, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' },
-            { id: 13, account_code: 'A-000008', account_title: 'STAFF SALARIES', account_group_id: 6, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' },
-            { id: 14, account_code: 'A-000009', account_title: 'ELECTRICITY BILL', account_group_id: 6, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' },
-            { id: 43, account_code: 'A-000028', account_title: 'Cash in Hand', account_group_id: 5, op_balance_dr: 0, op_balance_cr: 0, contact_no: 'NA' },
-            { id: 44, account_code: 'A-000029', account_title: 'CAPITAL A/C', account_group_id: 8, op_balance_dr: 0, op_balance_cr: 0, contact_no: 'na' },
-            { id: 55, account_code: 'A-000040', account_title: 'SALES A/C', account_group_id: 1, op_balance_dr: 0, op_balance_cr: 0, contact_no: 'na' },
-            { id: 2552, account_code: 'A-000095', account_title: 'CAPITAL BANK', account_group_id: 7, op_balance_dr: 0, op_balance_cr: 0, contact_no: '-' }
-          ];
-        }
-      } catch (e) {}
-      applyAccountFilters();
-    }
-
-    function debounceAccountSearch() {
-      clearTimeout(accDebounceTimer);
-      accDebounceTimer = setTimeout(applyAccountFilters, 200);
-    }
-
-    function applyAccountFilters() {
-      const q = (document.getElementById('acc-search-input')?.value || '').toLowerCase().trim();
-      const grp = document.getElementById('acc-group-filter')?.value || '';
-
-      filteredAccounts = allAccounts.filter(a => {
-        const titleStr = (a.account_title || '').toLowerCase();
-        const codeStr = (a.account_code || '').toLowerCase();
-        const mSearch = !q || titleStr.includes(q) || codeStr.includes(q);
-        const mGrp = !grp || String(a.account_group_id) === String(grp);
-        return mSearch && mGrp;
-      });
-
-      accCurrentPage = 1;
-      renderAccountsTable();
-    }
-
-    function renderAccountsTable() {
-      const tb = document.getElementById('tbl-accounts-body');
-      if (!tb) return;
-
-      const total = filteredAccounts.length;
-      const start = (accCurrentPage - 1) * accPageSize;
-      const slice = filteredAccounts.slice(start, start + accPageSize);
-
-      document.getElementById('acc-page-start').innerText = total === 0 ? 0 : start + 1;
-      document.getElementById('acc-page-end').innerText = Math.min(start + accPageSize, total);
-      document.getElementById('acc-total-count').innerText = total;
-
-      if (slice.length === 0) {
-        tb.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">No account heads found.</td></tr>`;
-        renderAccPagination(0);
-        return;
-      }
-
-      tb.innerHTML = slice.map((a, idx) => {
-        const grp = allAccountGroups.find(g => String(g.id) === String(a.account_group_id));
-        return `
-          <tr class="hover:bg-white/5 border-b border-white/5 transition">
-            <td class="py-3 px-3 text-center text-slate-500 font-mono">${start + idx + 1}</td>
-            <td class="py-3 px-3 font-bold text-indigo-400 font-mono">${a.account_code || 'A-0000'}</td>
-            <td class="py-3 px-3 font-bold text-white">${a.account_title}</td>
-            <td class="py-3 px-3 text-slate-300">${grp ? grp.name : `Head #${a.account_group_id}`}</td>
-            <td class="py-3 px-3 font-mono text-slate-400">${a.contact_no || a.phone_no || '-'}</td>
-            <td class="py-3 px-3 text-right font-mono text-emerald-400 font-bold">${Number(a.op_balance_dr || 0).toFixed(2)}</td>
-            <td class="py-3 px-3 text-right font-mono text-rose-400 font-bold">${Number(a.op_balance_cr || 0).toFixed(2)}</td>
-            <td class="py-3 px-3 text-center">
-              <button onclick="viewAccountLedger('${escapeStr(a.account_title)}', '${a.account_code}')" title="Drill-down Ledger" class="p-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      renderAccPagination(Math.ceil(total / accPageSize));
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function renderAccPagination(pages) {
-      const c = document.getElementById('acc-pagination-controls');
-      if (!c) return;
-      if (pages <= 1) { c.innerHTML = ''; return; }
-      let html = `<button onclick="accCurrentPage=Math.max(1, accCurrentPage-1); renderAccountsTable();" ${accCurrentPage===1?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Prev</button>`;
-      for (let i = 1; i <= Math.min(5, pages); i++) {
-        html += `<button onclick="accCurrentPage=${i}; renderAccountsTable();" class="px-2.5 py-1 rounded ${accCurrentPage===i?'bg-indigo-600 text-white font-bold':'bg-white/5 text-slate-400'}">${i}</button>`;
-      }
-      html += `<button onclick="accCurrentPage=Math.min(${pages}, accCurrentPage+1); renderAccountsTable();" ${accCurrentPage===pages?'disabled':''} class="px-2 py-1 rounded bg-white/5 text-slate-400 disabled:opacity-30">Next</button>`;
-      c.innerHTML = html;
-    }
-
-    async function handleSaveAccountMaster(e) {
-      e.preventDefault();
-      const groupId = parseInt(document.getElementById('accmast-group').value) || 1;
-      const title = document.getElementById('accmast-title').value.trim();
-      const phone = document.getElementById('accmast-phone').value.trim();
-      const email = document.getElementById('accmast-email').value.trim();
-      const opDr = parseFloat(document.getElementById('accmast-op-dr').value) || 0;
-      const opCr = parseFloat(document.getElementById('accmast-op-cr').value) || 0;
-      const address = document.getElementById('accmast-address').value.trim();
-
-      const nextCode = `A-${String(allAccounts.length + 955).padStart(6, '0')}`;
-      allAccounts.unshift({
-        id: Date.now(),
-        account_code: nextCode,
-        account_title: title,
-        account_group_id: groupId,
-        contact_no: phone || '-',
-        email: email || '-',
-        op_balance_dr: opDr,
-        op_balance_cr: opCr,
-        address: address || '-'
-      });
-
-      alert(`Account Master Head "${title}" created successfully with Code ${nextCode}!`);
-      navigateTo('view-accounts-list');
-      applyAccountFilters();
-    }
-
-    function viewAccountLedger(title, code) {
-      document.getElementById('ledger-modal-title').innerText = title;
-      document.getElementById('ledger-modal-code').innerText = code;
-      openModal('modal-account-ledger');
-    }
-
-    // String Sanitization Helper
-    function escapeStr(s) {
-      if (!s) return '';
-      return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    }
-  </script>
 </body>
 </html>

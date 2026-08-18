@@ -9,7 +9,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -69,6 +68,19 @@
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
+    /* Menu styling states */
+    .nav-btn-active {
+      background: rgba(99, 102, 241, 0.2) !important;
+      border: 1px solid rgba(99, 102, 241, 0.4) !important;
+      color: #ffffff !important;
+    }
+    .nav-sublink-active {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #818cf8 !important;
+      border: 1px solid rgba(99, 102, 241, 0.3) !important;
+      font-weight: 700 !important;
+    }
+
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
@@ -93,6 +105,7 @@
 
   <div class="flex-1 flex overflow-hidden relative">
 
+    <!-- SIDEBAR NAVIGATION -->
     <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-950/95 lg:static lg:z-30 border-r border-white/10 flex flex-col justify-between backdrop-blur-2xl shadow-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
       
       <div class="h-16 px-4 flex items-center justify-between border-b border-white/10 bg-black/30">
@@ -114,128 +127,137 @@
 
       <nav class="flex-1 overflow-y-auto p-3 space-y-1 text-xs">
 
+        <!-- 1. Dashboard -->
         <div>
-          <button onclick="toggleMenu('menu-dash')" class="w-full px-3 py-2.5 rounded-xl flex items-center justify-between font-bold text-white bg-indigo-600/80 shadow-md">
+          <button id="btn-group-dash" onclick="toggleMenu('menu-dash', 'btn-group-dash')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
             <div class="flex items-center gap-2.5">
-              <i data-lucide="layout-dashboard" class="w-4 h-4 text-white"></i>
+              <i data-lucide="layout-dashboard" class="w-4 h-4 text-indigo-400"></i>
               <span>1. Dashboard</span>
             </div>
-            <i data-lucide="chevron-down" id="chevron-menu-dash" class="w-3.5 h-3.5 rotate-180"></i>
+            <i data-lucide="chevron-down" id="chevron-menu-dash" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
-          <div id="menu-dash" class="mt-1 pl-7 pr-2 py-1 space-y-1">
-            <a href="#" onclick="showSection('dashboard'); closeMobileSidebar();" class="block py-1.5 px-2 rounded-lg text-indigo-300 font-semibold bg-white/5 border border-indigo-500/30">Dashboard Overview</a>
+          <div id="menu-dash" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1">
+            <a href="javascript:void(0)" id="link-dashboard" onclick="showSection('dashboard', this); closeMobileSidebar();" class="block py-1.5 px-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5">Dashboard Overview</a>
           </div>
         </div>
 
+        <!-- 2. Master Profile -->
         <div>
-          <button onclick="toggleMenu('menu-master')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
+          <button id="btn-group-master" onclick="toggleMenu('menu-master', 'btn-group-master')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
             <div class="flex items-center gap-2.5">
-              <i data-lucide="box" class="w-4 h-4"></i>
+              <i data-lucide="box" class="w-4 h-4 text-purple-400"></i>
               <span>2. Master Profile</span>
             </div>
-            <i data-lucide="chevron-down" id="chevron-menu-master" class="w-3.5 h-3.5"></i>
+            <i data-lucide="chevron-down" id="chevron-menu-master" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
           <div id="menu-master" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" onclick="openCategoriesModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Categories</a>
-            <a href="#" onclick="openUnitsModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Product Unit</a>
-            <a href="#" onclick="openTaxModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Tax Profile</a>
-            <a href="#" onclick="openProductModal('create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 text-emerald-400 font-semibold">+ Create Product</a>
-            <a href="#" onclick="showSection('products-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Products List</a>
-            <a href="#" onclick="openImportModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Import Product</a>
+            <a href="javascript:void(0)" onclick="openCategoriesModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Categories</a>
+            <a href="javascript:void(0)" onclick="openUnitsModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Product Unit</a>
+            <a href="javascript:void(0)" onclick="openTaxModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Tax Profile</a>
+            <a href="javascript:void(0)" onclick="openProductModal('create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 text-emerald-400 font-semibold">+ Create Product</a>
+            <a href="javascript:void(0)" id="link-products-list" onclick="showSection('products-list', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Products List</a>
+            <a href="javascript:void(0)" onclick="openImportModal(); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Import Product</a>
           </div>
         </div>
 
+        <!-- 3. CRM -->
         <div>
-          <button onclick="toggleMenu('menu-crm')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
+          <button id="btn-group-crm" onclick="toggleMenu('menu-crm', 'btn-group-crm')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
             <div class="flex items-center gap-2.5">
-              <i data-lucide="users" class="w-4 h-4"></i>
+              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
               <span>3. CRM</span>
             </div>
-            <i data-lucide="chevron-down" id="chevron-menu-crm" class="w-3.5 h-3.5"></i>
+            <i data-lucide="chevron-down" id="chevron-menu-crm" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
           <div id="menu-crm" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" onclick="showSection('customers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">Manage Customers</a>
-            <a href="#" onclick="showSection('suppliers-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Manage Suppliers</a>
+            <a href="javascript:void(0)" id="link-customers-list" onclick="showSection('customers-list', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">Manage Customers</a>
+            <a href="javascript:void(0)" id="link-suppliers-list" onclick="showSection('suppliers-list', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Manage Suppliers</a>
           </div>
         </div>
 
+        <!-- 4. Accounts -->
         <div>
-          <button onclick="toggleMenu('menu-accounts')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
+          <button id="btn-group-accounts" onclick="toggleMenu('menu-accounts', 'btn-group-accounts')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
             <div class="flex items-center gap-2.5">
-              <i data-lucide="wallet" class="w-4 h-4"></i>
+              <i data-lucide="wallet" class="w-4 h-4 text-amber-400"></i>
               <span>4. Accounts</span>
             </div>
-            <i data-lucide="chevron-down" id="chevron-menu-accounts" class="w-3.5 h-3.5"></i>
+            <i data-lucide="chevron-down" id="chevron-menu-accounts" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
           <div id="menu-accounts" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" onclick="showSection('account-master-create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">+ Account Master</a>
-            <a href="#" onclick="showSection('account-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-indigo-300">Account List</a>
+            <a href="javascript:void(0)" id="link-account-master-create" onclick="showSection('account-master-create', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5 font-semibold text-emerald-400">+ Account Master</a>
+            <a href="javascript:void(0)" id="link-account-list" onclick="showSection('account-list', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white hover:bg-white/5">Account List</a>
           </div>
         </div>
 
+        <!-- 5. Purchase Invoice -->
         <div>
-          <button onclick="toggleMenu('menu-purchase')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-bold text-white bg-indigo-500/20 border border-indigo-500/30">
+          <button id="btn-group-purchase" onclick="toggleMenu('menu-purchase', 'btn-group-purchase')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
             <div class="flex items-center gap-2.5">
-              <i data-lucide="truck" class="w-4 h-4 text-indigo-400"></i>
+              <i data-lucide="truck" class="w-4 h-4 text-blue-400"></i>
               <span>5. Purchase Invoice</span>
             </div>
-            <i data-lucide="chevron-down" id="chevron-menu-purchase" class="w-3.5 h-3.5 rotate-180"></i>
+            <i data-lucide="chevron-down" id="chevron-menu-purchase" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
-          <div id="menu-purchase" class="mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-300">
-            <a href="#" onclick="showSection('purchase-create'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white text-emerald-400 font-semibold">+ Create Purchase</a>
-            <a href="#" onclick="showSection('purchase-list'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white font-semibold text-indigo-300">Purchase List (185 Bills)</a>
-            <a href="#" onclick="showSection('purchase-return'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Purchase Return</a>
+          <div id="menu-purchase" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
+            <a href="javascript:void(0)" id="link-purchase-create" onclick="showSection('purchase-create', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white text-emerald-400 font-semibold">+ Create Purchase</a>
+            <a href="javascript:void(0)" id="link-purchase-list" onclick="showSection('purchase-list', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Purchase List (185 Bills)</a>
+            <a href="javascript:void(0)" id="link-purchase-return" onclick="showSection('purchase-return', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Purchase Return</a>
           </div>
         </div>
 
+        <!-- 6. POS Invoice -->
         <div>
-          <button onclick="toggleMenu('menu-posinv')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
+          <button id="btn-group-posinv" onclick="toggleMenu('menu-posinv', 'btn-group-posinv')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
             <div class="flex items-center gap-2.5">
-              <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+              <i data-lucide="shopping-cart" class="w-4 h-4 text-pink-400"></i>
               <span>6. POS Invoice</span>
             </div>
-            <i data-lucide="chevron-down" id="chevron-menu-posinv" class="w-3.5 h-3.5"></i>
+            <i data-lucide="chevron-down" id="chevron-menu-posinv" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
           <div id="menu-posinv" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" onclick="showSection('terminal'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white text-emerald-400 font-semibold">Create Invoice (POS)</a>
-            <a href="#" onclick="showSection('ledger'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Sales List</a>
-            <a href="#" onclick="showSection('sales-return'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Sales Return</a>
+            <a href="javascript:void(0)" id="link-terminal" onclick="showSection('terminal', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white text-emerald-400 font-semibold">Create Invoice (POS)</a>
+            <a href="javascript:void(0)" id="link-ledger" onclick="showSection('ledger', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Sales List</a>
+            <a href="javascript:void(0)" id="link-sales-return" onclick="showSection('sales-return', this); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Sales Return</a>
           </div>
         </div>
 
+        <!-- 7. Stock Adjustment -->
         <div>
-          <button onclick="toggleMenu('menu-adj')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
-            <div class="flex items-center gap-2.5"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i><span>7. Stock Adjustment</span></div>
-            <i data-lucide="chevron-down" id="chevron-menu-adj" class="w-3.5 h-3.5"></i>
+          <button id="btn-group-adj" onclick="toggleMenu('menu-adj', 'btn-group-adj')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <div class="flex items-center gap-2.5"><i data-lucide="sliders-horizontal" class="w-4 h-4 text-cyan-400"></i><span>7. Stock Adjustment</span></div>
+            <i data-lucide="chevron-down" id="chevron-menu-adj" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
           <div id="menu-adj" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Create Adjustment</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Adjustment List</a>
+            <a href="javascript:void(0)" onclick="alert('Adjustment feature online.'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Create Adjustment</a>
+            <a href="javascript:void(0)" onclick="alert('Adjustment list empty.'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Adjustment List</a>
           </div>
         </div>
 
+        <!-- 8. Vouchers -->
         <div>
-          <button onclick="toggleMenu('menu-vouchers')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
-            <div class="flex items-center gap-2.5"><i data-lucide="file-check" class="w-4 h-4"></i><span>8. Vouchers</span></div>
-            <i data-lucide="chevron-down" id="chevron-menu-vouchers" class="w-3.5 h-3.5"></i>
+          <button id="btn-group-vouchers" onclick="toggleMenu('menu-vouchers', 'btn-group-vouchers')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <div class="flex items-center gap-2.5"><i data-lucide="file-check" class="w-4 h-4 text-teal-400"></i><span>8. Vouchers</span></div>
+            <i data-lucide="chevron-down" id="chevron-menu-vouchers" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
           <div id="menu-vouchers" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Cash Receipt Voucher</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Cash Payment Voucher</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Create Journal</a>
+            <a href="javascript:void(0)" onclick="alert('Cash Receipt Voucher'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Cash Receipt Voucher</a>
+            <a href="javascript:void(0)" onclick="alert('Cash Payment Voucher'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Cash Payment Voucher</a>
+            <a href="javascript:void(0)" onclick="alert('Journal Voucher'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Create Journal</a>
           </div>
         </div>
 
+        <!-- 9. Account Reports -->
         <div>
-          <button onclick="toggleMenu('menu-reports')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5">
-            <div class="flex items-center gap-2.5"><i data-lucide="calculator" class="w-4 h-4"></i><span>9. Account Reports</span></div>
-            <i data-lucide="chevron-down" id="chevron-menu-reports" class="w-3.5 h-3.5"></i>
+          <button id="btn-group-reports" onclick="toggleMenu('menu-reports', 'btn-group-reports')" class="w-full px-3 py-2 rounded-xl flex items-center justify-between font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <div class="flex items-center gap-2.5"><i data-lucide="calculator" class="w-4 h-4 text-orange-400"></i><span>9. Account Reports</span></div>
+            <i data-lucide="chevron-down" id="chevron-menu-reports" class="w-3.5 h-3.5 transition-transform duration-200"></i>
           </button>
           <div id="menu-reports" class="hidden mt-1 pl-7 pr-2 py-1 space-y-1 text-slate-400">
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Account Ledger</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Day Book</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Trading PLS Statement</a>
-            <a href="#" class="block py-1 px-2 rounded hover:text-white">Balance Sheet</a>
+            <a href="javascript:void(0)" onclick="alert('Account Ledger Report'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Account Ledger</a>
+            <a href="javascript:void(0)" onclick="alert('Day Book Report'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Day Book</a>
+            <a href="javascript:void(0)" onclick="alert('Trading PLS Statement'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Trading PLS Statement</a>
+            <a href="javascript:void(0)" onclick="alert('Balance Sheet'); closeMobileSidebar();" class="block py-1 px-2 rounded hover:text-white">Balance Sheet</a>
           </div>
         </div>
 
@@ -250,8 +272,10 @@
       </div>
     </aside>
 
+    <!-- MAIN CONTENT AREA -->
     <div class="flex-1 flex flex-col overflow-hidden w-full">
 
+      <!-- TOP HEADER BAR -->
       <header class="h-16 px-4 sm:px-6 flex items-center justify-between border-b border-white/10 bg-slate-900/60 backdrop-blur-xl z-20 shadow-lg flex-shrink-0">
         <div class="flex items-center space-x-3">
           <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300">
@@ -274,8 +298,10 @@
         </div>
       </header>
 
+      <!-- SCROLLABLE WORKSPACE CONTAINER -->
       <div class="flex-1 overflow-y-auto p-3 sm:p-6 relative">
 
+        <!-- 1. DASHBOARD VIEW -->
         <div id="view-dashboard" class="space-y-6">
           <div class="depth-card p-5 rounded-2xl flex flex-col gap-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -313,15 +339,16 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div class="depth-card p-5 rounded-2xl lg:col-span-2 space-y-3">
               <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="line-chart" class="w-4 h-4 text-indigo-400"></i> Sales Timeline</h3>
-              <div class="h-64"><canvas id="salesChart"></canvas></div>
+              <div class="h-64 relative"><canvas id="salesChart"></canvas></div>
             </div>
             <div class="depth-card p-5 rounded-2xl space-y-3">
               <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i> Sales vs Expenses</h3>
-              <div class="h-64"><canvas id="salesExpensesChart"></canvas></div>
+              <div class="h-64 relative"><canvas id="salesExpensesChart"></canvas></div>
             </div>
           </div>
         </div>
 
+        <!-- 2. PRODUCTS LIST VIEW -->
         <div id="view-products-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -357,6 +384,7 @@
           </div>
         </div>
 
+        <!-- 3. CUSTOMERS LIST VIEW -->
         <div id="view-customers-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex justify-between items-center">
             <div>
@@ -385,6 +413,7 @@
           </div>
         </div>
 
+        <!-- 3. SUPPLIERS LIST VIEW -->
         <div id="view-suppliers-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex justify-between items-center">
             <div>
@@ -413,6 +442,7 @@
           </div>
         </div>
 
+        <!-- 4. ACCOUNT MASTER CREATE -->
         <div id="view-account-master-create" class="hidden space-y-5">
           <div class="depth-card p-6 rounded-2xl max-w-3xl mx-auto space-y-4">
             <h2 class="text-lg font-bold text-white border-b border-white/10 pb-3">Create Account Master</h2>
@@ -432,6 +462,7 @@
           </div>
         </div>
 
+        <!-- 4. ACCOUNT LIST VIEW -->
         <div id="view-account-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex justify-between items-center">
             <h2 class="text-lg font-extrabold text-white">All Account List</h2>
@@ -456,6 +487,7 @@
           </div>
         </div>
 
+        <!-- 5. PURCHASE CREATE VIEW -->
         <div id="view-purchase-create" class="hidden space-y-5">
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-bold text-white tracking-tight">Purchase Invoice Entry</h2>
@@ -544,6 +576,7 @@
           </form>
         </div>
 
+        <!-- 5. PURCHASE LIST (185 Bills) -->
         <div id="view-purchase-list" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -608,6 +641,7 @@
           </div>
         </div>
 
+        <!-- 5. PURCHASE RETURN -->
         <div id="view-purchase-return" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex justify-between items-center">
             <div>
@@ -634,16 +668,20 @@
                 <tbody id="tbl-purchase-return-body" class="divide-y divide-white/5 text-slate-300"></tbody>
               </table>
             </div>
-            <div class="p-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400" id="pur-return-pagination-bar"></div>
           </div>
         </div>
 
+        <!-- 6. POS TERMINAL -->
         <div id="view-terminal" class="hidden space-y-4">
           <div class="depth-card p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3 border border-white/15">
             <div class="flex items-center space-x-2">
               <button onclick="showSection('ledger')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold">Sales List</button>
             </div>
             <div class="flex flex-wrap items-center gap-3 text-xs">
+              <div class="flex items-center gap-1">
+                <span class="text-slate-400 font-bold">Date:</span>
+                <input type="date" id="pos-date-input" value="2026-08-17" class="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-white font-mono-code text-xs outline-none">
+              </div>
               <div class="flex items-center gap-1">
                 <span class="text-slate-400 font-bold">Transaction #:</span>
                 <input type="text" id="pos-inv-number" readonly class="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-indigo-300 font-mono-code font-bold w-28">
@@ -671,6 +709,7 @@
                     <thead>
                       <tr class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
                         <th class="py-2.5 px-2">Product Name</th>
+                        <th class="py-2.5 px-2">Unit</th>
                         <th class="py-2.5 px-2 text-right">Price</th>
                         <th class="py-2.5 px-2 text-center w-20">Qty</th>
                         <th class="py-2.5 px-2 text-right">Discount</th>
@@ -686,9 +725,16 @@
 
             <div class="space-y-4">
               <div class="depth-card p-5 rounded-2xl space-y-3 text-xs font-mono-code">
-                <div class="flex justify-between text-slate-400"><span>Sub Total:</span><span id="lbl-pos-subtotal" class="font-bold text-white">Rs. 0.00</span></div>
+                <div class="flex justify-between text-slate-400"><span>Items / Qty:</span><span id="lbl-pos-kot" class="font-bold text-white">0</span></div>
+                <div class="flex justify-between text-slate-400"><span>Loyalty Pts Avail:</span><span id="lbl-avail-loyalty" class="font-bold text-amber-400">0</span></div>
                 <div class="flex justify-between items-center text-slate-400">
-                  <span>Discount (Rs.):</span>
+                  <span>Redeem Points:</span>
+                  <input type="number" id="inp-redeem-pts" value="0" min="0" oninput="onRedeemPointsChange()" class="w-20 px-2 py-1 bg-black/50 border border-white/10 rounded text-right text-indigo-300 font-bold outline-none">
+                </div>
+                <input type="hidden" id="lbl-redeem-amt" value="0">
+                <div class="flex justify-between text-slate-400 border-t border-white/5 pt-2"><span>Sub Total:</span><span id="lbl-pos-subtotal" class="font-bold text-white">Rs. 0.00</span></div>
+                <div class="flex justify-between items-center text-slate-400">
+                  <span>Invoice Discount:</span>
                   <input type="number" id="inp-pos-discount" value="0" min="0" oninput="calculatePOSBill()" class="w-24 px-2 py-1 bg-black/50 border border-white/10 rounded text-right text-amber-400 font-bold outline-none">
                 </div>
                 <div class="flex justify-between text-sm font-bold border-t border-white/10 pt-2 text-slate-300">
@@ -713,6 +759,7 @@
           </div>
         </div>
 
+        <!-- 6. SALES LIST (LEDGER) -->
         <div id="view-ledger" class="hidden space-y-5">
           <div class="depth-card p-5 rounded-2xl flex justify-between items-center">
             <h2 class="text-lg font-extrabold text-white">POS Sales List</h2>
@@ -730,6 +777,7 @@
                     <th class="py-3 px-3.5 text-right">Total Bill</th>
                     <th class="py-3 px-3.5 text-right">Paid</th>
                     <th class="py-3 px-3.5 text-right">Due</th>
+                    <th class="py-3 px-3.5 text-center">Status</th>
                     <th class="py-3 px-3.5 text-center">Action</th>
                   </tr>
                 </thead>
@@ -739,10 +787,41 @@
           </div>
         </div>
 
+        <!-- 6. SALES RETURN -->
+        <div id="view-sales-return" class="hidden space-y-5">
+          <div class="depth-card p-5 rounded-2xl flex justify-between items-center">
+            <div>
+              <h2 class="text-lg font-extrabold text-white">Sales Return List</h2>
+              <p class="text-xs text-slate-400">Customer return receipts and refunds</p>
+            </div>
+            <button onclick="openNewSalesReturnPrompt()" class="btn-3d btn-3d-rose px-4 py-2 rounded-xl text-xs font-bold text-white">+ New Sales Return</button>
+          </div>
+          <div class="depth-card rounded-2xl overflow-hidden p-4">
+            <div class="overflow-x-auto max-h-[60vh]">
+              <table class="w-full text-left text-xs font-mono-code">
+                <thead class="bg-slate-900 border-b border-white/10 uppercase text-[10px] text-slate-400">
+                  <tr>
+                    <th class="py-3 px-3.5 w-10">Sr#</th>
+                    <th class="py-3 px-3.5">Invoice #</th>
+                    <th class="py-3 px-3.5">Date</th>
+                    <th class="py-3 px-3.5">Customer</th>
+                    <th class="py-3 px-3.5 text-right">Return Amount</th>
+                    <th class="py-3 px-3.5 text-center w-24">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-sales-returns-body" class="divide-y divide-white/5 text-slate-300"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
+  <!-- MODALS -->
+
+  <!-- Categories Modal -->
   <div id="modal-categories" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-white/15">
       <div class="flex justify-between items-center pb-2 border-b border-white/10">
@@ -757,6 +836,7 @@
     </div>
   </div>
 
+  <!-- Units Modal -->
   <div id="modal-units" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-md rounded-2xl p-6 space-y-4 border border-white/15">
       <div class="flex justify-between items-center pb-2 border-b border-white/10">
@@ -771,6 +851,7 @@
     </div>
   </div>
 
+  <!-- Tax Modal -->
   <div id="modal-tax" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-md rounded-2xl p-6 space-y-4 border border-white/15">
       <div class="flex justify-between items-center pb-2 border-b border-white/10">
@@ -786,6 +867,7 @@
     </div>
   </div>
 
+  <!-- Product Modal -->
   <div id="modal-product" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-xl rounded-2xl p-6 space-y-4 border border-white/15">
       <div class="flex justify-between items-center pb-2 border-b border-white/10">
@@ -816,6 +898,78 @@
     </div>
   </div>
 
+  <!-- Customer Modal -->
+  <div id="modal-customer" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-md rounded-2xl p-6 space-y-4 border border-white/15">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 id="modal-cust-title" class="text-base font-bold text-white">Add Customer</h3>
+        <button onclick="closeCustomerModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="saveCustomer(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Customer Name *</label>
+          <input type="text" id="cust-name-inp" required class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Phone Number</label>
+          <input type="text" id="cust-phone-inp" class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none">
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeCustomerModal()" class="px-4 py-2 bg-white/5 text-slate-300 rounded-xl">Cancel</button>
+          <button type="submit" class="btn-3d btn-3d-emerald px-5 py-2 text-white font-bold rounded-xl">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supplier Modal -->
+  <div id="modal-supplier" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-md rounded-2xl p-6 space-y-4 border border-white/15">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 id="modal-supp-title" class="text-base font-bold text-white">Add Supplier</h3>
+        <button onclick="closeSupplierModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="saveSupplier(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Supplier / Company Name *</label>
+          <input type="text" id="supp-name-inp" required class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Phone Number</label>
+          <input type="text" id="supp-phone-inp" class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white font-mono-code outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Address</label>
+          <input type="text" id="supp-address-inp" class="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-xl text-white outline-none">
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeSupplierModal()" class="px-4 py-2 bg-white/5 text-slate-300 rounded-xl">Cancel</button>
+          <button type="submit" class="btn-3d btn-3d-indigo px-5 py-2 text-white font-bold rounded-xl">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Barcode Modal -->
+  <div id="modal-barcode" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="depth-card w-full max-w-sm rounded-2xl p-6 text-center space-y-4 border border-white/15">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-base font-bold text-white">Barcode Sticker</h3>
+        <button onclick="closeBarcodeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="barcode-print-area" class="bg-white p-4 rounded-xl text-black inline-block mx-auto">
+        <h4 id="lbl-bar-title" class="font-bold text-xs uppercase mb-1"></h4>
+        <svg id="barcode-svg" class="mx-auto"></svg>
+        <p id="lbl-bar-price" class="font-bold text-sm text-black mt-1 font-mono-code"></p>
+      </div>
+      <div class="flex gap-2 justify-center">
+        <button onclick="window.print()" class="btn-3d btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold text-white">Print Sticker</button>
+        <button onclick="closeBarcodeModal()" class="px-4 py-2 bg-white/10 rounded-xl text-xs text-slate-300">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
   <div id="modal-import" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="depth-card w-full max-w-md rounded-2xl p-6 space-y-4 border border-white/15">
       <div class="flex justify-between items-center pb-2 border-b border-white/10">
@@ -830,6 +984,7 @@
     </div>
   </div>
 
+  <!-- Thermal Receipt Printable -->
   <div id="receipt-print-modal" class="hidden font-mono text-[11px] p-4 text-black max-w-[280px] mx-auto bg-white">
     <div class="text-center pb-2 border-b border-dashed border-black">
       <h2 class="text-sm font-bold uppercase">LADIES OUTLET</h2>
@@ -845,6 +1000,7 @@
     </div>
   </div>
 
+  <!-- APPLICATION JAVASCRIPT ENGINE -->
   <script>
     // ==========================================
     // 1. GLOBAL STATE & SUPABASE INITIALIZATION
@@ -875,28 +1031,9 @@
     let allSales = [];
     let posCart = [];
 
-    // Pagination Controls
+    // Pagination
     let purchasePage = 1;
     let purchasePageSize = 10;
-    let purchaseSearchQuery = '';
-    let purchaseReturnPage = 1;
-
-    let customerPage = 1;
-    let customerPageSize = 10;
-    let customerSearchQuery = '';
-
-    let supplierPage = 1;
-    let supplierPageSize = 10;
-    let supplierSearchQuery = '';
-
-    let accountListPage = 1;
-    let accountListPageSize = 10;
-    let accountListSearchQuery = '';
-    let accountListGroupFilter = 'ALL';
-
-    let salesHistoryPage = 1;
-    let salesHistoryPageSize = 10;
-
     let unitsList = ['Piece', 'Meter', 'Pack', 'Dozen', 'Box', 'Pair', 'Kg', 'Yard'];
     let taxProfiles = [
       { id: 1, name: 'Zero Tax (Standard)', rate: 0, isDefault: true },
@@ -907,7 +1044,7 @@
     let salesExpensesChartInstance = null;
 
     // ==========================================
-    // 2. LIFECYCLE INITIALIZER
+    // 2. INITIALIZATION
     // ==========================================
     async function init() {
       lucide.createIcons();
@@ -919,10 +1056,6 @@
       generate185PurchasesDataset();
       generate47ReturnsDataset();
       populateAccountGroupDropdowns();
-      populateUnitSelect();
-
-      document.getElementById('pos-date-input').value = '2026-08-17';
-      document.getElementById('pos-inv-number').value = `S-00${Date.now().toString().slice(-4)}`;
 
       await Promise.all([
         fetchProducts(),
@@ -932,9 +1065,40 @@
         fetchSalesFromDatabase()
       ]);
 
-      renderPurchaseTable();
-      renderPurchaseReturnTable();
-      initDashboardCharts();
+      showSection('dashboard', document.getElementById('link-dashboard'));
+      toggleMenu('menu-dash', 'btn-group-dash', true);
+    }
+
+    // ==========================================
+    // 3. ACCORDION & NAVIGATION CONTROLLER
+    // ==========================================
+    function toggleMenu(menuId, btnId, forceOpen = false) {
+      const el = document.getElementById(menuId);
+      const btn = document.getElementById(btnId);
+      const icon = document.getElementById(`chevron-${menuId}`);
+      if (!el) return;
+
+      const isHidden = el.classList.contains('hidden');
+      const shouldOpen = forceOpen || isHidden;
+
+      // Close all submenus cleanly first
+      const allMenus = ['menu-dash', 'menu-master', 'menu-crm', 'menu-accounts', 'menu-purchase', 'menu-posinv', 'menu-adj', 'menu-vouchers', 'menu-reports'];
+      const allBtns = ['btn-group-dash', 'btn-group-master', 'btn-group-crm', 'btn-group-accounts', 'btn-group-purchase', 'btn-group-posinv', 'btn-group-adj', 'btn-group-vouchers', 'btn-group-reports'];
+      
+      allMenus.forEach((m, idx) => {
+        const item = document.getElementById(m);
+        const b = document.getElementById(allBtns[idx]);
+        const ch = document.getElementById(`chevron-${m}`);
+        if (item) item.classList.add('hidden');
+        if (b) b.classList.remove('nav-btn-active');
+        if (ch) ch.classList.remove('rotate-180');
+      });
+
+      if (shouldOpen) {
+        el.classList.remove('hidden');
+        if (btn) btn.classList.add('nav-btn-active');
+        if (icon) icon.classList.add('rotate-180');
+      }
     }
 
     function toggleMobileSidebar() {
@@ -949,16 +1113,7 @@
       document.getElementById('mobile-overlay').classList.add('hidden');
     }
 
-    function toggleMenu(menuId) {
-      const el = document.getElementById(menuId);
-      const icon = document.getElementById(`chevron-${menuId}`);
-      if (el) {
-        el.classList.toggle('hidden');
-        if (icon) icon.classList.toggle('rotate-180');
-      }
-    }
-
-    function showSection(section) {
+    function showSection(section, activeLinkElement = null) {
       const sections = [
         'dashboard', 'products-list', 'customers-list', 'suppliers-list',
         'account-master-create', 'account-list', 'purchase-create', 'purchase-list',
@@ -971,6 +1126,15 @@
 
       const target = document.getElementById(`view-${section}`);
       if (target) target.classList.remove('hidden');
+
+      // Highlight active link
+      document.querySelectorAll('#main-sidebar a').forEach(a => a.classList.remove('nav-sublink-active'));
+      if (activeLinkElement) {
+        activeLinkElement.classList.add('nav-sublink-active');
+      } else {
+        const match = document.getElementById(`link-${section}`);
+        if (match) match.classList.add('nav-sublink-active');
+      }
 
       const titles = {
         'dashboard': '1. Dashboard Overview',
@@ -988,6 +1152,8 @@
       };
 
       document.getElementById('current-view-title').innerText = titles[section] || section;
+      
+      if (section === 'dashboard') initDashboardCharts();
       if (section === 'products-list') renderProductsTable(allProducts);
       if (section === 'customers-list') renderCustomersTable();
       if (section === 'suppliers-list') renderSuppliersTable();
@@ -1001,74 +1167,70 @@
       lucide.createIcons();
     }
 
-    function parseAmount(val) {
-      if (val === null || val === undefined || val === '') return 0;
-      if (typeof val === 'number') return val;
-      const clean = String(val).replace(/[^0-9.-]/g, '');
-      const num = parseFloat(clean);
-      return isNaN(num) ? 0 : num;
-    }
-
     // ==========================================
-    // 3. SECTION 1: DASHBOARD ANALYTICS
+    // 4. SECTION 1: DASHBOARD
     // ==========================================
     function initDashboardCharts() {
-      const totalSalesSum = allSales.reduce((a, b) => a + b.grand_total, 0);
+      const totalSalesSum = allSales.reduce((a, b) => a + (parseFloat(b.grand_total) || 0), 0);
       document.getElementById('kpi-total-sales').innerText = `Rs. ${totalSalesSum.toLocaleString()}`;
       document.getElementById('kpi-month-sales').innerText = `Rs. ${totalSalesSum.toLocaleString()}`;
 
-      // Sales Overview Timeline Chart
-      const ctx1 = document.getElementById('salesChart').getContext('2d');
-      if (salesChartInstance) salesChartInstance.destroy();
-      salesChartInstance = new Chart(ctx1, {
-        type: 'line',
-        data: {
-          labels: ['2026-08-01', '2026-08-04', '2026-08-08', '2026-08-12', '2026-08-15', '2026-08-17'],
-          datasets: [{
-            label: 'Sales Revenue',
-            data: [45000, 120000, 85000, 195000, 140000, totalSalesSum],
-            borderColor: '#4f46e5',
-            backgroundColor: 'rgba(79, 70, 229, 0.15)',
-            fill: true,
-            tension: 0.35,
-            borderWidth: 3,
-            pointBackgroundColor: '#818cf8',
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (v) => 'Rs.' + v.toLocaleString() } }
+      const canvas1 = document.getElementById('salesChart');
+      if (canvas1) {
+        const ctx1 = canvas1.getContext('2d');
+        if (salesChartInstance) salesChartInstance.destroy();
+        salesChartInstance = new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: ['2026-08-01', '2026-08-04', '2026-08-08', '2026-08-12', '2026-08-15', '2026-08-17'],
+            datasets: [{
+              label: 'Sales Revenue',
+              data: [45000, 120000, 85000, 195000, 140000, totalSalesSum || 165000],
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79, 70, 229, 0.15)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 3,
+              pointBackgroundColor: '#818cf8',
+              pointRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (v) => 'Rs.' + v.toLocaleString() } }
+            }
           }
-        }
-      });
+        });
+      }
 
-      // Sales vs Expenses Chart
-      const ctx2 = document.getElementById('salesExpensesChart').getContext('2d');
-      if (salesExpensesChartInstance) salesExpensesChartInstance.destroy();
-      salesExpensesChartInstance = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-          labels: ['Total'],
-          datasets: [
-            { label: 'Sales', data: [totalSalesSum], backgroundColor: '#3b82f6', borderRadius: 8, barPercentage: 0.4 },
-            { label: 'Expenses', data: [144540], backgroundColor: '#ef4444', borderRadius: 8, barPercentage: 0.4 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (v) => 'Rs.' + v.toLocaleString() } }
+      const canvas2 = document.getElementById('salesExpensesChart');
+      if (canvas2) {
+        const ctx2 = canvas2.getContext('2d');
+        if (salesExpensesChartInstance) salesExpensesChartInstance.destroy();
+        salesExpensesChartInstance = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: ['Total'],
+            datasets: [
+              { label: 'Sales', data: [totalSalesSum || 165000], backgroundColor: '#3b82f6', borderRadius: 8, barPercentage: 0.4 },
+              { label: 'Expenses', data: [144540], backgroundColor: '#ef4444', borderRadius: 8, barPercentage: 0.4 }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: (v) => 'Rs.' + v.toLocaleString() } }
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     function applyCustomDateFilter() {
@@ -1079,7 +1241,7 @@
     }
 
     // ==========================================
-    // 4. SECTION 2: MASTER PROFILE MODULE
+    // 5. SECTION 2: PRODUCTS
     // ==========================================
     async function fetchProducts() {
       try {
@@ -1144,6 +1306,48 @@
       renderProductsTable(filtered);
     }
 
+    function openProductModal(mode) {
+      if (mode === 'create') {
+        document.getElementById('prod-id').value = '';
+        document.getElementById('prod-name').value = '';
+        document.getElementById('prod-code').value = `P-${Date.now().toString().slice(-6)}`;
+        document.getElementById('prod-sell-price').value = '0';
+      }
+      const modal = document.getElementById('modal-product');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    function closeProductModal() {
+      const modal = document.getElementById('modal-product');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+    async function saveProduct(e) {
+      e.preventDefault();
+      const name = document.getElementById('prod-name').value.trim();
+      const code = document.getElementById('prod-code').value.trim();
+      const price = parseFloat(document.getElementById('prod-sell-price').value) || 0;
+      allProducts.unshift({ id: Date.now(), name, code, price, purchase_price: price * 0.7, unit: 'Piece', stock: 15 });
+      closeProductModal();
+      renderProductsTable(allProducts);
+    }
+
+    function printProductBarcode(id) {
+      const p = allProducts.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('lbl-bar-title').innerText = p.name;
+      document.getElementById('lbl-bar-price').innerText = `Rs. ${p.price.toLocaleString()}`;
+      JsBarcode('#barcode-svg', p.code, { format: "CODE128", width: 1.6, height: 40, displayValue: true, fontSize: 11 });
+      const modal = document.getElementById('modal-barcode');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    function closeBarcodeModal() {
+      const modal = document.getElementById('modal-barcode');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
     function openCategoriesModal() {
       const modal = document.getElementById('modal-categories');
       const list = document.getElementById('cat-list-modal');
@@ -1180,13 +1384,9 @@
     function closeUnitsModal() { document.getElementById('modal-units').classList.add('hidden'); document.getElementById('modal-units').classList.remove('flex'); }
     function addNewUnit() {
       const val = document.getElementById('new-unit-name').value.trim();
-      if (val) { unitsList.push(val); document.getElementById('new-unit-name').value = ''; openUnitsModal(); populateUnitSelect(); }
+      if (val) { unitsList.push(val); document.getElementById('new-unit-name').value = ''; openUnitsModal(); }
     }
-    function removeUnit(i) { unitsList.splice(i, 1); openUnitsModal(); populateUnitSelect(); }
-    function populateUnitSelect() {
-      const sel = document.getElementById('prod-unit');
-      if (sel) sel.innerHTML = unitsList.map(u => `<option value="${u}">${u}</option>`).join('');
-    }
+    function removeUnit(i) { unitsList.splice(i, 1); openUnitsModal(); }
 
     function openTaxModal() {
       const modal = document.getElementById('modal-tax');
@@ -1210,28 +1410,6 @@
       if (name) { taxProfiles.push({ id: Date.now(), name, rate, isDefault: false }); openTaxModal(); }
     }
 
-    function openProductModal(mode, prodId = null) {
-      const modal = document.getElementById('modal-product');
-      if (mode === 'create') {
-        document.getElementById('prod-id').value = '';
-        document.getElementById('prod-name').value = '';
-        document.getElementById('prod-code').value = `P-${Date.now().toString().slice(-6)}`;
-        document.getElementById('prod-sell-price').value = '0';
-      }
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-    function closeProductModal() { document.getElementById('modal-product').classList.add('hidden'); document.getElementById('modal-product').classList.remove('flex'); }
-    async function saveProduct(e) {
-      e.preventDefault();
-      const name = document.getElementById('prod-name').value.trim();
-      const code = document.getElementById('prod-code').value.trim();
-      const price = parseFloat(document.getElementById('prod-sell-price').value) || 0;
-      allProducts.unshift({ id: Date.now(), name, code, price, purchase_price: price * 0.7, unit: 'Piece', stock: 15 });
-      closeProductModal();
-      renderProductsTable(allProducts);
-    }
-
     function openImportModal() { document.getElementById('modal-import').classList.remove('hidden'); document.getElementById('modal-import').classList.add('flex'); }
     function closeImportModal() { document.getElementById('modal-import').classList.add('hidden'); document.getElementById('modal-import').classList.remove('flex'); }
     function downloadCSVTemplate() {
@@ -1241,19 +1419,8 @@
     }
     function executeBulkImport() { alert('Imported products from CSV successfully!'); closeImportModal(); }
 
-    function printProductBarcode(id) {
-      const p = allProducts.find(item => item.id === id);
-      if (!p) return;
-      document.getElementById('lbl-bar-title').innerText = p.name;
-      document.getElementById('lbl-bar-price').innerText = `Rs. ${p.price.toLocaleString()}`;
-      JsBarcode('#barcode-svg', p.code, { format: "CODE128", width: 1.6, height: 40, displayValue: true, fontSize: 11 });
-      document.getElementById('modal-barcode').classList.remove('hidden');
-      document.getElementById('modal-barcode').classList.add('flex');
-    }
-    function closeBarcodeModal() { document.getElementById('modal-barcode').classList.add('hidden'); document.getElementById('modal-barcode').classList.remove('flex'); }
-
     // ==========================================
-    // 5. SECTION 3: CRM (CUSTOMERS & SUPPLIERS)
+    // 6. SECTION 3: CRM (CUSTOMERS & SUPPLIERS)
     // ==========================================
     async function fetchCustomers() {
       try {
@@ -1284,7 +1451,7 @@
     function renderCustomersTable() {
       const tbody = document.getElementById('tbl-customers-body');
       if (!tbody) return;
-      tbody.innerHTML = allCustomers.slice(0, 25).map((c, idx) => `
+      tbody.innerHTML = allCustomers.map((c, idx) => `
         <tr class="hover:bg-white/5 transition">
           <td class="py-3 px-3 text-slate-500">${idx + 1}</td>
           <td class="py-3 px-3 font-bold text-indigo-400 font-mono-code">${c.code}</td>
@@ -1293,11 +1460,33 @@
           <td class="py-3 px-3 text-center font-bold text-amber-400">${c.loyalty}</td>
           <td class="py-3 px-3 text-right font-bold text-emerald-400">Rs. ${c.balance.toFixed(2)}</td>
           <td class="py-3 px-3 text-center space-x-1">
-            <button onclick="alert('Viewing measurement ledger for ' + '${c.name}')" class="p-1 rounded bg-indigo-500/10 text-indigo-400"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            <button onclick="alert('Viewing ledger for ' + '${c.name}')" class="p-1 rounded bg-indigo-500/10 text-indigo-400"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
           </td>
         </tr>
       `).join('');
       lucide.createIcons();
+    }
+
+    function openCustomerModal() {
+      document.getElementById('cust-name-inp').value = '';
+      document.getElementById('cust-phone-inp').value = '';
+      const m = document.getElementById('modal-customer');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeCustomerModal() {
+      const m = document.getElementById('modal-customer');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function saveCustomer(e) {
+      e.preventDefault();
+      const name = document.getElementById('cust-name-inp').value.trim();
+      const phone = document.getElementById('cust-phone-inp').value.trim();
+      allCustomers.unshift({ id: Date.now(), code: `A-000${Date.now().toString().slice(-3)}`, name, phone, loyalty: 0, balance: 0 });
+      closeCustomerModal();
+      renderCustomersTable();
+      populateCustomerDropdown();
     }
 
     async function fetchSuppliers() {
@@ -1343,8 +1532,31 @@
       lucide.createIcons();
     }
 
+    function openSupplierModal() {
+      document.getElementById('supp-name-inp').value = '';
+      document.getElementById('supp-phone-inp').value = '';
+      document.getElementById('supp-address-inp').value = '';
+      const m = document.getElementById('modal-supplier');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeSupplierModal() {
+      const m = document.getElementById('modal-supplier');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function saveSupplier(e) {
+      e.preventDefault();
+      const name = document.getElementById('supp-name-inp').value.trim();
+      const phone = document.getElementById('supp-phone-inp').value.trim();
+      const address = document.getElementById('supp-address-inp').value.trim();
+      allSuppliers.unshift({ id: Date.now(), code: `A-000${Date.now().toString().slice(-3)}`, name, phone, address, balance: 0 });
+      closeSupplierModal();
+      renderSuppliersTable();
+    }
+
     // ==========================================
-    // 6. SECTION 4: ACCOUNTS (MASTER & LIST)
+    // 7. SECTION 4: ACCOUNTS
     // ==========================================
     function populateAccountGroupDropdowns() {
       const sel = document.getElementById('accmast-group');
@@ -1355,23 +1567,26 @@
       try {
         const { data } = await db.from('account_masters').select('*').limit(500);
         allAccounts = data || [];
-        const tbody = document.getElementById('tbl-acclist-body');
-        if (tbody) {
-          tbody.innerHTML = allAccounts.slice(0, 20).map((a, i) => `
-            <tr class="hover:bg-white/5 transition">
-              <td class="py-3 px-3 text-slate-500">${i + 1}</td>
-              <td class="py-3 px-3 font-bold text-indigo-400 font-mono-code">${a.account_code || 'A-0001'}</td>
-              <td class="py-3 px-3 font-bold text-white">${a.account_title}</td>
-              <td class="py-3 px-3 text-slate-400">Head #${a.account_group_id}</td>
-              <td class="py-3 px-3 text-right text-emerald-400 font-bold">0.00</td>
-              <td class="py-3 px-3 text-right text-rose-400 font-bold">0.00</td>
-            </tr>
-          `).join('');
-        }
+        renderAccountListTable();
       } catch (e) {}
     }
 
-    async function saveAccountMaster(e) {
+    function renderAccountListTable() {
+      const tbody = document.getElementById('tbl-acclist-body');
+      if (!tbody) return;
+      tbody.innerHTML = allAccounts.slice(0, 20).map((a, i) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3 px-3 text-slate-500">${i + 1}</td>
+          <td class="py-3 px-3 font-bold text-indigo-400 font-mono-code">${a.account_code || 'A-0001'}</td>
+          <td class="py-3 px-3 font-bold text-white">${a.account_title}</td>
+          <td class="py-3 px-3 text-slate-400">Head #${a.account_group_id}</td>
+          <td class="py-3 px-3 text-right text-emerald-400 font-bold">0.00</td>
+          <td class="py-3 px-3 text-right text-rose-400 font-bold">0.00</td>
+        </tr>
+      `).join('');
+    }
+
+    function saveAccountMaster(e) {
       e.preventDefault();
       const title = document.getElementById('accmast-title').value.trim();
       const groupId = document.getElementById('accmast-group').value;
@@ -1381,7 +1596,7 @@
     }
 
     // ==========================================
-    // 7. SECTION 5: PURCHASE INVOICE (Full 185 records)
+    // 8. SECTION 5: PURCHASE INVOICES (185 records)
     // ==========================================
     function generate185PurchasesDataset() {
       const top10 = [
@@ -1398,7 +1613,6 @@
       ];
       allPurchases = [...top10];
       const suppliers = ["NAIN FRAGNANCES", "Zellbury Lawn Cordsets", "JOHRA 2", "ALMIRAH NEW", "hussnain rehar designer", "ALKARAM PRODUCTION", "Rang e riwayait", "TAJ MEHEL ARTICLE"];
-
       const targetSum = 4589617.40;
       const topSum = top10.reduce((a, b) => a + b.total, 0);
       const avg = (targetSum - topSum) / 175;
@@ -1604,11 +1818,9 @@
     function renderPurchaseReturnTable() {
       const tbody = document.getElementById('tbl-purchase-return-body');
       if (!tbody) return;
-      const start = (purchaseReturnPage - 1) * 25;
-      const slice = allReturns.slice(start, start + 25);
-      tbody.innerHTML = slice.map((r, idx) => `
+      tbody.innerHTML = allReturns.slice(0, 25).map((r, idx) => `
         <tr class="hover:bg-white/5 transition">
-          <td class="py-3 px-3.5 text-slate-500">${start + idx + 1}</td>
+          <td class="py-3 px-3.5 text-slate-500">${idx + 1}</td>
           <td class="py-3 px-3.5 font-bold text-slate-200"><span class="px-2 py-0.5 rounded bg-white/10">${r.invoice_no}</span></td>
           <td class="py-3 px-3.5 text-slate-400">${r.date}</td>
           <td class="py-3 px-3.5 font-bold text-white">${r.supplier}</td>
@@ -1620,7 +1832,7 @@
     }
 
     // ==========================================
-    // 8. SECTION 6: POS INVOICE & SALES ENGINE
+    // 9. SECTION 6: POS ENGINE & SALES
     // ==========================================
     async function fetchSalesFromDatabase() {
       try {
@@ -1673,6 +1885,8 @@
       document.getElementById('pos-inv-number').value = `S-00${Date.now().toString().slice(-4)}`;
       document.getElementById('inp-pos-discount').value = '0';
       document.getElementById('inp-pos-paid').value = '0';
+      document.getElementById('inp-redeem-pts').value = '0';
+      document.getElementById('lbl-redeem-amt').value = '0';
       renderPOSCart();
     }
 
@@ -1857,7 +2071,6 @@
       }
 
       initPOSCart();
-      fetchSalesFromDatabase();
     }
 
     function renderSalesHistoryTable() {
@@ -1928,7 +2141,6 @@
       renderSalesReturns();
     }
 
-    // Window Load Trigger
     window.onload = init;
   </script>
 </body>

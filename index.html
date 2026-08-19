@@ -5692,21 +5692,33 @@ const RealData = {
   }
 };
 
-/* Boot the correct data source */
-if (SUPABASE_URL && SUPABASE_KEY){
-  DataBridge.applyConfig(SUPABASE_URL, SUPABASE_KEY);
-  setTimeout(() => {
+/* Boot the correct data source (Waits for Supabase CDN to finish loading) */
+function initSupabaseBridge() {
+    if (window.__sbBooted) return;
+    window.__sbBooted = true;
+
+    if (SUPABASE_URL && SUPABASE_KEY){
+      DataBridge.applyConfig(SUPABASE_URL, SUPABASE_KEY);
+      setTimeout(() => {
+          RealData.injectSyncButton();
+          RealData.sync();
+      }, 800);
+    } else if (DataBridge.status === 'connected'){
+      setTimeout(() => {
+          RealData.injectSyncButton();
+          RealData.sync();
+      }, 800);
+    } else {
       RealData.injectSyncButton();
-      RealData.sync();
-  }, 500);
-} else if (DataBridge.status === 'connected'){
-  setTimeout(() => {
-      RealData.injectSyncButton();
-      RealData.sync();
-  }, 500);
+      RealData.tryStatic();
+    }
+}
+
+if (window.supabase) {
+    initSupabaseBridge();
 } else {
-  RealData.injectSyncButton();
-  RealData.tryStatic();
+    window.addEventListener('load', initSupabaseBridge);
+    setTimeout(initSupabaseBridge, 4000); // Safety fallback
 }
 
 /* ==========================================================

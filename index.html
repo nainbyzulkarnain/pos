@@ -5501,12 +5501,10 @@ LuxModal.confirm = function(title, text){
 <!-- <<< END: HOTFIX - Restore App Shell Grid   -->
 <!-- ========================================== -->
 <!-- ========================================== -->
-<!-- >>> START: PART 13 - Real Data Bridge & Performance Overhaul -->
+<!-- >>> START: PART 13 (REVISED) - Real Data Bridge & Diagnostics -->
 <!-- ========================================== -->
 <style>
-/* ==========================================================
-   65. PERFORMANCE OVERRIDES (kill continuous paint + lighten blur)
-========================================================== */
+/* 65. PERFORMANCE OVERRIDES */
 body::before{animation:none}
 .boot-gem{animation:none}
 .sidebar,.topbar,.lux-modal__panel,.dd-panel,.bridge-pill,.toast,.glass{
@@ -5516,17 +5514,29 @@ body::before{animation:none}
 .kpi-card,.card-3d{will-change:auto}
 .table-lux tbody tr{transition:none}
 @media (max-width:640px){.table-lux tbody td{transition:none}}
+
+/* Sync Button in Topbar */
+.topbar__sync-btn {
+  display: flex; align-items: center; gap: .4em;
+  padding: .45em .85em; border-radius: var(--r-full);
+  background: var(--emerald-soft); color: var(--emerald);
+  border: 1px solid rgba(52,211,153,.3); font-size: var(--fs-xs); font-weight: 700;
+  cursor: pointer; transition: var(--t-fast);
+}
+.topbar__sync-btn:hover { background: rgba(52,211,153,.25); transform: translateY(-1px); }
+.topbar__sync-btn.is-syncing { opacity: .6; pointer-events: none; }
+.topbar__sync-btn .spinner { width: 1em; height: 1em; border-width: 2px; }
 </style>
 
 <script>
 /* ==========================================================
-   66. REAL-DATA CONFIG — paste your Supabase credentials here
+   66. REAL-DATA CONFIG
 ========================================================== */
 const SUPABASE_URL = 'https://akfhhyljhjaotxbbpljh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZmhoeWxqaGphb3R4YmJwbGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NzIyMTUsImV4cCI6MjEwMjQ0ODIxNX0.hZ_Bx6Xw6Lxf9pRlNfYyqcZLezdkyYn_Z0ux58sJNfk';
 
 /* ==========================================================
-   67. SEARCH DEBOUNCER (stops per-keystroke full re-renders)
+   67. SEARCH DEBOUNCER
 ========================================================== */
 (function(){
   document.addEventListener('input', function(e){
@@ -5542,7 +5552,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 })();
 
 /* ==========================================================
-   68. QUOTA-SAFE CACHE (full data may exceed 5MB localStorage)
+   68. QUOTA-SAFE CACHE
 ========================================================== */
 (function(){
   const key = DataBridge.CACHE_KEY;
@@ -5555,14 +5565,14 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
           const slim = Object.assign({}, window.DB);
           ['sell_products','account_transactions','audit_logs','purchase_products','measurements'].forEach(k => delete slim[k]);
           localStorage.setItem(key, JSON.stringify(slim));
-        } catch(e2){ /* storage full — run live/static only */ }
+        } catch(e2){ /* storage full */ }
       }
     }, 400);
   };
 })();
 
 /* ==========================================================
-   69. REAL DATA LOADER — static dump (data.js) or live Supabase
+   69. REAL DATA LOADER WITH DIAGNOSTICS
 ========================================================== */
 function reRenderCurrent(){
   const hash = location.hash || '#/dashboard';
@@ -5576,13 +5586,7 @@ const RealData = {
           'account_types','account_heads','account_groups','account_masters','account_transactions',
           'loyalty_points','measurements','branches','employees','departments','designations'],
 
-  applyDump(dump){
-    const db = MasterStore.db();
-    Object.keys(dump).forEach(k => { if (Array.isArray(dump[k]) && dump[k].length) db[k] = dump[k]; });
-    DataBridge._lens = {};
-    Object.keys(db).forEach(k => { if (Array.isArray(db[k])) DataBridge._lens[k] = db[k].length; });
-    DataBridge.scheduleCache();
-  },
+  isSyncing: false,
 
   tryStatic(){
     const s = document.createElement('script');
@@ -5592,53 +5596,121 @@ const RealData = {
         this.applyDump(window.LO_DUMP);
         if (NoticeCenter.bell) NoticeCenter.refresh();
         reRenderCurrent();
-        toast('success','Full dataset loaded — '+(window.DB.products||[]).length+' products, '+(window.DB.customers||[]).length+' customers, '+(window.DB.sells||[]).length+' sales');
+        toast('success','Full dataset loaded from data.js');
       }
     };
-    s.onerror = () => {}; /* no data.js — stay on cache/seed */
+    s.onerror = () => {}; 
     document.head.appendChild(s);
+  },
+  
+  applyDump(dump){
+    const db = MasterStore.db();
+    Object.keys(dump).forEach(k => { if (Array.isArray(dump[k]) && dump[k].length) db[k] = dump[k]; });
+    DataBridge._lens = {};
+    Object.keys(db).forEach(k => { if (Array.isArray(db[k])) DataBridge._lens[k] = db[k].length; });
+    DataBridge.scheduleCache();
   },
 
   async fetchAll(client, table){
     let out = [], from = 0; const step = 1000;
     for(;;){
       const { data, error } = await client.from(table).select('*').range(from, from + step - 1);
-      if (error) return null;
+      if (error) {
+        console.error(`[Supabase Sync] ❌ Error fetching table "${table}":`, error);
+        return { error: error.message, data: null };
+      }
       out = out.concat(data || []);
       if (!data || data.length < step) break;
       from += step;
-      if (out.length > 30000) break;
+      if (out.length > 50000) break;
     }
-    return out;
+    return { error: null, data: out };
   },
 
   async sync(){
-    if (!DataBridge.client) return;
+    if (this.isSyncing) return;
+    if (!DataBridge.client) {
+        toast('error', 'Supabase client not initialized. Check URL/Key.');
+        return;
+    }
+    
+    this.isSyncing = true;
+    const syncBtn = document.getElementById('topbarSyncBtn');
+    if (syncBtn) syncBtn.classList.add('is-syncing');
+    
     toast('info','Syncing live database…');
     const db = MasterStore.db();
+    let successCount = 0;
+    let emptyCount = 0;
+    let failCount = 0;
+    
     for (const t of this.TABLES){
-      const rows = await this.fetchAll(DataBridge.client, t);
-      if (rows && rows.length) db[t] = rows;
+      const res = await this.fetchAll(DataBridge.client, t);
+      if (res.error) {
+          failCount++;
+          continue;
+      }
+      if (res.data && res.data.length > 0) {
+          db[t] = res.data;
+          successCount++;
+      } else {
+          emptyCount++;
+          console.warn(`[Supabase Sync] ⚠️ Table "${t}" returned 0 rows. (Check if table exists or if RLS is blocking the anon key).`);
+      }
     }
+    
+    DataBridge._lens = {};
+    Object.keys(db).forEach(k => { if (Array.isArray(db[k])) DataBridge._lens[k] = db[k].length; });
     DataBridge.scheduleCache();
+    
     if (NoticeCenter.bell) NoticeCenter.refresh();
     reRenderCurrent();
-    toast('success','Live sync complete — '+(db.products||[]).length+' products / '+(db.sells||[]).length+' sales');
+    
+    this.isSyncing = false;
+    if (syncBtn) syncBtn.classList.remove('is-syncing');
+
+    if (failCount > 0) {
+        toast('error', `Sync failed for ${failCount} tables. Open Console (F12) to see errors.`);
+    } else if (emptyCount > 0 && successCount === 0) {
+        toast('warning', `Supabase returned 0 rows for all tables. RLS might be enabled. Check Console.`);
+    } else {
+        toast('success',`Synced! ${(db.products||[]).length} products, ${(db.customers||[]).length} customers, ${(db.sells||[]).length} sales.`);
+    }
+  },
+
+  injectSyncButton() {
+      const rightSection = document.querySelector('.topbar__right');
+      if (rightSection && !document.getElementById('topbarSyncBtn')) {
+          const btn = document.createElement('button');
+          btn.id = 'topbarSyncBtn';
+          btn.className = 'topbar__sync-btn';
+          btn.innerHTML = '<i data-lucide="refresh-cw" style="width:1em;height:1em"></i> <span>Force Sync</span>';
+          btn.onclick = () => this.sync();
+          rightSection.insertBefore(btn, rightSection.firstChild);
+          if (window.lucide) window.lucide.createIcons();
+      }
   }
 };
 
 /* Boot the correct data source */
 if (SUPABASE_URL && SUPABASE_KEY){
   DataBridge.applyConfig(SUPABASE_URL, SUPABASE_KEY);
-  RealData.sync();
+  setTimeout(() => {
+      RealData.injectSyncButton();
+      RealData.sync();
+  }, 500);
 } else if (DataBridge.status === 'connected'){
-  RealData.sync();
+  setTimeout(() => {
+      RealData.injectSyncButton();
+      RealData.sync();
+  }, 500);
 } else {
+  RealData.injectSyncButton();
   RealData.tryStatic();
 }
 
 /* ==========================================================
-   70. DASHBOARD OPTIMIZATION for 1,000+ row datasets (Map lookups)
+   70. DASHBOARD OPTIMIZATION
 ========================================================== */
 DashboardModule.pmap = function(d){
   if (!this._pmap || this._pSrc !== d.products){
@@ -5668,7 +5740,7 @@ DashboardModule.topProducts = function(d){
 };
 </script>
 <!-- ========================================== -->
-<!-- <<< END: PART 13 - Real Data Bridge & Performance Overhaul -->
+<!-- <<< END: PART 13 (REVISED) - Real Data Bridge & Diagnostics -->
 <!-- ========================================== -->
 </body>
 </html>

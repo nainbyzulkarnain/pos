@@ -5500,8 +5500,179 @@ LuxModal.confirm = function(title, text){
 <!-- ========================================== -->
 <!-- <<< END: HOTFIX - Restore App Shell Grid   -->
 <!-- ========================================== -->
+<!-- ========================================== -->
+<!-- >>> START: PART 13 - Real Data Bridge & Performance Overhaul -->
+<!-- ========================================== -->
+<style>
+/* ==========================================================
+   65. PERFORMANCE OVERRIDES (kill continuous paint + lighten blur)
+========================================================== */
+body::before{animation:none}
+.boot-gem{animation:none}
+.sidebar,.topbar,.lux-modal__panel,.dd-panel,.bridge-pill,.toast,.glass{
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.stagger>*{animation-delay:0s!important}
+.kpi-card,.card-3d{will-change:auto}
+.table-lux tbody tr{transition:none}
+@media (max-width:640px){.table-lux tbody td{transition:none}}
+</style>
+
+<script>
+/* ==========================================================
+   66. REAL-DATA CONFIG — paste your Supabase credentials here
+========================================================== */
+const SUPABASE_URL = 'https://akfhhyljhjaotxbbpljh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZmhoeWxqaGphb3R4YmJwbGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NzIyMTUsImV4cCI6MjEwMjQ0ODIxNX0.hZ_Bx6Xw6Lxf9pRlNfYyqcZLezdkyYn_Z0ux58sJNfk';
+
+/* ==========================================================
+   67. SEARCH DEBOUNCER (stops per-keystroke full re-renders)
+========================================================== */
+(function(){
+  document.addEventListener('input', function(e){
+    const el = e.target;
+    if (!el || !el.matches) return;
+    if (el.matches('input[id$="Search"]')){
+      if (el.__synthetic){ el.__synthetic = false; return; }
+      e.stopPropagation();
+      clearTimeout(el.__dt);
+      el.__dt = setTimeout(() => { el.__synthetic = true; el.dispatchEvent(new Event('input')); }, 220);
+    }
+  }, true);
+})();
+
+/* ==========================================================
+   68. QUOTA-SAFE CACHE (full data may exceed 5MB localStorage)
+========================================================== */
+(function(){
+  const key = DataBridge.CACHE_KEY;
+  DataBridge.scheduleCache = function(){
+    clearTimeout(this._cacheTimer);
+    this._cacheTimer = setTimeout(() => {
+      try { localStorage.setItem(key, JSON.stringify(window.DB||{})); }
+      catch(e){
+        try {
+          const slim = Object.assign({}, window.DB);
+          ['sell_products','account_transactions','audit_logs','purchase_products','measurements'].forEach(k => delete slim[k]);
+          localStorage.setItem(key, JSON.stringify(slim));
+        } catch(e2){ /* storage full — run live/static only */ }
+      }
+    }, 400);
+  };
+})();
+
+/* ==========================================================
+   69. REAL DATA LOADER — static dump (data.js) or live Supabase
+========================================================== */
+function reRenderCurrent(){
+  const hash = location.hash || '#/dashboard';
+  const route = AppRouter.routes[hash];
+  if (route && ViewManager.registry[route.view]) ViewManager.registry[route.view]();
+}
+
+const RealData = {
+  TABLES:['categories','units','taxes','products','customers','suppliers','sells','sell_products',
+          'purchases','purchase_products','purchase_returns','sale_returns','raw_materials',
+          'account_types','account_heads','account_groups','account_masters','account_transactions',
+          'loyalty_points','measurements','branches','employees','departments','designations'],
+
+  applyDump(dump){
+    const db = MasterStore.db();
+    Object.keys(dump).forEach(k => { if (Array.isArray(dump[k]) && dump[k].length) db[k] = dump[k]; });
+    DataBridge._lens = {};
+    Object.keys(db).forEach(k => { if (Array.isArray(db[k])) DataBridge._lens[k] = db[k].length; });
+    DataBridge.scheduleCache();
+  },
+
+  tryStatic(){
+    const s = document.createElement('script');
+    s.src = 'data.js';
+    s.onload = () => {
+      if (window.LO_DUMP){
+        this.applyDump(window.LO_DUMP);
+        if (NoticeCenter.bell) NoticeCenter.refresh();
+        reRenderCurrent();
+        toast('success','Full dataset loaded — '+(window.DB.products||[]).length+' products, '+(window.DB.customers||[]).length+' customers, '+(window.DB.sells||[]).length+' sales');
+      }
+    };
+    s.onerror = () => {}; /* no data.js — stay on cache/seed */
+    document.head.appendChild(s);
+  },
+
+  async fetchAll(client, table){
+    let out = [], from = 0; const step = 1000;
+    for(;;){
+      const { data, error } = await client.from(table).select('*').range(from, from + step - 1);
+      if (error) return null;
+      out = out.concat(data || []);
+      if (!data || data.length < step) break;
+      from += step;
+      if (out.length > 30000) break;
+    }
+    return out;
+  },
+
+  async sync(){
+    if (!DataBridge.client) return;
+    toast('info','Syncing live database…');
+    const db = MasterStore.db();
+    for (const t of this.TABLES){
+      const rows = await this.fetchAll(DataBridge.client, t);
+      if (rows && rows.length) db[t] = rows;
+    }
+    DataBridge.scheduleCache();
+    if (NoticeCenter.bell) NoticeCenter.refresh();
+    reRenderCurrent();
+    toast('success','Live sync complete — '+(db.products||[]).length+' products / '+(db.sells||[]).length+' sales');
+  }
+};
+
+/* Boot the correct data source */
+if (SUPABASE_URL && SUPABASE_KEY){
+  DataBridge.applyConfig(SUPABASE_URL, SUPABASE_KEY);
+  RealData.sync();
+} else if (DataBridge.status === 'connected'){
+  RealData.sync();
+} else {
+  RealData.tryStatic();
+}
+
+/* ==========================================================
+   70. DASHBOARD OPTIMIZATION for 1,000+ row datasets (Map lookups)
+========================================================== */
+DashboardModule.pmap = function(d){
+  if (!this._pmap || this._pSrc !== d.products){
+    this._pmap = new Map((d.products||[]).map(p => [Number(p.id), p]));
+    this._pSrc = d.products;
+  }
+  return this._pmap;
+};
+DashboardModule.categoryDist = function(d){
+  const pm = this.pmap(d);
+  const qty = new Map();
+  (d.sell_products||[]).forEach(sp => {
+    const p = pm.get(Number(sp.product_id));
+    const cat = p ? p.category_id : 0;
+    qty.set(cat, (qty.get(cat)||0) + Number(sp.quantity||0));
+  });
+  const rows = [...qty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
+  return { labels: rows.map(r => { const c=(d.categories||[]).find(x=>x.id==r[0]); return c?c.title:'Misc'; }),
+           data: rows.map(r=>r[1]), total: rows.reduce((a,r)=>a+r[1],0) };
+};
+DashboardModule.topProducts = function(d){
+  const pm = this.pmap(d);
+  const qty = new Map();
+  (d.sell_products||[]).forEach(sp => qty.set(Number(sp.product_id), (qty.get(Number(sp.product_id))||0) + Number(sp.quantity||0)));
+  return [...qty.entries()].map(e => { const p = pm.get(e[0]); return { title: p?p.title:'Product #'+e[0], qty:e[1] }; })
+    .sort((a,b)=>b.qty-a.qty).slice(0,6);
+};
+</script>
+<!-- ========================================== -->
+<!-- <<< END: PART 13 - Real Data Bridge & Performance Overhaul -->
+<!-- ========================================== -->
 </body>
 </html>
 <!-- ========================================== -->
 <!-- <<< END: PART 12 - Global Interactivity & App Init: Toasts, Command Search, Notifications, PDF Export & Boot Sequence -->
 <!-- ========================================== -->
+

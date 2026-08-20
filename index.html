@@ -2976,6 +2976,9 @@
         // -------------------------------------------------------------------------
         // 2. SUPABASE DATA ACCESS LAYER
         // -------------------------------------------------------------------------
+        // -------------------------------------------------------------------------
+        // 2. FAULT-TOLERANT SUPABASE DATA ACCESS LAYER
+        // -------------------------------------------------------------------------
         const SupabaseService = {
             client: null,
             cache: {
@@ -2993,6 +2996,7 @@
                 if (!url || !key) return false;
                 try {
                     this.client = supabase.createClient(url, key);
+                    console.log("Supabase client initialized.");
                     return true;
                 } catch (e) {
                     console.error("Supabase Init Error:", e);
@@ -3000,135 +3004,179 @@
                 }
             },
 
-            async fetchAllRows(tableName, selectQuery = "*", orderBy = "id") {
+            // Safe fetcher that won't crash the app if a table is missing
+            async fetchTableSafe(tableName) {
                 if (!this.client) return [];
-                let allRecords = [];
-                let page = 0;
-                const pageSize = 1000;
-                let hasMore = true;
+                try {
+                    let allRecords = [];
+                    let page = 0;
+                    const pageSize = 1000;
+                    let hasMore = true;
 
-                while (hasMore) {
-                    const { data, error } = await this.client
-                        .from(tableName)
-                        .select(selectQuery)
-                        .order(orderBy, { ascending: true })
-                        .range(page * pageSize, (page + 1) * pageSize - 1);
+                    while (hasMore) {
+                        const { data, error } = await this.client
+                            .from(tableName)
+                            .select('*')
+                            .range(page * pageSize, (page + 1) * pageSize - 1);
 
-                    if (error || !data || data.length === 0) {
-                        hasMore = false;
-                        break;
+                        if (error) {
+                            console.warn(`[Supabase] Table '${tableName}' error or not found:`, error.message);
+                            return []; // Graceful fallback
+                        }
+                        if (!data || data.length === 0) {
+                            hasMore = false;
+                            break;
+                        }
+                        allRecords = allRecords.concat(data);
+                        if (data.length < pageSize) {
+                            hasMore = false;
+                        } else {
+                            page++;
+                        }
                     }
-                    
-                    allRecords = allRecords.concat(data);
-                    
-                    if (data.length < pageSize) {
-                        hasMore = false;
-                    } else {
-                        page++;
-                    }
+                    console.log(`[Supabase] Fetched ${allRecords.length} rows from '${tableName}'.`);
+                    return allRecords;
+                } catch (e) {
+                    console.warn(`[Supabase] Exception fetching '${tableName}':`, e);
+                    return [];
                 }
-                return allRecords;
             },
 
             async syncMasterData() {
                 if (!this.client) return false;
                 
                 try {
-                    const [rawCats, rawUnits, rawAccounts, rawProducts, rawSells, rawPurchases] = await Promise.all([
-                        this.fetchAllRows("categories", "id, title", "id"),
-                        this.fetchAllRows("units", "*", "id"),
-                        this.fetchAllRows("account_masters", "*", "id"),
-                        this.fetchAllRows("products", "*", "id"),
-                        this.fetchAllRows("sells", "*", "id"),
-                        this.fetchAllRows("purchases", "*", "id")
-                    ]);
+                    // Fetch tables individually. If one fails, the others still succeed.
+                    const rawCats = await this.fetchTableSafe("categories");
+                    const rawUnits = await this.fetchTableSafe("units");
+                    const rawAccounts = await this.fetchTableSafe("account_masters");
+                    const rawProducts = await this.fetchTableSafe("products");
+                    const rawCustomers = await this.fetchTableSafe("customers");
+                    const rawSuppliers = await this.fetchTableSafe("suppliers");
+                    const rawSells = await this.fetchTableSafe("sells");
+                    const rawPurchases = await this.fetchTableSafe("purchases");
 
-                    this.cache.categories.clear();
-                    rawCats.forEach(c => this.cache.categories.set(c.id, c.title || c.name || `Cat-${c.id}`));
+                    // 1. Map Categories
+                    if (rawCats.length > 0) {
+                        this.cache.categories.clear();
+                        POSDataStore.categories = [];
+                        rawCats.forEach(c => {
+                            const name = c.category_name || c.name || c.title || `Cat-${c.id}`;
+                            this.cache.categories.set(c.id, name);
+                            POSDataStore.categories.push({ id: c.id, name: name });
+                        });
+                    }
 
-                    this.cache.units.clear();
-                    rawUnits.forEach(u => this.cache.units.set(u.id, u.unit_name || u.title || `Unit-${u.id}`));
+                    // 2. Map Units
+                    if (rawUnits.length > 0) {
+                        this.cache.units.clear();
+                        POSDataStore.units = [];
+                        rawUnits.forEach(u => {
+                            const name = u.unit_name || u.name || u.title || `Unit-${u.id}`;
+                            this.cache.units.set(u.id, name);
+                            POSDataStore.units.push({ id: u.id, name: name });
+                        });
+                    }
 
-                    this.cache.customers = [];
-                    this.cache.suppliers = [];
-                    this.cache.accounts = [];
+                    // 3. Map Explicit Customers Table
+                    if (rawCustomers.length > 0) {
+                        POSDataStore.customers = rawCustomers.map(c => ({
+                            id: c.id,
+                            code: c.customer_code || c.code || `C-${c.id}`,
+                            name: c.customer_name || c.name || c.title || 'Unnamed',
+                            phone: c.phone || c.contact || c.phone_no || '-',
+                            address: c.address || '-',
+                            points: c.loyalty_points || c.points || 0,
+                            balance: parseFloat(c.closing_balance || c.balance || c.op_balance_dr || 0)
+                        }));
+                    }
 
-                    rawAccounts.forEach(acc => {
-                        const item = {
-                            id: acc.id,
-                            code: acc.account_code || `A-${acc.id}`,
-                            name: acc.account_title || acc.account_name || 'Unnamed',
-                            title: acc.account_title || acc.account_name || 'Unnamed',
-                            phone: acc.contact_no || acc.phone_no || '-',
-                            address: acc.address || '-',
-                            email: acc.email || '-',
-                            group: acc.account_group_id,
-                            points: acc.loyalty_point || 0,
-                            balance: parseFloat(acc.closing_balance || acc.op_balance_dr || 0)
-                        };
-
-                        if (acc.account_group_id === 4 || acc.type === 1) {
-                            this.cache.customers.push(item);
-                        } else if (acc.account_group_id === 3 || acc.type === 2) {
-                            this.cache.suppliers.push(item);
-                        } else {
-                            this.cache.accounts.push({ ...item, type: acc.account_group_id === 5 ? 'Asset' : 'Liability' });
-                        }
-                    });
-
-                    this.cache.products = rawProducts.map(p => {
-                        const purPrice = parseFloat(p.purchase_price || p.cost_price || p.pur_price || 0);
-                        const stockQty = parseInt(p.stock || p.quantity || 0);
-                        return {
-                            id: p.id,
-                            sku: p.sku || `SKU-${p.id}`,
-                            title: p.title || p.product_name || p.item_name || 'Unnamed Product',
-                            category: this.cache.categories.get(p.category_id) || 'Uncategorized',
-                            unit: this.cache.units.get(p.unit_id) || 'Piece',
-                            purPrice: purPrice,
-                            sellPrice: parseFloat(p.sell_price || p.sale_price || 0),
-                            openingStock: 0,
-                            stock: stockQty,
-                            computedValue: purPrice * (stockQty > 0 ? stockQty : 0)
-                        };
-                    });
-
-                    let totSales = 0;
-                    this.cache.sales = rawSells.map(s => {
-                        const cust = this.cache.customers.find(c => c.id === s.customer_id);
-                        const total = parseFloat(s.grand_total || s.total_amount || 0);
-                        const paid = parseFloat(s.paid_amount || 0);
-                        const due = parseFloat(s.due_amount || 0);
-                        totSales += total;
-                        return {
+                    // 4. Map Explicit Suppliers Table
+                    if (rawSuppliers.length > 0) {
+                        POSDataStore.suppliers = rawSuppliers.map(s => ({
                             id: s.id,
-                            txnId: s.invoice_id || s.invoice_no || `INV-${s.id}`,
-                            date: s.created_at ? s.created_at.split('T')[0] : today(),
-                            customer: cust ? cust.name : 'Walk-in Client',
-                            total: total,
-                            paid: paid,
-                            due: due,
-                            status: due <= 0 ? 'Paid' : (paid > 0 ? 'Partial' : 'Due'),
-                            items: []
-                        };
-                    });
+                            code: s.supplier_code || s.code || `S-${s.id}`,
+                            name: s.supplier_name || s.company_name || s.name || 'Unnamed',
+                            phone: s.phone || s.contact || s.phone_no || '-',
+                            email: s.email || '-',
+                            address: s.address || '-',
+                            balance: parseFloat(s.closing_balance || s.balance || s.op_balance_dr || 0)
+                        }));
+                    }
 
+                    // 5. Map Account Masters (Chart of Accounts)
+                    if (rawAccounts.length > 0) {
+                        POSDataStore.accounts = rawAccounts.map(a => ({
+                            id: a.id,
+                            code: a.account_code || `A-${a.id}`,
+                            title: a.account_title || a.account_name || a.name || 'Unnamed',
+                            phone: a.contact_no || a.phone_no || '-',
+                            address: a.address || '-',
+                            group: a.account_group_id || 'General',
+                            type: a.type === 1 ? 'Asset' : 'Liability',
+                            balance: parseFloat(a.closing_balance || a.op_balance_dr || 0)
+                        }));
+                    }
+
+                    // 6. Map Products (Highly fault tolerant column checks)
+                    if (rawProducts.length > 0) {
+                        POSDataStore.products = rawProducts.map(p => {
+                            const purPrice = parseFloat(p.purchase_price || p.cost_price || p.pur_price || p.cost || 0);
+                            const sellPrice = parseFloat(p.sell_price || p.sale_price || p.price || 0);
+                            const stockQty = parseInt(p.stock || p.quantity || p.qty || 0);
+                            return {
+                                id: p.id,
+                                sku: p.sku || p.product_code || p.barcode || `SKU-${p.id}`,
+                                title: p.title || p.product_name || p.name || p.item_name || 'Unnamed',
+                                category: this.cache.categories.get(p.category_id) || p.category || 'Uncategorized',
+                                unit: this.cache.units.get(p.unit_id) || p.unit || 'Piece',
+                                purPrice: purPrice,
+                                sellPrice: sellPrice,
+                                stock: stockQty,
+                                computedValue: purPrice * (stockQty > 0 ? stockQty : 0)
+                            };
+                        });
+                    }
+
+                    // 7. Map Sales / Sells
+                    let totSales = 0;
+                    if (rawSells.length > 0) {
+                        POSDataStore.sales = rawSells.map(s => {
+                            const total = parseFloat(s.grand_total || s.total_amount || s.total || 0);
+                            const paid = parseFloat(s.paid_amount || s.paid || 0);
+                            const due = parseFloat(s.due_amount || s.due || 0);
+                            totSales += total;
+                            return {
+                                id: s.id,
+                                txnId: s.invoice_id || s.invoice_no || s.reference_no || `INV-${s.id}`,
+                                date: s.date || (s.created_at ? s.created_at.split('T')[0] : today()),
+                                customer: s.customer_name || 'Walk-in Client',
+                                total: total,
+                                paid: paid,
+                                due: due,
+                                status: due <= 0 ? 'Paid' : (paid > 0 ? 'Partial' : 'Due'),
+                                items: []
+                            };
+                        });
+                    }
+
+                    // 8. Map Purchases
                     let totPur = 0;
-                    this.cache.purchases = rawPurchases.map(p => {
-                        const sup = this.cache.suppliers.find(s => s.id === p.supplier_id);
-                        const total = parseFloat(p.grand_total || p.total_amount || 0);
-                        totPur += total;
-                        return {
-                            id: p.id,
-                            invoice: p.invoice_no || p.bill_no || `PUR-${p.id}`,
-                            date: p.created_at ? p.created_at.split('T')[0] : today(),
-                            supplier: sup ? sup.name : 'Unknown Supplier',
-                            total: total,
-                            paid: parseFloat(p.paid_amount || 0),
-                            due: parseFloat(p.due_amount || 0),
-                            other: 0
-                        };
-                    });
+                    if (rawPurchases.length > 0) {
+                        POSDataStore.purchases = rawPurchases.map(p => {
+                            const total = parseFloat(p.grand_total || p.total_amount || p.total || 0);
+                            totPur += total;
+                            return {
+                                id: p.id,
+                                invoice: p.invoice_no || p.bill_no || p.reference_no || `PUR-${p.id}`,
+                                date: p.date || (p.created_at ? p.created_at.split('T')[0] : today()),
+                                supplier: p.supplier_name || 'Unknown Supplier',
+                                total: total,
+                                paid: parseFloat(p.paid_amount || p.paid || 0),
+                                due: parseFloat(p.due_amount || p.due || 0)
+                            };
+                        });
+                    }
 
                     POSDataStore.dashboardMetrics.totalSales = totSales;
                     POSDataStore.dashboardMetrics.monthSales = totSales; 
@@ -3137,7 +3185,7 @@
 
                     return true;
                 } catch (e) {
-                    console.error("Master Sync Error:", e);
+                    console.error("Master Sync Exception:", e);
                     return false;
                 }
             }
@@ -3147,25 +3195,24 @@
         // 3. INITIALIZATION
         // -------------------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', async () => {
-            const savedUrl = localStorage.getItem('pos360_supabase_url') || document.getElementById('s-supabase-url')?.value;
-            const savedKey = localStorage.getItem('pos360_supabase_key') || document.getElementById('s-supabase-key')?.value;
+            
+            // Hardcode your URL and Key here if you don't want to type them in the UI every time:
+            const HARDCODED_URL = 'https://akfhhyljhjaotxbbpljh.supabase.co'; 
+            const HARDCODED_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZmhoeWxqaGphb3R4YmJwbGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NzIyMTUsImV4cCI6MjEwMjQ0ODIxNX0.hZ_Bx6Xw6Lxf9pRlNfYyqcZLezdkyYn_Z0ux58sJNfk';
+
+            const savedUrl = HARDCODED_URL || localStorage.getItem('pos360_supabase_url') || document.getElementById('s-supabase-url')?.value;
+            const savedKey = HARDCODED_KEY || localStorage.getItem('pos360_supabase_key') || document.getElementById('s-supabase-key')?.value;
 
             if (savedUrl && savedKey) {
-                showToast('Connecting to Supabase...', 'info');
+                showToast('Connecting to Database...', 'info');
                 const isConnected = SupabaseService.init(savedUrl, savedKey);
                 
                 if (isConnected) {
                     const isSynced = await SupabaseService.syncMasterData();
                     if (isSynced) {
-                        POSDataStore.products = SupabaseService.cache.products;
-                        POSDataStore.customers = SupabaseService.cache.customers;
-                        POSDataStore.suppliers = SupabaseService.cache.suppliers;
-                        POSDataStore.accounts = SupabaseService.cache.accounts;
-                        POSDataStore.sales = SupabaseService.cache.sales;
-                        POSDataStore.purchases = SupabaseService.cache.purchases;
-                        POSDataStore.categories = Array.from(SupabaseService.cache.categories, ([id, name]) => ({ id, name }));
-                        POSDataStore.units = Array.from(SupabaseService.cache.units, ([id, name]) => ({ id, name }));
                         showToast('Live database records synchronized!', 'success');
+                    } else {
+                        showToast('Connected, but could not map tables.', 'warning');
                     }
                 }
             }

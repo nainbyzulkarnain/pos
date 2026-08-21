@@ -1267,10 +1267,110 @@ let nextPurchaseId = 4;
 let csvImportBuffer = [];
 
 // ============================
+// SUPABASE INTEGRATION
+// ============================
+let supabaseClient = null;
+
+function initSupabase() {
+  const url = localStorage.getItem('supabaseUrl') || document.getElementById('s-supabase-url')?.value;
+  const key = localStorage.getItem('supabaseKey') || document.getElementById('s-supabase-key')?.value;
+  
+  if (url && key) {
+    supabaseClient = supabase.createClient(url, key);
+    return true;
+  }
+  return false;
+}
+
+async function fetchLiveData() {
+  if (!initSupabase()) return;
+
+  showToast('Syncing with live database...', 'info');
+
+  // We fetch each table individually so one failure doesn't break the whole app
+  const { data: prods } = await supabaseClient.from('products').select('*');
+  if (prods) {
+    POSDataStore.products = prods.map(p => ({
+      id: p.id, sku: p.sku || '', title: p.title || '', category: p.category || '', 
+      unit: p.unit || '', purPrice: parseFloat(p.pur_price || 0), 
+      sellPrice: parseFloat(p.sell_price || 0), stock: parseInt(p.stock || 0)
+    }));
+  }
+
+  const { data: cats } = await supabaseClient.from('categories').select('*');
+  if (cats) POSDataStore.categories = cats.map(c => ({ id: c.id, name: c.name || c.category_name || '' }));
+
+  const { data: custs } = await supabaseClient.from('customers').select('*');
+  if (custs) POSDataStore.customers = custs.map(c => ({
+    id: c.id, code: c.code || '', name: c.name || c.customer_name || '', 
+    phone: c.phone || '', address: c.address || '', balance: parseFloat(c.balance || 0)
+  }));
+
+  const { data: supps } = await supabaseClient.from('suppliers').select('*');
+  if (supps) POSDataStore.suppliers = supps.map(s => ({
+    id: s.id, code: s.code || '', name: s.name || s.supplier_name || '', 
+    phone: s.phone || '', email: s.email || '', balance: parseFloat(s.balance || 0)
+  }));
+
+  const { data: sales } = await supabaseClient.from('sales').select('*');
+  if (sales) POSDataStore.sales = sales.map(s => ({
+    id: s.id, txnId: s.txn_id || '', date: s.date || '', customer: s.customer || 'Walk-in',
+    items: [], subtotal: parseFloat(s.total || 0), discount: 0, 
+    total: parseFloat(s.total || 0), paid: parseFloat(s.paid || 0), 
+    due: parseFloat(s.due || 0), status: parseFloat(s.due || 0) > 0 ? 'Due' : 'Paid'
+  }));
+
+  const { data: accs } = await supabaseClient.from('accounts').select('*');
+  if (accs) POSDataStore.accounts = accs.map(a => ({
+    id: a.id, code: a.code || '', title: a.title || '', 
+    group: a.group || '', type: a.type || '', balance: parseFloat(a.balance || 0)
+  }));
+
+  const { data: adjs } = await supabaseClient.from('adjustments').select('*');
+  if (adjs) POSDataStore.adjustments = adjs.map(a => ({
+    date: a.date || '', ref: a.ref || '', type: a.type || '', 
+    product: a.product || '', qty: parseInt(a.qty || 0), reason: a.reason || ''
+  }));
+
+  // --- DYNAMIC DASHBOARD METRICS ---
+  // Recalculate the top bar cards based on the real data we just downloaded
+  let tSales = 0, mSales = 0, tPur = 0, mPur = 0;
+  const currentMonth = new Date().toISOString().slice(0, 7); // Gets "YYYY-MM"
+  
+  POSDataStore.sales.forEach(s => {
+      tSales += s.total;
+      if (s.date && s.date.startsWith(currentMonth)) mSales += s.total;
+  });
+  
+  POSDataStore.purchases.forEach(p => {
+      tPur += p.total;
+      if (p.date && p.date.startsWith(currentMonth)) mPur += p.total;
+  });
+
+  POSDataStore.dashboardMetrics = {
+      monthSales: mSales,
+      totalSales: tSales,
+      monthPurchase: mPur,
+      totalPurchase: tPur
+  };
+
+  showToast('Live data synced successfully!', 'success');
+}
+// ============================
 // INIT
 // ============================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initSidebar();
+  
+  // Load saved Supabase credentials into the settings inputs
+  const savedUrl = localStorage.getItem('supabaseUrl');
+  const savedKey = localStorage.getItem('supabaseKey');
+  if (savedUrl) document.getElementById('s-supabase-url').value = savedUrl;
+  if (savedKey) document.getElementById('s-supabase-key').value = savedKey;
+
+  // Wait for Supabase to pull live data BEFORE building the UI
+  await fetchLiveData();
+
   initDropdowns();
   populateAllTables();
   switchView('dashboard-overview');
@@ -1822,28 +1922,67 @@ function setExactPay(){
 }
 function setQuickPay(v){const el=document.getElementById('pos-paid-amount');if(el){el.value=v;calculatePOSTotals();}}
 
-function savePOSSale(){
+async function savePOSSale(){
   if(!posCart.length){showToast('Cart is empty','warning');return;}
-  const customer=document.getElementById('pos-customer')?.value||'Walk-in Client';
-  const date=document.getElementById('pos-date')?.value||today();
-  const txnId=document.getElementById('pos-txn-no')?.value||'INV-'+Date.now();
-  const subtotal=posCart.reduce((a,i)=>a+(i.price*i.qty)-i.disc,0);
-  const gDisc=parseFloat(document.getElementById('pos-global-discount')?.value)||0;
-  const total=Math.max(0,subtotal-gDisc);
-  const paid=Math.min(parseFloat(document.getElementById('pos-paid-amount')?.value)||0,total);
-  const due=total-paid;
-  const status=due<=0?'Paid':paid>0?'Partial':'Due';
-  // Deduct stock
-  posCart.forEach(item=>{const p=POSDataStore.products.find(x=>x.id===item.id);if(p)p.stock-=item.qty;});
-  // Save sale
-  const sale={id:nextSaleId++,txnId,date,customer,items:[...posCart.map(i=>({title:i.title,qty:i.qty,price:i.price,disc:i.disc}))],subtotal,discount:gDisc,total,paid,due,status};
+  
+  // Disable button to prevent double-clicks
+  const btn = event?.currentTarget;
+  if(btn) { btn.disabled = true; btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Saving...'; }
+
+  const customer = document.getElementById('pos-customer')?.value || 'Walk-in Client';
+  const date = document.getElementById('pos-date')?.value || today();
+  const txnId = document.getElementById('pos-txn-no')?.value || 'INV-' + Date.now();
+  
+  const subtotal = posCart.reduce((a,i) => a + (i.price * i.qty) - i.disc, 0);
+  const gDisc = parseFloat(document.getElementById('pos-global-discount')?.value) || 0;
+  const total = Math.max(0, subtotal - gDisc);
+  const paid = Math.min(parseFloat(document.getElementById('pos-paid-amount')?.value) || 0, total);
+  const due = total - paid;
+  const status = due <= 0 ? 'Paid' : paid > 0 ? 'Partial' : 'Due';
+
+  // 1. Prepare data for Supabase
+  const newSaleRecord = {
+    txn_id: txnId,
+    date: date,
+    customer: customer,
+    total: total,
+    paid: paid,
+    due: due
+  };
+
+  // 2. Push to Supabase Cloud
+  if (supabaseClient) {
+    const { error } = await supabaseClient.from('sales').insert([newSaleRecord]);
+    
+    if (error) {
+      console.error("Supabase Insert Error:", error);
+      showToast('Failed to save to cloud: ' + error.message, 'error');
+      if(btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-check-circle"></i> Save & Print Invoice'; }
+      return; // Stop execution if cloud save fails
+    }
+  } else {
+    showToast('Offline Mode: Sale saved locally only.', 'warning');
+  }
+
+  // 3. Deduct stock locally & Update UI instantly
+  posCart.forEach(item => {
+    const p = POSDataStore.products.find(x => x.id === item.id);
+    if(p) p.stock -= item.qty;
+  });
+
+  const sale = { id: nextSaleId++, txnId, date, customer, items: [...posCart.map(i => ({title: i.title, qty: i.qty, price: i.price, disc: i.disc}))], subtotal, discount: gDisc, total, paid, due, status };
+  
   POSDataStore.sales.unshift(sale);
-  // Update metrics
-  POSDataStore.dashboardMetrics.totalSales+=total;POSDataStore.dashboardMetrics.monthSales+=total;
-  // Audit log
-  POSDataStore.auditLog.unshift({ts:date+' '+new Date().toLocaleTimeString(),user:'Hassnain',action:'SALE',module:'POS Invoice',details:txnId+' — '+fmtMoney(total)});
-  renderSalesListTable();updateTodayStats();
-  showToast('Invoice saved — '+txnId,'success');
+  POSDataStore.dashboardMetrics.totalSales += total;
+  POSDataStore.dashboardMetrics.monthSales += total;
+  POSDataStore.auditLog.unshift({ts: date + ' ' + new Date().toLocaleTimeString(), user: 'Hassnain', action: 'SALE', module: 'POS Invoice', details: txnId + ' — ' + fmtMoney(total)});
+  
+  renderSalesListTable();
+  updateTodayStats();
+  
+  if(btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-check-circle"></i> Save & Print Invoice'; }
+  
+  showToast('Invoice saved — ' + txnId, 'success');
   buildAndShowReceipt(sale);
   clearPOSCart();
 }
@@ -2458,7 +2597,7 @@ function handleSupplierSave(e){
   renderSuppliersTable();refreshSupplierDropdowns();closeModal();showToast('Supplier added — '+name);
 }
 
-function handleCreateProduct(e){
+async function handleCreateProduct(e){
   e.preventDefault();
   const title=document.getElementById('prod-title')?.value?.trim();
   const sku=document.getElementById('prod-barcode')?.value?.trim();
@@ -2467,10 +2606,56 @@ function handleCreateProduct(e){
   const purPrice=parseFloat(document.getElementById('prod-pur-price')?.value)||0;
   const sellPrice=parseFloat(document.getElementById('prod-sell-price')?.value)||0;
   const stock=parseInt(document.getElementById('prod-stock')?.value)||0;
+  
   if(!title||!sku||!category||!unit){showToast('Fill all required fields','warning');return;}
-  const id=Math.max(...POSDataStore.products.map(p=>p.id))+1;
-  POSDataStore.products.push({id,sku,title,category,unit,purPrice,sellPrice,stock});
-  renderProductsList();e.target.reset();showToast('Product registered — '+title);
+  
+  // Disable button to prevent double-submissions
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn ? submitBtn.innerHTML : '';
+  if(submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Saving...'; }
+
+  // 1. Prepare data mapping for Supabase (snake_case columns)
+  const newProductRecord = {
+    sku: sku,
+    title: title,
+    category: category,
+    unit: unit,
+    pur_price: purPrice,
+    sell_price: sellPrice,
+    stock: stock
+  };
+
+  // 2. Push to Supabase Cloud
+  if (supabaseClient) {
+    // We use .select() to get the row back so we have the official Database ID
+    const { data, error } = await supabaseClient.from('products').insert([newProductRecord]).select();
+    
+    if (error) {
+      console.error("Supabase Insert Error:", error);
+      showToast('Failed to save to cloud: ' + error.message, 'error');
+      if(submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalText; }
+      return; // Stop execution if cloud save fails
+    }
+    
+    // 3. Save to local UI memory using the official cloud ID
+    if (data && data.length > 0) {
+       const dbRecord = data[0];
+       POSDataStore.products.push({
+         id: dbRecord.id, sku, title, category, unit, purPrice, sellPrice, stock
+       });
+    }
+  } else {
+    // Fallback for offline mode
+    const id = Math.max(0, ...POSDataStore.products.map(p=>p.id)) + 1;
+    POSDataStore.products.push({id, sku, title, category, unit, purPrice, sellPrice, stock});
+    showToast('Offline Mode: Product saved locally only.', 'warning');
+  }
+
+  // Update UI
+  renderProductsList();
+  e.target.reset();
+  if(submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalText; }
+  showToast('Product registered — ' + title, 'success');
 }
 
 function handleCreateAccount(e){
@@ -2575,11 +2760,24 @@ function renderAuditLog(){
 
 function saveSettings(e){
   e.preventDefault();
-  AppState.settings.bizName=document.getElementById('s-biz-name')?.value||'POS360 Luxury Outlet';
-  AppState.settings.currency=document.getElementById('s-currency')?.value||'Rs.';
-  AppState.settings.address=document.getElementById('s-address')?.value||'';
-  AppState.settings.phone=document.getElementById('s-phone')?.value||'';
-  showToast('Settings saved');
+  AppState.settings.bizName = document.getElementById('s-biz-name')?.value || 'POS360 Luxury Outlet';
+  AppState.settings.currency = document.getElementById('s-currency')?.value || 'Rs.';
+  AppState.settings.address = document.getElementById('s-address')?.value || '';
+  AppState.settings.phone = document.getElementById('s-phone')?.value || '';
+  
+  // Save Supabase credentials
+  const url = document.getElementById('s-supabase-url')?.value;
+  const key = document.getElementById('s-supabase-key')?.value;
+  if(url) localStorage.setItem('supabaseUrl', url);
+  if(key) localStorage.setItem('supabaseKey', key);
+  
+  showToast('Settings saved. Refreshing data...');
+  
+  // Trigger a fresh data pull with the new credentials
+  fetchLiveData().then(() => {
+    populateAllTables();
+    renderDashboard();
+  });
 }
 
 function testSupabaseConnection(){

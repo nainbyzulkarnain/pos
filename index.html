@@ -1286,16 +1286,84 @@ async function fetchLiveData() {
   if (!initSupabase()) return;
 
   showToast('Syncing with live database...', 'info');
+  let errLogs = []; // Array to catch hidden database errors
 
-  // We fetch each table individually so one failure doesn't break the whole app
-  const { data: prods } = await supabaseClient.from('products').select('*');
-  if (prods) {
-    POSDataStore.products = prods.map(p => ({
-      id: p.id, sku: p.sku || '', title: p.title || '', category: p.category || '', 
-      unit: p.unit || '', purPrice: parseFloat(p.pur_price || 0), 
-      sellPrice: parseFloat(p.sell_price || 0), stock: parseInt(p.stock || 0)
-    }));
+  // 1. Fetch Products
+  const { data: prods, error: err1 } = await supabaseClient.from('products').select('*');
+  if (err1) errLogs.push(`Products: ${err1.message}`);
+  else if (prods) POSDataStore.products = prods.map(p => ({
+    id: p.id, sku: p.sku || '', title: p.title || '', category: p.category || '', 
+    unit: p.unit || '', purPrice: parseFloat(p.pur_price || 0), 
+    sellPrice: parseFloat(p.sell_price || 0), stock: parseInt(p.stock || 0)
+  }));
+
+  // 2. Fetch Categories
+  const { data: cats, error: err2 } = await supabaseClient.from('categories').select('*');
+  if (err2) errLogs.push(`Categories: ${err2.message}`);
+  else if (cats) POSDataStore.categories = cats.map(c => ({ id: c.id, name: c.name || c.category_name || '' }));
+
+  // 3. Fetch Customers
+  const { data: custs, error: err3 } = await supabaseClient.from('customers').select('*');
+  if (err3) errLogs.push(`Customers: ${err3.message}`);
+  else if (custs) POSDataStore.customers = custs.map(c => ({
+    id: c.id, code: c.code || '', name: c.name || c.customer_name || '', 
+    phone: c.phone || '', address: c.address || '', balance: parseFloat(c.balance || 0)
+  }));
+
+  // 4. Fetch Suppliers
+  const { data: supps, error: err4 } = await supabaseClient.from('suppliers').select('*');
+  if (err4) errLogs.push(`Suppliers: ${err4.message}`);
+  else if (supps) POSDataStore.suppliers = supps.map(s => ({
+    id: s.id, code: s.code || '', name: s.name || s.supplier_name || '', 
+    phone: s.phone || '', email: s.email || '', balance: parseFloat(s.balance || 0)
+  }));
+
+  // 5. Fetch Sales
+  const { data: sales, error: err5 } = await supabaseClient.from('sales').select('*');
+  if (err5) errLogs.push(`Sales: ${err5.message}`);
+  else if (sales) POSDataStore.sales = sales.map(s => ({
+    id: s.id, txnId: s.txn_id || '', date: s.date || '', customer: s.customer || 'Walk-in',
+    items: [], subtotal: parseFloat(s.total || 0), discount: 0, 
+    total: parseFloat(s.total || 0), paid: parseFloat(s.paid || 0), 
+    due: parseFloat(s.due || 0), status: parseFloat(s.due || 0) > 0 ? 'Due' : 'Paid'
+  }));
+
+  // 6. Fetch Accounts
+  const { data: accs, error: err6 } = await supabaseClient.from('accounts').select('*');
+  if (err6) errLogs.push(`Accounts: ${err6.message}`);
+  else if (accs) POSDataStore.accounts = accs.map(a => ({
+    id: a.id, code: a.code || '', title: a.title || '', 
+    group: a.group || '', type: a.type || '', balance: parseFloat(a.balance || 0)
+  }));
+
+  // 7. Fetch Adjustments
+  const { data: adjs, error: err7 } = await supabaseClient.from('adjustments').select('*');
+  if (err7) errLogs.push(`Adjustments: ${err7.message}`);
+  else if (adjs) POSDataStore.adjustments = adjs.map(a => ({
+    date: a.date || '', ref: a.ref || '', type: a.type || '', 
+    product: a.product || '', qty: parseInt(a.qty || 0), reason: a.reason || ''
+  }));
+
+  // --- DYNAMIC DASHBOARD METRICS ---
+  let tSales = 0, mSales = 0, tPur = 0, mPur = 0;
+  const currentMonth = new Date().toISOString().slice(0, 7); 
+  POSDataStore.sales.forEach(s => { tSales += s.total; if (s.date && s.date.startsWith(currentMonth)) mSales += s.total; });
+  POSDataStore.purchases.forEach(p => { tPur += p.total; if (p.date && p.date.startsWith(currentMonth)) mPur += p.total; });
+  POSDataStore.dashboardMetrics = { monthSales: mSales, totalSales: tSales, monthPurchase: mPur, totalPurchase: tPur };
+
+  // Trigger error alert if Supabase blocked the connection
+  if (errLogs.length > 0) {
+    Swal.fire({
+      title: 'Database Sync Blocked',
+      html: `<div style="text-align:left;font-size:0.85rem;color:#EF233C;">Supabase rejected the read requests:<br><br>${errLogs.join('<br>')}</div><br><p style="font-size:0.9rem;">To fix this, disable RLS in Supabase or add public policies.</p>`,
+      icon: 'error',
+      background: '#1C2B4B',
+      color: '#fff'
+    });
+  } else {
+    showToast('Live data synced successfully!', 'success');
   }
+}
 
   const { data: cats } = await supabaseClient.from('categories').select('*');
   if (cats) POSDataStore.categories = cats.map(c => ({ id: c.id, name: c.name || c.category_name || '' }));
